@@ -1,0 +1,21 @@
+{% load staticfiles %}
+
+<!DOCTYPE html>
+<head>
+	<meta charset="utf-8">
+	<meta name="author" content="hyjang@cisco.com">
+	<title>DjangoTest</title>
+</head>
+
+<body>
+	<form method="post" action="/account/login">
+		<label>Username</label>
+		<input type="text" name="username" autocomplete="off" />
+		<label>Password</label>
+		<input type="password" name="password" autocomplete="off" />
+		<input type="submit" value="LOGIN"/>
+		<input type="hidden" name="next" value="/" />
+	</form>
+</body>
+
+</html>
