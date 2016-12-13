@@ -54,10 +54,9 @@ Create database & auth
 #### 1.1.5. Initial Setting
 
 Using Environments
-* {ARCHON_ROOT} : Webkit Package Root
+* {ARCHON_ROOT} : Archon Package Root
 
 Edit {ARCHON_ROOT}/application/__init__.py
-
 
 	DATABASE_AUTH = {
 		'USER': '{ADMIN_NAME}',
