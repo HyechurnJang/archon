@@ -16,7 +16,17 @@ class Manager:
     def instance(cls, *argv, **kargs):
         if cls.__MANAGER__ == None: cls.__MANAGER__ = cls(*argv, **kargs)
         return cls.__MANAGER__
-
+    
+class View:
+    
+    @classmethod
+    def Error(cls, title, msg):
+        return {'menu' : DIV(), 'page' : Alert(title, msg, **{'class' : 'alert-danger'})}
+    
+    def __init__(self):
+        self.Menu = DIV()
+        self.Page = DIV()
+    
 def pageview(manager_class):
     
     manager = manager_class.instance()
@@ -43,12 +53,12 @@ def pageview(manager_class):
                 else:
                     query = {}
                     data = {}
-            except Exception as e: return JsonResponse({'menu' : DIV(), 'page' : Alert(u'요청 에러', str(e), **{'class' : 'alert-danger'})})
+            except Exception as e: return JsonResponse(View.Error(u'요청 에러', str(e)))
             try:
-                menu = Menu() 
-                page = view(manager, request, method, path, query, data, menu)
-            except Exception as e: return JsonResponse({'menu' : DIV(), 'page' : Alert(u'서버 에러', str(e), **{'class' : 'alert-danger'})})
-            if isinstance(page, dict): return JsonResponse({'menu' : menu, 'page' : page})
-            else: return JsonResponse({'menu' : menu, 'page' : DIV().html(page)})
+                v = View() 
+                view(request, method, path, query, data, manager, v)
+                v = {'menu' : v.Menu, 'page' : v.Page}
+            except Exception as e: return JsonResponse(View.Error(u'서버 에러', str(e)))
+            return JsonResponse(v)
         return decofunc
     return wrapper

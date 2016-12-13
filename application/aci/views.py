@@ -1,18 +1,15 @@
 # -*- coding: utf-8 -*-
 
-import json
 import re
 
-from archon import pageview
-from archon.view import *
-from manager import ACIManager
+from archon import *
+
+from archon.manager.aci import ACIManager
 
 # Create your views here.
 
 @pageview(ACIManager)
-def device(manager, request, method, path, query, data, menu):
-    
-    layout = DIV()
+def device(request, method, path, query, data, manager, view):
     
     if len(path) > 3:
         domain_name = path[3]
@@ -21,7 +18,7 @@ def device(manager, request, method, path, query, data, menu):
         node_data = manager[domain_name](dn, detail=True)
         children = node_data.children(detail=True)
         
-        layout.html(HEADER(1).html(node_data['name']))
+        view.Page.html(HEAD(1).html(node_data['name']))
         
         lo_detail = DIV(**{'style' : 'padding:0px 0px 0px 40px;'})
         for key in node_data: lo_detail.html(KeyVal(key, node_data[key]))
@@ -29,23 +26,23 @@ def device(manager, request, method, path, query, data, menu):
         if hasattr(node_data, 'System'):
             lo_system = DIV(**{'style' : 'padding:0px 0px 0px 40px;'})
             for key in node_data.System: lo_system.html(KeyVal(key, node_data.System[key]))
-            layout.html(Col(6).html(HEADER(3).html('Details')).html(lo_detail))
-            layout.html(Col(6).html(HEADER(3).html('System')).html(lo_system))
+            view.Page.html(COL(6).html(HEAD(3).html('Details')).html(lo_detail))
+            view.Page.html(COL(6).html(HEAD(3).html('System')).html(lo_system))
         else:
-            layout.html(Col(12).html(HEADER(3).html('Details')).html(lo_detail))
+            view.Page.html(COL(12).html(HEAD(3).html('Details')).html(lo_detail))
         
         lo_child = DIV(**{'style' : 'padding:0px 0px 0px 40px;'})
-        layout.html(Col(12).html(HEADER(3).html('Child Objects')).html(lo_child))
+        view.Page.html(COL(12).html(HEAD(3).html('Child Objects')).html(lo_child))
         for child in children:
             key = child.keys(); val = []; hkey = []
             for k in key: val.append(child[k])
             for k in key: hkey.append('+' + k)
             lo_child.html(FooTable('Class Name', *hkey).record(child.class_name, *val))
+        
+        return
             
-        return layout
     
     node_data = manager.Node.list(detail=True)
-    node_health = manager.Node.health()
     cfrm_data = manager.Class('firmwareCtrlrRunning').list(detail=True)
     sfrm_data = manager.Class('firmwareRunning').list(detail=True)
     tsys_data = manager.System.list(detail=True)
@@ -111,17 +108,13 @@ def device(manager, request, method, path, query, data, menu):
                                      'Service' if state == 'in-service' else 'Enormal',
                                      uptime[:-4])
                         break
-        layout.html(HEADER(1).html(domain_name + u' 도메인'))
-        layout.html(table)
+        view.Page.html(HEAD(1).html(domain_name + u' 도메인'))
+        view.Page.html(table)
      
-    if layout.isEmpty(): layout.html(Alert(u'알림', u'APIC 연결이 없습니다', **{'class' : 'alert-info'}))
+    if not view.Page: view.Page.html(Alert(u'알림', u'APIC 연결이 없습니다', **{'class' : 'alert-info'}))
      
-    return layout
-
 @pageview(ACIManager)
-def tenant(manager, request, method, path, query, data, menu):
-    
-    layout = DIV()
+def tenant(request, method, path, query, data, manager, view):
     
     if len(path) > 3:
         domain_name = path[3]
@@ -129,15 +122,15 @@ def tenant(manager, request, method, path, query, data, menu):
         
         tenant = manager[domain_name](dn, detail=True)
         
-        layout.html(HEADER(1).html(tenant['name']))
+        view.Page.html(HEAD(1).html(tenant['name']))
         
         lo_detail = DIV(**{'style' : 'padding:0px 0px 0px 40px;'})
-        layout.html(Col(12).html(HEADER(3).html('Details')).html(Col(12).html(lo_detail)))
+        view.Page.html(COL(12).html(HEAD(3).html('Details')).html(COL(12).html(lo_detail)))
         for key in tenant: lo_detail.html(KeyVal(key, tenant[key]))
         
         approf = tenant.AppProfile.list(detail=True)
         lo_ap = DIV(**{'style' : 'padding:0px 0px 0px 40px;'})
-        lo_detail.html(DIV().html(HEADER(4).html('Application Profile')).html(lo_ap))
+        lo_detail.html(DIV().html(HEAD(4).html('Application Profile')).html(lo_ap))
         for ap in approf:
             key = ap.keys(); val = []; hkey = []
             for k in key: val.append(ap[k])
@@ -146,30 +139,14 @@ def tenant(manager, request, method, path, query, data, menu):
             
             epgs = ap.EPG.list(detail=True)
             lo_epg = DIV(**{'style' : 'padding:0px 0px 0px 40px;'})
-            lo_ap.html(DIV().html(HEADER(4).html('EPGs')).html(lo_epg))
+            lo_ap.html(DIV().html(HEAD(4).html('EPGs')).html(lo_epg))
             for epg in epgs:
                 key = epg.keys(); val = []; hkey = []
                 for k in key: val.append(epg[k])
                 for k in key: hkey.append('+' + k if k != 'name' else k)
                 lo_epg.html(FooTable(*hkey).record(*val))
         
-        
-#         lo_bd = DIV(**{'style' : 'padding:0px 0px 0px 40px;'})
-#         layout.html(DIV().html(HEADER(3).html('EPGs')).html(lo_bd))
-#         
-#         lo_ctx = DIV(**{'style' : 'padding:0px 0px 0px 40px;'})
-#         layout.html(DIV().html(HEADER(3).html('EPGs')).html(lo_ctx))
-#         
-#         lo_ctr = DIV(**{'style' : 'padding:0px 0px 0px 40px;'})
-#         layout.html(DIV().html(HEADER(3).html('EPGs')).html(lo_ctr))
-#         
-#         lo_flt = DIV(**{'style' : 'padding:0px 0px 0px 40px;'})
-#         layout.html(DIV().html(HEADER(3).html('EPGs')).html(lo_flt))
-#          
-#         lo_child = DIV(**{'style' : 'padding:0px 0px 0px 40px;'})
-#         layout.html(DIV().html(HEADER(3).html('Child Objects')).html(lo_child))
-        
-        return layout
+        return
         
     tns = manager.Tenant.list()
     epgs = manager.EPG.list()
@@ -216,17 +193,17 @@ def tenant(manager, request, method, path, query, data, menu):
             
             table.record(domain_name, Get(name, '/aci/show/tenant/' + domain_name + '/' + tn['dn']), epg_data, bd_data, ctx_data, ctr_data, flt_data)
     
-    if table.isEmpty():
-        layout.html(Alert(u'알림', u'APIC 연결이 없습니다', **{'class' : 'alert-info'}))
+    if not table:
+        view.Page.html(Alert(u'알림', u'APIC 연결이 없습니다', **{'class' : 'alert-info'}))
     else:
-        layout.html(
+        view.Page.html(
             Panel(**{'class' : 'panel-default'}).Head(
-                Row().html(
-                    Col(3).html(
+                ROW().html(
+                    COL(3).html(
                         Icon('users', **{'class' : 'fa-5x'})
                     )
                 ).html(
-                    Col(9, **{'class' : 'text-right'}).html(
+                    COL(9, **{'class' : 'text-right'}).html(
                         DIV(**{'class' : 'huge-font'}).html(tn_cnt)
                     ).html(
                         DIV().html('Tenants')
@@ -234,51 +211,51 @@ def tenant(manager, request, method, path, query, data, menu):
                 )
             )
         )
-        layout.html(table)
+        view.Page.html(table)
     
-    return layout
+    return
 
 @pageview(ACIManager)
-def epg(manager, request, method, path, query, data, menu):
+def epg(request, method, path, query, data, manager, view):
     return 'Endpoint Group'
 
 @pageview(ACIManager)
-def ep(manager, request, method, path, query, data, menu):
+def ep(request, method, path, query, data, manager, view):
     return 'Endpoint'
 
 @pageview(ACIManager)
-def contract(manager, request, method, path, query, data, menu):
+def contract(request, method, path, query, data, manager, view):
     return 'Contract'
 
 @pageview(ACIManager)
-def external(manager, request, method, path, query, data, menu):
+def external(request, method, path, query, data, manager, view):
     return 'External Network'
 
 @pageview(ACIManager)
-def fault(manager, request, method, path, query, data, menu):
+def fault(request, method, path, query, data, manager, view):
     return 'Fault'
 
 
 @pageview(ACIManager)
-def intf_util(manager, request, method, path, query, data, menu):
+def intf_util(request, method, path, query, data, manager, view):
     return 'Interface Utilization'
 
 @pageview(ACIManager)
-def epg_util(manager, request, method, path, query, data, menu):
+def epg_util(request, method, path, query, data, manager, view):
     return 'Epg Utilization'
 
 
 @pageview(ACIManager)
-def eptracker(manager, request, method, path, query, data, menu):
+def eptracker(request, method, path, query, data, manager, view):
     return 'EP Tracker'
 
 @pageview(ACIManager)
-def ofinder(manager, request, method, path, query, data, menu):
+def ofinder(request, method, path, query, data, manager, view):
     return 'Object Finder'
 
 
 @pageview(ACIManager)
-def config(manager, request, method, path, query, data, menu):
+def config(request, method, path, query, data, manager, view):
     
     alert = None
     
@@ -293,9 +270,9 @@ def config(manager, request, method, path, query, data, menu):
             alert = Alert(u'제거 성공', path[2] + u'와 연결이  제거되었습니다', **{'class' : 'alert-success'})
         else:
             alert = Alert(u'제거 실패', path[2] + u'의 연결이 제거되지 않았습니다', **{'class' : 'alert-danger'})
-        
-    menu.html(
-        Modal(BUTTON, u'APIC 연결', 'Register APIC Domain', **{'class' : 'btn-primary', 'style' : 'float:right;'}).html(
+    
+    view.Menu.html(
+        Modal('Register APIC Domain', BUTTON(**{'class' : 'btn-primary', 'style' : 'float:right;'}).html(u'APIC 연결')).html(
             Post('/aci/conf', 'Register', **{'class' : 'btn-primary', 'style' : 'float:right;'}
             ).Text('domain_name', Post.TopLabel('Domain Name')
             ).Text('ip', Post.TopLabel('APIC Address'), placeholder='XXX.XXX.XXX.XXX'
@@ -313,9 +290,8 @@ def config(manager, request, method, path, query, data, menu):
                      manager[domain_name]['conn_max'],
                      DelButton('/aci/conf/' + domain_name, u'삭제', tail=True))
     
-    ret = DIV()
-    if alert != None: ret.html(alert)
-    return ret.html(table)
+    if alert != None: view.Page.html(alert)
+    view.Page.html(table)
 
 
 

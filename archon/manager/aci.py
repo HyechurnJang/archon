@@ -5,10 +5,7 @@ Created on 2016. 12. 6.
 '''
 
 import re
-import json
 import time
-import copy
-import requests
 import threading
 try: from Queue import Queue
 except: from queue import Queue
@@ -150,14 +147,11 @@ class HealthMonitor(SchedTask):
         
         self.health = health
     
-#         print json.dumps(self.health, indent=2)
-    
 class EndpointTracker(acidipy.SubscribeHandler):
     
     @classmethod
     def initDatabase(cls):
         EPTracker.objects.all().delete()
-#         print 'init complete'
     
     def __init__(self, manager, domain_name):
         self.manager = manager
@@ -190,7 +184,6 @@ class EndpointTracker(acidipy.SubscribeHandler):
                                          intf=','.join(self.getIfName(ep)),
                                          start=self.convertTstamp(ep['modTs']),
                                          stop='0000-00-00 00:00:00')
-#             print ep
             
     def subscribe(self, status, obj):
         
@@ -220,8 +213,6 @@ class EndpointTracker(acidipy.SubscribeHandler):
                                      intf=', '.join(self.getIfName(obj)),
                                      start=self.convertTstamp(obj['modTs']),
                                      stop='0000-00-00 00:00:00')
-        
-#         print status, obj
         
 
 class ACIManager(archon.Manager, acidipy.MultiDomain):
@@ -257,15 +248,3 @@ class ACIManager(archon.Manager, acidipy.MultiDomain):
         acidipy.MultiDomain.delDomain(self, domain_name)
         domain.delete()
         return True
-    
-if __name__ == '__main__':
-    
-    am = ACIManager()
-    print am.addDomain('Test1', '10.72.86.21', 'admin', '1234Qwer')
-    
-    while True:
-        time.sleep(1)
-    
-    print 'Close'
-    am.close()
-    print 'End'

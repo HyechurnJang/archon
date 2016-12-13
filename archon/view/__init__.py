@@ -1,4 +1,6 @@
 
-from core import DIV, SPAN, HEADER, PARA, LABEL, ANC, TABLE, TH, TR, TD, UL, LI, FORM, INPUT, BUTTON
-from preset import Row, Col, Menu, KeyVal, DataTable, FooTable, Modal, Alert, Panel, Icon, Get, Post, DelClick, DelButton
+from core import DIV, SPAN, HEAD, PARA, ANCH, LABEL, TABLE, THEAD, TBODY, TH, TR, TD, UL, LI, FORM, INPUT, BUTTON
+from deco import ROW, COL, KeyVal, Modal, Alert, Panel, Icon
+from table import DataTable, FooTable
+from action import Get, Post, Delete, DelClick, DelButton
 

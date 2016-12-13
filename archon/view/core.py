@@ -22,10 +22,12 @@ class VIEW(dict):
         self['elements'].append(element)
         return self
     
+    def __len__(self, *args, **kwargs):
+        return self['elements'].__len__()
+    
     def isEmpty(self):
-        if len(self['elements']) == 0: return True
-        return False
-
+        return not self.__len__()
+    
 class DIV(VIEW):
     def __init__(self, **attrs):
         VIEW.__init__(self, 'div', **attrs)
@@ -34,7 +36,7 @@ class SPAN(VIEW):
     def __init__(self, **attrs):
         VIEW.__init__(self, 'span', **attrs)
 
-class HEADER(VIEW):
+class HEAD(VIEW):
     def __init__(self, level, **attrs):
         VIEW.__init__(self, 'h' + str(level), **attrs)
 
@@ -42,14 +44,14 @@ class PARA(VIEW):
     def __init__(self, **attrs):
         VIEW.__init__(self, 'p', **attrs)
 
+class ANCH(VIEW):
+    def __init__(self, **attrs):
+        VIEW.__init__(self, 'a', **attrs)
+
 class LABEL(VIEW):
     def __init__(self, **attrs):
         VIEW.__init__(self, 'label', **attrs)
 
-class ANC(VIEW):
-    def __init__(self, **attrs):
-        VIEW.__init__(self, 'a', **attrs)
-        
 class TABLE(VIEW):
     def __init__(self, **attrs):
         VIEW.__init__(self, 'table', **attrs)

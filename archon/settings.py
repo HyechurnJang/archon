@@ -39,7 +39,6 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'archon',
     'application.aci',
-    'application.sample',
 ]
 
 MIDDLEWARE_CLASSES = [

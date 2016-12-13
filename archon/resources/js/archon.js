@@ -9,7 +9,7 @@ $(document).ready(function() {
 	var app_selector = $(".app-selector");
 	var page_selector = $(".page-selector");
 	var loading_page = $("#loading-page");
-	var menu_page = $("#menu-page");
+	var subject_page = $("#subject-page");
 	var dashboard_page = $("#dashboard-page");
 
 	apps.hide();
@@ -22,10 +22,10 @@ $(document).ready(function() {
 		page_current = dashboard_page;
 		apps.fadeOut(350);
 		dashboard_page.fadeOut(350);
-		menu_page.fadeOut(350);
+		subject_page.fadeOut(350);
 		dynpages.fadeOut(350);
 		dashboard_page.collapse("hide");
-		menu_page.collapse("hide");
+		subject_page.collapse("hide");
 		dynpages.collapse("hide");
 		loading_page.collapse("show");
 		setTimeout(function() {
@@ -53,10 +53,10 @@ $(document).ready(function() {
 		page_selector.css("color", "#777");
 		selector.css("color", "#337ab7");
 		dashboard_page.fadeOut(350);
-		menu_page.fadeOut(350);
+		subject_page.fadeOut(350);
 		dynpages.fadeOut(350);
 		dashboard_page.collapse("hide");
-		menu_page.collapse("hide");
+		subject_page.collapse("hide");
 		dynpages.collapse("hide");
 		loading_page.collapse("show");
 		
@@ -66,17 +66,17 @@ $(document).ready(function() {
 				dataType : "json",
 				success : function(data) {
 					if ( page_current == page ) {
-						$("#menu-title").html(selector.html());
-						$("#menu-title").attr("onclick", "GetData('" + url + "');");
-						$("#menu-action").html(ParseViewDom(page.attr("id") + '-m-', data.menu))
+						$("#subject-title").html(selector.html());
+						$("#subject-title").attr("onclick", "GetData('" + url + "');");
+						$("#subject-menu").html(ParseViewDom(page.attr("id") + '-m-', data.menu))
 						ParseViewData(data.menu);
 						page.html(ParseViewDom(page.attr("id") + '-', data.page));
 						ParseViewData(data.page);
-						page.css("height", "calc(100% - 106px)");
+						page.css("height", "calc(100% - 100px)");
 						loading_page.collapse("hide");
-						menu_page.fadeIn(350);
+						subject_page.fadeIn(350);
 						page.fadeIn(350);
-						menu_page.collapse("show");
+						subject_page.collapse("show");
 						page.collapse("show");
 					}
 				},
@@ -106,7 +106,7 @@ function GetCookie(c_name)
 
 function GetData(url) {
 	var dynpages = $(".dynpage");
-	var menu_page = $("#menu-page");
+	var subject_page = $("#subject-page");
 	dynpages.fadeOut(350);
 	dynpages.collapse("hide");
 	setTimeout(function() {
@@ -115,11 +115,11 @@ function GetData(url) {
 			url: url,
 			dataType: "json",
 			success : function(data) {
-				$("#menu-action").html(ParseViewDom(page_current.attr("id") + '-m-', data.menu))
+				$("#subject-menu").html(ParseViewDom(page_current.attr("id") + '-m-', data.menu))
 				ParseViewData(data.menu);
 				page_current.html(ParseViewDom(page_current.attr("id") + '-', data.page));
 				ParseViewData(data.page);
-				page_current.css("height", "calc(100% - 110px)");
+				page_current.css("height", "calc(100% - 100px)");
 				page_current.fadeIn(350);
 				page_current.collapse("show");
 			},
@@ -133,7 +133,7 @@ function GetData(url) {
 
 function PostData(uuid, url) {
 	var dynpages = $(".dynpage");
-	var menu_page = $("#menu-page");
+	var subject_page = $("#subject-page");
 	var data = {};
 	$(uuid).each(function(index) {
 		view = $(this);
@@ -150,11 +150,11 @@ function PostData(uuid, url) {
 			dataType: "json",
 			data: JSON.stringify(data),
 			success : function(data) {
-				$("#menu-action").html(ParseViewDom(page_current.attr("id") + '-m-', data.menu))
+				$("#subject-menu").html(ParseViewDom(page_current.attr("id") + '-m-', data.menu))
 				ParseViewData(data.menu);
 				page_current.html(ParseViewDom(page_current.attr("id") + '-', data.page));
 				ParseViewData(data.page);
-				page_current.css("height", "calc(100% - 110px)");
+				page_current.css("height", "calc(100% - 100px)");
 				page_current.fadeIn(350);
 				page_current.collapse("show");
 			},
@@ -168,7 +168,7 @@ function PostData(uuid, url) {
 
 function DeleteData(url) {
 	var dynpages = $(".dynpage");
-	var menu_page = $("#menu-page");
+	var subject_page = $("#subject-page");
 	dynpages.fadeOut(350);
 	dynpages.collapse("hide");
 	setTimeout(function() {
@@ -177,11 +177,11 @@ function DeleteData(url) {
 			url: url,
 			dataType: "json",
 			success : function(data) {
-				$("#menu-action").html(ParseViewDom(page_current.attr("id") + '-m-', data.menu))
+				$("#subject-menu").html(ParseViewDom(page_current.attr("id") + '-m-', data.menu))
 				ParseViewData(data.menu);
 				page_current.html(ParseViewDom(page_current.attr("id") + '-', data.page));
 				ParseViewData(data.page);
-				page_current.css("height", "calc(100% - 110px)");
+				page_current.css("height", "calc(100% - 100px)");
 				page_current.fadeIn(350);
 				page_current.collapse("show");
 			},

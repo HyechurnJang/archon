@@ -36,6 +36,40 @@ h1, h2, h3, h4, h5, h6 {
   background-color: #e7e7e7;
 }
 
+.input-group {
+	width: 100%;
+	padding-top: 2px;
+	padding-bottom: 2px;
+}
+.input-group>label {
+	padding-top: 6px;
+}
+
+.huge-font {
+	font-size: 40px;
+}
+
+.panel {
+	border-radius: 0px;
+	-webkit-box-shadow: 0 3px 9px rgba(0, 0, 0, .05);
+	box-shadow: 0 3px 9px rgba(0, 0, 0, .05);
+}
+
+.alert {
+	border-radius: 2px;
+	-webkit-box-shadow: 0 3px 9px rgba(0, 0, 0, .05);
+	box-shadow: 0 3px 9px rgba(0, 0, 0, .05);
+}
+.alert>strong {
+	padding-right: 10px;
+}
+
+
+
+
+
+
+
 .app-selector {
   float: left;
   height: 50px;
@@ -72,7 +106,7 @@ h1, h2, h3, h4, h5, h6 {
 #pages .dynpage {
 	padding-top: 10px;
     overflow-y: scroll;
-    height: calc(100% - 106px);
+    height: calc(100% - 100px);
     background: #fff
 }
 #loading-page {
@@ -84,25 +118,55 @@ h1, h2, h3, h4, h5, h6 {
     height: calc(100% - 50px);
     background-color: rgba(255,255,255,0.9);
 }
-#menu-page {
+#subject-page {
 	background-color: rgba(255,255,255,0.7);
 }
-#menu-title {
+#subject-title {
 	margin: 0px;
-	padding: 15px 5px 5px 5px;
-	font-size: 31px;
+	padding: 8px 5px 2px 5px;
+	font-size: 37px;
 	font-weight: bold;
 	float: left;
 	cursor: pointer;
 }
-#menu-title:hover,
-#menu-title:focus {
+#subject-title:hover,
+#subject-title:focus {
 	color: #337ab7;
 }
-#menu-action {
-	padding: 15px 5px 5px 5px;
+#subject-menu {
+	padding-top: 8px;
 	float: right;
 }
+#subject-menu>div>div {
+	padding-left: 5px;
+	float: right;
+}
+
+.keyval {
+	margin:0px;
+}
+.keyval-key {
+	float:left;
+	font-weight:bold;
+	font-size:14px;
+	padding:0px;
+	margin:0px;
+}
+
+.data-action {
+	cursor: pointer;
+	text-decoration: none;
+	color: #333;
+}
+.data-action:hover,
+.data-action:focus {
+	font-weight: bold;
+	text-decoration: none;
+}
+
+
+
+
 
 .dt-buttons {
 	float: left;
@@ -134,40 +198,4 @@ table.footable-details>tbody>tr>th:nth-child(1) {
 	min-width: 80px;
 	max-width: 400px;
 	width: 20%;
-}
-
-.input-group {
-	width: 100%;
-	padding-top: 2px;
-	padding-bottom: 2px;
-}
-.input-group>label {
-	padding-top: 6px;
-}
-
-.huge-font {
-	font-size: 40px;
-}
-
-.panel {
-	border-radius: 0px;
-	-webkit-box-shadow: 0 3px 9px rgba(0, 0, 0, .05);
-	box-shadow: 0 3px 9px rgba(0, 0, 0, .05);
-}
-
-.alert {
-	border-radius: 2px;
-	-webkit-box-shadow: 0 3px 9px rgba(0, 0, 0, .05);
-	box-shadow: 0 3px 9px rgba(0, 0, 0, .05);
-}
-
-.getdata {
-	cursor: pointer;
-	text-decoration: none;
-	color: #333;
-}
-.getdata:hover,
-.getdata:focus {
-	font-weight: bold;
-	text-decoration: none;
 }
