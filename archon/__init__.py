@@ -66,10 +66,13 @@ def pageview(manager_class):
     
     try: manager = manager_class.instance()
     except Exception as e:
-        print 'Manager Allocation Error', str(e)
-        return JsonResponse(View.Error(u'매니저 할당 에러', str(e)))
+        def manager_error_wrapper(view):
+            def decofunc(request):
+                return JsonResponse(View.Error(u'매니저 할당 에러', str(e)))
+            return decofunc
+        return manager_error_wrapper
 
-    def wrapper(view):
+    def pageview_wrapper(view):
         @login_required
         def decofunc(request):
             request.session.set_expiry(SESSION_COOKIE_AGE)
@@ -99,7 +102,7 @@ def pageview(manager_class):
             except Exception as e: return JsonResponse(View.Error(u'서버 에러', str(e)))
             return JsonResponse(v)
         return decofunc
-    return wrapper
+    return pageview_wrapper
 
 def modelview(model):
     admin.site.register(model, admin.ModelAdmin)
