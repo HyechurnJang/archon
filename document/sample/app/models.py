@@ -36,31 +36,13 @@
 
 from __future__ import unicode_literals
 from django.db import models
-from django.utils import timezone
 from archon import modelview
 
 #===============================================================================
 # Create your models here.
 #===============================================================================
+class Sample(models.Model):
+    author = models.CharField(max_length=64)
+    text = models.CharField(max_length=1024)
 
-class Domain(models.Model):
-    name = models.CharField(max_length=64)
-    controllers = models.CharField(max_length=64)
-    user = models.CharField(max_length=32)
-    password = models.CharField(max_length=32)
-    created_date = models.DateTimeField(default=timezone.now)
-
-modelview(Domain)
-
-class EPTracker(models.Model):
-    mac = models.CharField(max_length=18)
-    ip = models.CharField(max_length=16)
-    domain = models.CharField(max_length=64)
-    tenant = models.CharField(max_length=100)
-    app = models.CharField(max_length=100)
-    epg = models.CharField(max_length=100)
-    intf = models.CharField(max_length=2048)
-    start = models.CharField(max_length=24)
-    stop = models.CharField(max_length=24)
-
-modelview(EPTracker)
+modelview(Sample)

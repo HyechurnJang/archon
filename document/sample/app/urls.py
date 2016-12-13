@@ -33,3 +33,19 @@
 #    under the License.                                                        #
 #                                                                              #
 ################################################################################
+
+from django.conf.urls import url, include
+from . import views
+
+#===============================================================================
+# Link your view here.
+#===============================================================================
+url_dropdown = [
+    url(r'sample1/?', views.sample1, name=u'샘플1'),
+    url(r'sample2/?', views.sample2, name=u'샘플2'),
+]
+
+urlpatterns = [
+    url(r'dropdown/', include(url_dropdown, namespace=u'드롭다운리스트')),
+    url(r'direct_sample/?', views.direct_sample, name=u'즉시로딩'),
+]

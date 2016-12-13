@@ -34,33 +34,25 @@
 #                                                                              #
 ################################################################################
 
-from __future__ import unicode_literals
-from django.db import models
-from django.utils import timezone
-from archon import modelview
+from archon import *
 
 #===============================================================================
-# Create your models here.
+# Import application manager here.
+#===============================================================================
+from manager import SampleManager
+
+#===============================================================================
+# Create your views here.
 #===============================================================================
 
-class Domain(models.Model):
-    name = models.CharField(max_length=64)
-    controllers = models.CharField(max_length=64)
-    user = models.CharField(max_length=32)
-    password = models.CharField(max_length=32)
-    created_date = models.DateTimeField(default=timezone.now)
+@pageview(SampleManager)
+def direct_sample(request, method, path, query, data, manager, view):
+    view.Page.html('Direct Sample Page')
 
-modelview(Domain)
+@pageview(SampleManager)
+def sample1(request, method, path, query, data, manager, view):
+    view.Page.html('Sample 1 Page')
 
-class EPTracker(models.Model):
-    mac = models.CharField(max_length=18)
-    ip = models.CharField(max_length=16)
-    domain = models.CharField(max_length=64)
-    tenant = models.CharField(max_length=100)
-    app = models.CharField(max_length=100)
-    epg = models.CharField(max_length=100)
-    intf = models.CharField(max_length=2048)
-    start = models.CharField(max_length=24)
-    stop = models.CharField(max_length=24)
-
-modelview(EPTracker)
+@pageview(SampleManager)
+def sample2(request, method, path, query, data, manager, view):
+    view.Page.html('Sample 1 Page')
