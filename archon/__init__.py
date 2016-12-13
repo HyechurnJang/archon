@@ -64,14 +64,6 @@ class View:
         
 def pageview(manager_class):
     
-    try: manager = manager_class.instance()
-    except Exception as e:
-        def manager_error_wrapper(view):
-            def decofunc(request):
-                return JsonResponse(View.Error(u'매니저 할당 에러', str(e)))
-            return decofunc
-        return manager_error_wrapper
-
     def pageview_wrapper(view):
         @login_required
         def decofunc(request):
@@ -96,7 +88,8 @@ def pageview(manager_class):
                     data = {}
             except Exception as e: return JsonResponse(View.Error(u'요청 에러', str(e)))
             try:
-                v = View() 
+                v = View()
+                manager = manager_class.instance() 
                 view(request, method, path, query, data, manager, v)
                 v = {'menu' : v.Menu, 'page' : v.Page}
             except Exception as e: return JsonResponse(View.Error(u'서버 에러', str(e)))
