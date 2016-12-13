@@ -7,18 +7,18 @@ Cisco Application Centric Manager
 
 #### 1.1.1. Install Mariadb
 
-* Windows
+**Windows**
 	
-    * [MariaDB Link](https://downloads.mariadb.org/interstitial/mariadb-10.1.14/winx64-packages/mariadb-10.1.14-winx64.msi/from/http%3A//ftp.utexas.edu/mariadb/)
+	[MariaDB Link](https://downloads.mariadb.org/interstitial/mariadb-10.1.14/winx64-packages/mariadb-10.1.14-winx64.msi/from/http%3A//ftp.utexas.edu/mariadb/)
 
-* Redhat/CentOS (tested on CentOS 7.x):
+**Redhat/CentOS (tested on CentOS 7.x):**
 	
 	$ yum install epel-release
 	$ yum install git gcc python-pip mariadb-server mariadb-devel python-devel
 	$ systemctl enable mariadb
 	$ systemctl start mariadb
 
-* Ubuntu/Debian (tested on Ubuntu 14.04): 
+**Ubuntu/Debian (tested on Ubuntu 14.04):** 
 
 	$ apt-get install git gcc python-pip mariadb-server libmysqlclient-dev python-dev
 
