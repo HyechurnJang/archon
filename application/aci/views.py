@@ -40,7 +40,6 @@ def device(request, method, path, query, data, manager, view):
             lo_child.html(FooTable('Class Name', *hkey).record(child.class_name, *val))
         
         return
-            
     
     node_data = manager.Node.list(detail=True)
     cfrm_data = manager.Class('firmwareCtrlrRunning').list(detail=True)
