@@ -93,7 +93,7 @@ MIDDLEWARE_CLASSES = [
 
 ROOT_URLCONF = 'archon.urls'
 LOGIN_REDIRECT_URL = '/'
-LOGIN_URL = 'django.contrib.auth.views.login'
+LOGIN_URL = '/account/login'
 
 TEMPLATES = [
     {
