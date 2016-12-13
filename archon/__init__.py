@@ -64,7 +64,10 @@ class View:
         
 def pageview(manager_class):
     
-    manager = manager_class.instance()
+    try: manager = manager_class.instance()
+    except Exception as e:
+        print 'Manager Allocation Error', str(e)
+        return JsonResponse(View.Error(u'매니저 할당 에러', str(e)))
 
     def wrapper(view):
         @login_required
