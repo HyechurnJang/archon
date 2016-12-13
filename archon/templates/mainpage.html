@@ -3,42 +3,46 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="utf-8">
-<meta http-equiv="X-UA-Compatible" content="IE=edge">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<meta name="description" content="Cisco Webkit">
-<meta name="author" content="hyjang@cisco.com">
+	<meta charset="utf-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<meta name="description" content="Cisco Webkit">
+	<meta name="author" content="hyjang@cisco.com">
 
-<!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
-<title>Archon</title>
 
-<!-- Bootstrap -->
-<link rel="stylesheet" href="/resources/css/bootstrap.css" />
-<link rel="stylesheet" href="/resources/css/font-awesome.min.css" />
-<link rel="stylesheet" href="/resources/css/archon.css" />
+	<!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
+	<title>Archon</title>
 
-<!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
-<!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
-<!--[if lt IE 9]>
-	<script src="https://oss.maxcdn.com/html5shiv/3.7.3/html5shiv.min.js"></script>
-	<script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
-<![endif]-->
 
+	<!-- CSS -->
+	<link rel="stylesheet" href="/resources/css/bootstrap.css" />
+	<link rel="stylesheet" href="/resources/css/font-awesome.min.css" />
+	<link rel="stylesheet" href="/resources/css/datatables.min.css"/>
+	<link rel="stylesheet" href="/resources/css/footable.bootstrap.min.css"/>
+	<link rel="stylesheet" href="/resources/css/archon.css" />
+
+
+	<!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
+	<!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+	<!--[if lt IE 9]>
+		<script src="https://oss.maxcdn.com/html5shiv/3.7.3/html5shiv.min.js"></script>
+		<script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
+	<![endif]-->
 </head>
-
 <body>
-
+	<!-- Javascripts -->
 	<script src="/resources/js/jquery-2.2.4.min.js"></script>
 	<script src="/resources/js/bootstrap.min.js"></script>
-	<script src="/resource/js/spin.js"></script>
+	<script src="/resources/js/datatables.min.js"></script>
+	<script src="/resources/js/footable.min.js"></script>
+	<script src="/resources/js/spin.js"></script>
 	<script src="/resources/js/archon.js"></script>
 
+
+	<!-- Navbar -->
 	<nav class="navbar navbar-default" role="navigation">
-	
 		<div class="container-fluid">
-		
 			<div class="navbar-header">
-			
 				<!-- Small Screen Navbar -->
 				<button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navigate-action-list">
 			        <span class="sr-only">Toggle navigation</span>
@@ -46,143 +50,97 @@
 			        <span class="icon-bar"></span>
 			        <span class="icon-bar"></span>
       			</button>
+      			<!-- <a class="navbar-brand"><img src="/resources/images/logo_nav.png" width="40px" /></a> -->
+      			<a class="navbar-brand" style="padding:5px 15px !important;"><img src="/resources/images/customer/KRHS.png" width="40px" /></a>
       			
-      			<!-- Brand -->
-      			<a class="navbar-brand" href="#"><img src="/resources/images/logo_nav.png" width="40px" /></a>
       			
-      			{{ applications }}
+<!-- ------------------------Application Selector------------------------ -->
+<!-- 
+				<a class="app-selector" app="#test-app">Test App</a>
+ -->
+<!-- ------------------------Application Selector------------------------ -->
+{{ app_selectors }}
+<!-- ------------------------Application Selector------------------------ -->
       			
-      			<a class="app-selector" href="#" app="#testapp">Test App</a>
       			
+      			<!-- Application Page Divider -->
       			<a><img id="app-divider" src="/resources/images/appdivider.png" /></a>
-      			
     		</div>
-    		
     		<div class="collapse navbar-collapse" id="navigate-action-list">
     		
     		
-    			{{ navigations }}
-			
+<!-- ------------------------Page Selector------------------------ -->
+<!-- 
+				<a class="page-selector" page="#test-page" view="/test/page/view">Test Page View</a>
+ -->
+{{ page_selectors }}
+<!-- ------------------------Page Selector------------------------ -->
+
 				
-				<!-- Center Navbar -->
-				<ul class="nav navbar-nav app" id="testapp">
-					<li><a href="#" class="page-selector" page="#page-test">Test Page</a></li>
-					<li class="dropdown">
-						<a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">DropDown Menu<span class="caret"></span></a>
-						<ul class="dropdown-menu" role="menu">
-							<li><a href="#" class="page-selector" page="#page-blank">Blank Page</a></li>
-							<li class="divider"></li>
-							<li><a href="#" class="page-selector" page="#page-init">Init Page</a></li>
-							<li class="divider"></li>
-							<li><a href="#" class="page-selector" page="#page-error">Error Page</a></li>
-						</ul>
-					</li>
-				</ul>
-				
-				
-				
-				
-				<!-- Optional Navbar -->
+				<!-- Option Bar -->
 				<ul class="nav navbar-nav navbar-right">
-				
-					<li><a href="#">Alert</a></li>
-					
+					<li>
+					    <a href="#" data-toggle="modal" data-target="#InformationDocument">
+					        Info
+					    </a>
+					    <div class="modal fade" id="InformationDocument" tabindex="-1" role="dialog" aria-labelledby="InformationDocumentLabel">
+					        <div class="modal-dialog" role="document">
+					            <div class="modal-content">
+					                <div class="modal-header">
+					                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+					                    <h4 class="modal-title" id="InformationDocumentLabel">Modal title</h4>
+					                </div>
+					                <div class="modal-body">
+this is test
+					                </div>
+					                <div class="modal-footer">
+					                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+					                </div>
+					            </div>
+					        </div>
+					    </div>
+					</li>
 					<li class="dropdown">
 						<a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">User <span class="caret"></span></a>
 						<ul class="dropdown-menu" role="menu">
-							<li><a href="#">Profile</a></li>
+
+
+<!-- ------------------------User Menu------------------------ -->
+{{ user_menu }}
+<!--  -->
+
+
 							<li class="divider"></li>
-							<li><a href="#">Logout</a></li>
+							<li><a href="#">Profile</a></li>
+							<li><a href="/account/logout">Logout</a></li>
 						</ul>
 					</li>
-					
 				</ul>
-				
 			</div>
-			
 		</div>
 	</nav>
 	
-	<div id="pageplane">
-	
-	<div id="loading-page" class="page accordion-body collapse"><img src="/resources/images/background.jpg" alt="Loading..." width="100%" /></div>
-	
-	<div id="dashboard-page" class="container-fluid page active-page accordion-body collapse"><h1>Dashboard</h1></div>
-	
-	<div id="page-error" class="container-fluid page active-page accordion-body collapse"><h1>Hello Error</h1></div>
-	
-	<div id="page-blank" class="container-fluid page active-page accordion-body collapse"><h1>Hello Blank</h1>
-		<br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/>
-		<br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/>
-		<br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/>
-		<br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/>
-		<br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/>
-		<br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/>
-		<br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/>
-		Hello Black
-	</div>
-	
-	<div id="page-test" class="container-fluid page active-page accordion-body collapse">
-		<h1>Hello, world!</h1>
-		
-		<div role="tabpanel">
-			<ul class="nav nav-tabs" role="tablist">
-				<li role="presentation" class="active"><a href="#home" aria-controls="home" role="tab" data-toggle="tab">Home</a></li>
-				<li role="presentation"><a href="#profile" aria-controls="profile" role="tab" data-toggle="tab">Profile</a></li>
-				<li role="presentation"><a href="#messages" aria-controls="messages" role="tab" data-toggle="tab">Messages</a></li>
-				<li role="presentation"><a href="#settings" aria-controls="settings" role="tab" data-toggle="tab">Settings</a></li>
-			</ul>
-	
-			<div class="tab-content">
-				<div role="tabpanel" class="tab-pane active" id="home">This is Home</div>
-				<div role="tabpanel" class="tab-pane" id="profile">This is Profile</div>
-				<div role="tabpanel" class="tab-pane" id="messages">This is Messages</div>
-				<div role="tabpanel" class="tab-pane" id="settings">This is Settings</div>
-			</div>
-	
+	<div id="pages">
+		<div id="menu-page" class="container-fluid page collapse">
+			<h1 id="menu-title"></h1>
+			<div id="menu-action"></div>
 		</div>
-		
-		<div class="panel-group" id="accordion" role="tablist" aria-multiselectable="true">
-		
-			<div class="panel panel-primary">
-				<div class="panel-heading" role="tab" id="headingOne">
-					<h4 class="panel-title">
-						<a data-toggle="collapse" data-parent="#accordion" href="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
-							Collapsible Group Item #1
-						</a>
-					</h4>
-				</div>
-				<div id="collapseOne" class="panel-collapse collapse in" role="tabpanel" aria-labelledby="headingOne">
-					<div class="panel-body">
-						Anim pariatur cliche reprehenderit, enim eiusmod high life accusamus terry richardson ad squid. 3 wolf moon officia aute, non cupidatat skateboard dolor brunch. Food truck quinoa nesciunt laborum eiusmod. Brunch 3 wolf moon tempor, sunt aliqua put a bird on it squid single-origin coffee nulla assumenda shoreditch et. Nihil anim keffiyeh helvetica, craft beer labore wes anderson cred nesciunt sapiente ea proident. Ad vegan excepteur butcher vice lomo. Leggings occaecat craft beer farm-to-table, raw denim aesthetic synth nesciunt you probably haven't heard of them accusamus labore sustainable VHS.
-					</div>
-				</div>
-			</div>
-			
-			<div class="panel panel-default">
-				<div class="panel-heading" role="tab" id="headingTwo">
-					<h4 class="panel-title">
-						<a class="collapsed" data-toggle="collapse" data-parent="#accordion" href="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo">
-							Collapsible Group Item #2
-						</a>
-					</h4>
-				</div>
-				<div id="collapseTwo" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingTwo">
-					<div class="panel-body">
-						Anim pariatur cliche reprehenderit, enim eiusmod high life accusamus terry richardson ad squid. 3 wolf moon officia aute, non cupidatat skateboard dolor brunch. Food truck quinoa nesciunt laborum eiusmod. Brunch 3 wolf moon tempor, sunt aliqua put a bird on it squid single-origin coffee nulla assumenda shoreditch et. Nihil anim keffiyeh helvetica, craft beer labore wes anderson cred nesciunt sapiente ea proident. Ad vegan excepteur butcher vice lomo. Leggings occaecat craft beer farm-to-table, raw denim aesthetic synth nesciunt you probably haven't heard of them accusamus labore sustainable VHS.
-					</div>
-				</div>
-			</div>
-			
+		<div id="loading-page" class="page collapse">
+			<!-- <img src="/resources/images/loading.jpg" alt="Loading..." width="100%" /> -->
 		</div>
-		
-	</div>
-	
-	<div id="page-init" class="container-fluid page active-page accordion-body collapse"><div class="well">Init Page</div></div>
-	
-	</div>
+		<div id="dashboard-page" class="container-fluid page collapse in">
+			<h1>Dashboard</h1>
+		</div>
 
+
+<!-- ------------------------Pages------------------------ -->
+<!-- 
+		<div id="page-test-app" class="container-fluid page dynpage collapse">Test Page Data</div>
+ -->
+{{ pages }}
+<!-- ------------------------Pages------------------------ -->
+
+
+	</div>
 </body>
-
 </html>
-

@@ -8,6 +8,7 @@ __pycache__/
 
 # Distribution / packaging
 .Python
+.settings/
 application/sample1/
 application/sample2/
 env/

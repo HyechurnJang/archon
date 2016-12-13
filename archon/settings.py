@@ -38,8 +38,8 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'archon',
-    'application.sample1',
-    'application.sample2',
+    'application.aci',
+    'application.sample',
 ]
 
 MIDDLEWARE_CLASSES = [
