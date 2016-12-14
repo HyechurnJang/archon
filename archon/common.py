@@ -34,103 +34,77 @@
 #                                                                              #
 ################################################################################
 
-import uuid
+import time
+import threading
+try: from Queue import Queue
+except: from queue import Queue
 
-class VIEW(dict):
+class ArchonThread(threading.Thread):
     
-    @classmethod
-    def getUUID(cls): return str(uuid.uuid4())
+    def __init__(self):
+        threading.Thread.__init__(self)
+        self._tb_sw = False
+        
+    def start(self):
+        if not self._tb_sw:
+            self._tb_sw = True
+            threading.Thread.start(self)
     
-    @classmethod
-    def setAttrs(cls, kv, attrs):
-        for key in kv: attrs[key] = kv[key] + ' ' + attrs[key] if key in attrs else kv[key]
+    def stop(self):
+        if self._tb_sw:
+            self._tb_sw = False
+            try: self._Thread__stop()
+            except:
+                try: self._stop()
+                except:
+                    try: self.__stop()
+                    except: pass
+            self.join()
+        
+    def run(self):
+        while self._tb_sw: self.thread()
+            
+    def thread(self): pass
+
+class ArchonTask:
+    def __init__(self, tick):
+        self.schedtask_tick = tick
+        self.schedtask_cur = 0
+        
+    def __sched_wrapper__(self, sched_tick):
+        self.schedtask_cur += sched_tick
+        if self.schedtask_cur >= self.schedtask_tick:
+            self.schedtask_cur = 0
+            self.sched()
+            
+    def sched(self): pass
+
+class Scheduler(ArchonThread):
     
-    def __init__(self, _type, **attrs):
-        dict.__init__(self, type=_type, elements=[], attrs=attrs)
-        
-    def html(self, element):
-        self['elements'].append(element)
-        return self
+    def __init__(self, tick):
+        ArchonThread.__init__(self)
+        self.tick = tick
+        self.queue = []
+        self.regreq = Queue()
     
-    def __len__(self, *args, **kwargs):
-        return self['elements'].__len__()
-    
-    def isEmpty(self):
-        return not self.__len__()
-    
-class DIV(VIEW):
-    def __init__(self, **attrs):
-        VIEW.__init__(self, 'div', **attrs)
-
-class SPAN(VIEW):
-    def __init__(self, **attrs):
-        VIEW.__init__(self, 'span', **attrs)
-
-class HEAD(VIEW):
-    def __init__(self, level, **attrs):
-        VIEW.__init__(self, 'h' + str(level), **attrs)
-
-class PARA(VIEW):
-    def __init__(self, **attrs):
-        VIEW.__init__(self, 'p', **attrs)
-
-class ANCH(VIEW):
-    def __init__(self, **attrs):
-        VIEW.__init__(self, 'a', **attrs)
-
-class LABEL(VIEW):
-    def __init__(self, **attrs):
-        VIEW.__init__(self, 'label', **attrs)
-
-class STRONG(VIEW):
-    def __init__(self, **attrs):
-        VIEW.__init__(self, 'strong', **attrs)
-
-class SMALL(VIEW):
-    def __init__(self, **attrs):
-        VIEW.__init__(self, 'small', **attrs)
-
-class TABLE(VIEW):
-    def __init__(self, **attrs):
-        VIEW.__init__(self, 'table', **attrs)
+    def thread(self):
+        start_time = time.time()
+        while not self.regreq.empty():
+            task = self.regreq.get()
+            self.queue.append(task)
+        for task in self.queue:
+            try: task.__sched_wrapper__(self.tick)
+            except: continue
+        end_time = time.time()
+        sleep_time = self.tick - (end_time - start_time)
+        if sleep_time > 0: time.sleep(sleep_time)
         
-class THEAD(VIEW):
-    def __init__(self, **attrs):
-        VIEW.__init__(self, 'thead', **attrs)
+            
+    def register(self, task):
+        self.regreq.put(task)
         
-class TBODY(VIEW):
-    def __init__(self, **attrs):
-        VIEW.__init__(self, 'tbody', **attrs)
-        
-class TH(VIEW):
-    def __init__(self, **attrs):
-        VIEW.__init__(self, 'th', **attrs)
-        
-class TR(VIEW):
-    def __init__(self, **attrs):
-        VIEW.__init__(self, 'tr', **attrs)
-
-class TD(VIEW):
-    def __init__(self, **attrs):
-        VIEW.__init__(self, 'td', **attrs)
-        
-class UL(VIEW):
-    def __init__(self, **attrs):
-        VIEW.__init__(self, 'ul', **attrs)
-
-class LI(VIEW):
-    def __init__(self, **attrs):
-        VIEW.__init__(self, 'li', **attrs)
-
-class FORM(VIEW):
-    def __init__(self, **attrs):
-        VIEW.__init__(self, 'form', **attrs)
-
-class INPUT(VIEW):
-        def __init__(self, **attrs):
-            VIEW.__init__(self, 'input', **attrs)
-
-class BUTTON(VIEW):
-    def __init__(self, **attrs):
-        VIEW.setAttrs({'class' : 'btn', 'type' : 'button'}, attrs)
-        VIEW.__init__(self, 'button', **attrs)
+    def unregister(self, task):
+        sw_stat = self._tb_sw
+        if sw_stat: self.stop()
+        if task in self.queue: self.queue.remove(task)
+        if sw_stat: self.start()

@@ -42,7 +42,7 @@ class ROW(DIV):
         DIV.__init__(self, **attrs)
 
 class COL(DIV):
-    def __init__(self, size, scr='md', **attrs):
+    def __init__(self, size, scr='sm', **attrs):
         VIEW.setAttrs({'class' : 'col-%s-%d' % (scr, size)}, attrs)
         DIV.__init__(self, **attrs)
 
@@ -135,3 +135,25 @@ class Panel(DIV):
         self.foot.html(element)
         if self.foot not in self['elements']: self['elements'].append(self.foot)
         return self
+
+class CountPanel(DIV):
+    
+    def __init__(self, title, icon, count, **attrs):
+        VIEW.setAttrs({'class' : 'panel'}, attrs)
+        DIV.__init__(self, **attrs)
+        self.html(
+            DIV(**{'class' : 'panel-heading'}).html(
+                ROW().html(
+                    COL(4, 'xs').html(
+                        Icon(icon, **{'class' : 'fa-5x'})
+                    )
+                ).html(
+                    COL(8, 'xs', **{'class' : 'text-right'}).html(
+                        DIV(**{'class' : 'huge-font'}).html(count)
+                    ).html(
+                        DIV().html(STRONG().html(title))
+                    )
+                )
+            )
+        )
+        

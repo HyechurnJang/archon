@@ -36,9 +36,6 @@
 
 import re
 import time
-import threading
-try: from Queue import Queue
-except: from queue import Queue
 
 import acidipy
 import archon
@@ -49,80 +46,10 @@ from models import *
 # Create your manager here.
 #===============================================================================
 
-class SystemThread(threading.Thread):
-    
-    def __init__(self):
-        threading.Thread.__init__(self)
-        self._tb_sw = False
-        
-    def start(self):
-        if not self._tb_sw:
-            self._tb_sw = True
-            threading.Thread.start(self)
-    
-    def stop(self):
-        if self._tb_sw:
-            self._tb_sw = False
-            try: self._Thread__stop()
-            except:
-                try: self._stop()
-                except:
-                    try: self.__stop()
-                    except: pass
-            self.join()
-        
-    def run(self):
-        while self._tb_sw: self.thread()
-            
-    def thread(self): pass
-
-class SchedTask:
-    def __init__(self, tick):
-        self.schedtask_tick = tick
-        self.schedtask_cur = 0
-        
-    def __sched_wrapper__(self, sched_tick):
-        self.schedtask_cur += sched_tick
-        if self.schedtask_cur >= self.schedtask_tick:
-            self.schedtask_cur = 0
-            self.sched()
-            
-    def sched(self): pass
-
-class Scheduler(SystemThread):
-    
-    def __init__(self, tick):
-        SystemThread.__init__(self)
-        self.tick = tick
-        self.queue = []
-        self.regreq = Queue()
-    
-    def thread(self):
-        start_time = time.time()
-        while not self.regreq.empty():
-            task = self.regreq.get()
-            self.queue.append(task)
-        for task in self.queue:
-            try: task.__sched_wrapper__(self.tick)
-            except: continue
-        end_time = time.time()
-        sleep_time = self.tick - (end_time - start_time)
-        if sleep_time > 0: time.sleep(sleep_time)
-        
-            
-    def register(self, task):
-        self.regreq.put(task)
-        
-    def unregister(self, task):
-        sw_stat = self._tb_sw
-        if sw_stat: self.stop()
-        if task in self.queue: self.queue.remove(task)
-        if sw_stat: self.start()
-
-class HealthMonitor(SchedTask):
+class HealthMonitor(archon.ArchonTask):
     
     def __init__(self, manager, mon_sec, mon_cnt):
-        SchedTask.__init__(self, tick=mon_sec)
+        archon.ArchonTask.__init__(self, tick=mon_sec)
         self.manager = manager
         self.count = mon_cnt
         self.health = {'_tstamp' : []}
@@ -249,12 +176,12 @@ class EndpointTracker(acidipy.SubscribeHandler):
                                      stop='0000-00-00 00:00:00')
         
 
-class ACIManager(archon.Manager, acidipy.MultiDomain):
+class Manager(archon.BaseManager, acidipy.MultiDomain):
     
-    def __init__(self, mon_sec=5, mon_cnt=10, debug=False):
+    def __init__(self, mon_sec=60, mon_cnt=10, debug=False):
         acidipy.MultiDomain.__init__(self, conns=5, conn_max=10, debug=debug)
         EndpointTracker.initDatabase()
-        self.scheduler = Scheduler(2)
+        self.scheduler = archon.Scheduler(10)
         self.healthmon = HealthMonitor(self, mon_sec, mon_cnt)
         self.scheduler.register(self.healthmon)
         self.scheduler.start()

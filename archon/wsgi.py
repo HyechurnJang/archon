@@ -44,9 +44,62 @@ https://docs.djangoproject.com/en/1.9/howto/deployment/wsgi/
 """
 
 import os
-
 from django.core.wsgi import get_wsgi_application
 
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "archon.settings")
-
 application = get_wsgi_application()
+
+
+
+import sys
+import json
+from .settings import INSTALLED_APPS
+from openpyxl import load_workbook
+
+def getLocaleFromXLSX(path):
+    wb = load_workbook(filename=path)
+    sheet = wb['locale']
+    sheet_langs = sheet['1']
+    sheet_keys = sheet['A']
+    langs = []
+    keys = []
+    locale = {}
+    
+    for sheet_lang in sheet_langs[1:]: langs.append(sheet_lang.value)
+    for sheet_key in sheet_keys[1:]: keys.append(sheet_key.value)
+    for i in range(0, len(keys)):
+        vals = sheet[str(i + 2)]
+        key = keys[i]
+        locale[key] = {}
+        
+        for j in range(0, len(vals) - 1):
+            val = vals[j + 1].value
+            if val != None: locale[key][langs[j]] = val
+    
+    return locale
+
+print('\n3. Loading locales')
+sys.stdout.write('%-40s =====> ' % './archon/locale.xlsx')
+archon_locales = {'GLOBAL' : getLocaleFromXLSX('./archon/locale.xlsx')}
+print('[ OK ]')
+for app in INSTALLED_APPS:
+    if 'application.' in app:
+        app_name = app.split('.')[-1]
+        locale_path = './' + app.replace('.', '/') + '/locale.xlsx'
+        sys.stdout.write('%-40s =====> ' % locale_path)
+        archon_locales[app_name] = getLocaleFromXLSX(locale_path)
+        print('[ OK ]')
+# print json.dumps(archon_locales, indent=2)
+__builtins__['archon_locales'] = archon_locales
+
+print('\n4. Loading archon managers')
+for app in INSTALLED_APPS:
+    if 'application.' in app:
+        manager_path = app + '.manager'
+        fromlist = app.split('.')
+        sys.stdout.write('%-40s =====> ' % manager_path)
+        __import__(manager_path, globals(), fromlist=fromlist).Manager.instance()
+        print('[ OK ]')
+
+print('\n5. Archon Initialization Finished >> Logging Start')
+

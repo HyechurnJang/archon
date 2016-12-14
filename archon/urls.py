@@ -51,8 +51,7 @@ Including another URLconf
 """
 
 import re
-import json
-
+import sys
 from django.core.urlresolvers import RegexURLPattern, RegexURLResolver
 from django.conf.urls import url, include
 from django.views.generic import RedirectView
@@ -156,7 +155,7 @@ def parse_urls(parent, urls):
 
 application_names = __import__('application').APPLICATION_NAMES
 navbar_desc = []
-print('Application loading')
+print('1. Loading applications')
 for app in INSTALLED_APPS:
     if 'application.' in app:
         name = app.split('application.')[1]
@@ -165,10 +164,12 @@ for app in INSTALLED_APPS:
                 display = application_name['display']
                 break
         else: display = name.upper()
-        print('%s : %s' % (display, app))
+        sys.stdout.write('%-40s =====> ' % ('%s : %s' % (display, app)))
         app_urls = include(app + '.urls')
         urlpatterns = [ url(r'^%s/' % name, app_urls) ] + urlpatterns
         navbar_desc.append({'name' : name, 'display' : display, 'urls' : parse_urls([name], app_urls[0].urlpatterns)})
-print('')
+        print('[ OK ]')
 mainpage.setAppDesc(navbar_desc)
-    
+
+print('\n2. Loading WSGI Server')
+

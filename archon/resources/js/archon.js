@@ -226,7 +226,7 @@ function ParseViewData(view) {
 function UXTable(view) {
 	if (view.attrs.lib == "datatable") {
 		$("#" + view.attrs.id).DataTable({
-	    	scrollX: false,
+			scrollX: false,
 	    	dom: 'Bfrtip',
 	        lengthMenu: [
 	            [ 10, 25, 50, -1 ],

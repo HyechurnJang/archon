@@ -35,24 +35,20 @@
 ################################################################################
 
 from archon import *
-
-#===============================================================================
-# Import application manager here.
-#===============================================================================
-from manager import SampleManager
+from manager import Manager
 
 #===============================================================================
 # Create your views here.
 #===============================================================================
 
-@pageview(SampleManager)
+@pageview(Manager)
 def direct_sample(request, method, path, query, data, manager, view):
     view.Page.html('Direct Sample Page')
 
-@pageview(SampleManager)
+@pageview(Manager)
 def sample1(request, method, path, query, data, manager, view):
     view.Page.html('Sample 1 Page')
 
-@pageview(SampleManager)
+@pageview(Manager)
 def sample2(request, method, path, query, data, manager, view):
     view.Page.html('Sample 1 Page')

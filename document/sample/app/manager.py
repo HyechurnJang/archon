@@ -39,4 +39,7 @@ import archon
 #===============================================================================
 # Create your manager here.
 #===============================================================================
-class SampleManager(archon.Manager): pass
+class Manager(archon.Manager):
+    
+    def __init__(self):
+        pass

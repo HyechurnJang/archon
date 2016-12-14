@@ -42,6 +42,9 @@ class Get(ANCH):
         VIEW.setAttrs({'class' : 'data-action', 'onclick' : "GetData('%s');" % url}, attrs)
         ANCH.__init__(self, **attrs)
         self.html(element)
+        
+def GetOnClick(url):
+    return "GetData('%s');" % url 
 
 class Post(DIV):
     

@@ -10,6 +10,11 @@ h1, h2, h3, h4, h5, h6 {
 	color: #444;
 }
 
+td>p {
+	margin: 0px;
+	padding: 0px;
+}
+
 #loginboard {
 	position: absolute;
 	width: 100%;
@@ -62,19 +67,8 @@ h1, h2, h3, h4, h5, h6 {
 	font-size: 40px;
 }
 
-.panel {
-	border-radius: 0px;
-	-webkit-box-shadow: 0 3px 9px rgba(0, 0, 0, .05);
-	box-shadow: 0 3px 9px rgba(0, 0, 0, .05);
-}
-
-.alert {
-	border-radius: 2px;
-	-webkit-box-shadow: 0 3px 9px rgba(0, 0, 0, .05);
-	box-shadow: 0 3px 9px rgba(0, 0, 0, .05);
-}
 .alert>strong {
-	padding-right: 10px;
+	padding-right: 15px;
 }
 
 
