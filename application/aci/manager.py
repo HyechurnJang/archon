@@ -176,7 +176,7 @@ class EndpointTracker(acidipy.SubscribeHandler):
                                      stop='0000-00-00 00:00:00')
         
 
-class Manager(archon.BaseManager, acidipy.MultiDomain):
+class Manager(archon.ManagerAbstraction, acidipy.MultiDomain):
     
     def __init__(self, mon_sec=60, mon_cnt=10, debug=False):
         acidipy.MultiDomain.__init__(self, conns=5, conn_max=10, debug=debug)

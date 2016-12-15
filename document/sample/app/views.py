@@ -42,13 +42,13 @@ from manager import Manager
 #===============================================================================
 
 @pageview(Manager)
-def direct_sample(request, method, path, query, data, manager, view):
+def direct_sample(request, manager, view):
     view.Page.html('Direct Sample Page')
 
 @pageview(Manager)
-def sample1(request, method, path, query, data, manager, view):
+def sample1(request, manager, view):
     view.Page.html('Sample 1 Page')
 
 @pageview(Manager)
-def sample2(request, method, path, query, data, manager, view):
+def sample2(request, manager, view):
     view.Page.html('Sample 1 Page')

@@ -39,7 +39,7 @@ import archon
 #===============================================================================
 # Create your manager here.
 #===============================================================================
-class Manager(archon.Manager):
+class Manager(archon.ManagerAbstraction):
     
     def __init__(self):
         pass

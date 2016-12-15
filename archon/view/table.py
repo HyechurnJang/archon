@@ -58,7 +58,7 @@ class DataTable(VIEW):
 class FooTable(VIEW):
     
     def __init__(self, *heads, **attrs):
-        VIEW.setAttrs({'id' : VIEW.getUUID(), 'class' : 'table', 'data-sorting' : 'true', 'data-show-toggle' : 'true', 'data-paging' : 'true', 'width' : '100%', 'lib' : 'footable'}, attrs)
+        VIEW.setAttrs({'id' : VIEW.getUUID(), 'class' : 'table', 'data-show-toggle' : 'true', 'data-paging' : 'true', 'width' : '100%', 'lib' : 'footable'}, attrs)
         VIEW.__init__(self, 'TABLE', **attrs)
         self.body = TBODY()
         tr = TR()

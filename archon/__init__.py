@@ -45,7 +45,7 @@ from archon.settings import SESSION_COOKIE_AGE
 from archon.common import *
 from archon.view import *
 
-class BaseManager:
+class ManagerAbstraction:
     
     __MANAGER__ = None
     
