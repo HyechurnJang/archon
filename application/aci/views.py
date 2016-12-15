@@ -58,6 +58,9 @@ def tenant(Req, Man, View):
 
 @pageview(Manager)
 def epg(Req, Man, View):
+    
+    key = ['name', 'childAction', 'configIssues', 'configSt', 'descr', 'dn', 'fwdCtrl', 'isAttrBasedEPg', 'lcOwn', 'matchT', 'modTs', 'monPolDn', 'pcEnfPref', 'pcTag', 'prefGrMemb', 'prio', 'scope', 'status', 'triggerSt', 'txId', 'uid']
+    
     return 'Endpoint Group'
 
 @pageview(Manager)

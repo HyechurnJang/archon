@@ -24,7 +24,7 @@ Cisco Application Centric Manager
 
 #### 1.1.2. Install Python Package 
 
-	$ pip install django mysqlclient
+	$ pip install django mysqlclient openpyxl
 
 #### 1.1.3. Install Acidipy
 
