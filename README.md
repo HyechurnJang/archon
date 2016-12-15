@@ -28,7 +28,7 @@ Cisco Application Centric Manager
 
 #### 1.1.3. Install Acidipy
 
-	[Acidipy Link](https://github.com/HyechurnJang/acidipy)
+[Acidipy Link](https://github.com/HyechurnJang/acidipy)
 
 #### 1.1.4. Create Database
 
