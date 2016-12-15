@@ -134,7 +134,6 @@ def device_one(R, M, V):
     dn = '/'.join(R.Path[4:])
     
     node_data = M[domain_name](dn, detail=True)
-    children = node_data.children(detail=True)
     
     V.Page.html(HEAD(1).html(node_data['name']))
     
@@ -146,17 +145,24 @@ def device_one(R, M, V):
         for key in node_data.System: lo_system.html(KeyVal(key, node_data.System[key]))
         V.Page.html(COL(6).html(HEAD(3).html(V('Details'))).html(lo_detail))
         V.Page.html(COL(6).html(HEAD(3).html(V('System'))).html(lo_system))
+        
+        physif = node_data.System.PhysIf.list(detail=True)
+        if physif:
+            key = physif[0].keys()
+            col = []
+            for k in key: col.append('+' + k if k != 'id' else V('ID'))
+            
+            physif_table = FooTable(*col)
+            lo_physif = DIV(**{'style' : 'padding:0px 0px 0px 40px;'}).html(physif_table)
+            V.Page.html(COL(12).html(HEAD(3).html(V('Physical Interface'))).html(lo_physif))
+            
+            for pi in physif:
+                val = []
+                for k in key: val.append(pi[k])
+                physif_table.record(*val)
     else:
         V.Page.html(COL(12).html(HEAD(3).html(V('Details'))).html(lo_detail))
     
-    lo_child = DIV(**{'style' : 'padding:0px 0px 0px 40px;'})
-    V.Page.html(COL(12).html(HEAD(3).html(V('Child Objects'))).html(lo_child))
-    for child in children:
-        key = child.keys(); val = []; hkey = []
-        for k in key: val.append(child[k])
-        for k in key: hkey.append('+' + k)
-        lo_child.html(FooTable(V('Class Name'), *hkey).record(child.class_name, *val))
-
 def tenant_all(R, M, V):
     tns = M.Tenant.list()
     epgs = M.EPG.list()
@@ -208,24 +214,52 @@ def tenant_one(R, M, V):
     V.Page.html(HEAD(1).html(tenant['name']))
     
     lo_detail = DIV(**{'style' : 'padding:0px 0px 0px 40px;'})
-    V.Page.html(COL(12).html(HEAD(3).html(V('Details'))).html(COL(12).html(lo_detail)))
+    V.Page.html(
+        COL(12).html(
+            HEAD(3).html(
+                V('Details')
+            )
+        )
+    ).html(
+        COL(12).html(
+            lo_detail
+        )
+    )
     for key in tenant: lo_detail.html(KeyVal(key, tenant[key]))
-    
-    approf = tenant.AppProfile.list(detail=True)
-    lo_ap = DIV(**{'style' : 'padding:0px 0px 0px 40px;'})
-    lo_detail.html(DIV().html(HEAD(4).html(V('Application Profile'))).html(lo_ap))
-    for ap in approf:
-        key = ap.keys(); val = []; hkey = []
-        for k in key: val.append(ap[k])
-        for k in key: hkey.append('+' + k if k != 'name' else k)
-        lo_ap.html(FooTable(*hkey).record(*val))
-        
-        epgs = ap.EPG.list(detail=True)
-        lo_epg = DIV(**{'style' : 'padding:0px 0px 0px 40px;'})
-        lo_ap.html(DIV().html(HEAD(4).html(V('EPG'))).html(lo_epg))
-        for epg in epgs:
-            key = epg.keys(); val = []; hkey = []
-            for k in key: val.append(epg[k])
-            for k in key: hkey.append('+' + k if k != 'name' else k)
-            lo_epg.html(FooTable(*hkey).record(*val))
 
+    approf = tenant.AppProfile.list(detail=True)
+    if approf:
+        akey = approf[0].keys()
+        acol = []
+        for k in akey: acol.append('+' + k if k != 'name' else V('Application Profile Name'))    
+        lo_apepg = DIV(**{'style' : 'padding:0px 0px 0px 40px;'})
+        V.Page.html(
+            COL(12).html(
+                HEAD(3).html(
+                    V('Application Profile')
+                )
+            )
+        ).html(
+            COL(12).html(
+                lo_apepg
+            )
+        )
+        for ap in approf:
+            val = []
+            for k in akey: val.append(ap[k])
+            lo_apepg.html(FooTable(*acol).record(*val))
+            
+            epgs = ap.EPG.list(detail=True)
+            if epgs:
+                ekey = epgs[0].keys()
+                ecol = []
+                for k in ekey: ecol.append('+' + k if k != 'name' else V('EPG Name'))
+                 
+                epg_table = FooTable(*ecol)
+                lo_epg = DIV(**{'style' : 'padding:0px 0px 0px 40px;'}).html(epg_table)
+                lo_apepg.html(lo_epg)
+                 
+                for epg in epgs:
+                    val = []
+                    for k in ekey: val.append(epg[k])
+                    epg_table.record(*val)
