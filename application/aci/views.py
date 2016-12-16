@@ -58,9 +58,6 @@ def tenant(Req, Man, View):
 
 @pageview(Manager)
 def epg(Req, Man, View):
-    
-    key = ['name', 'childAction', 'configIssues', 'configSt', 'descr', 'dn', 'fwdCtrl', 'isAttrBasedEPg', 'lcOwn', 'matchT', 'modTs', 'monPolDn', 'pcEnfPref', 'pcTag', 'prefGrMemb', 'prio', 'scope', 'status', 'triggerSt', 'txId', 'uid']
-    
     return 'Endpoint Group'
 
 @pageview(Manager)
@@ -142,8 +139,6 @@ def config(Req, Man, View):
                      Man[domain_name]['conns'],
                      Man[domain_name]['conn_max'],
                      DelButton('/aci/conf/' + domain_name, View('Delete'), tail=True))
-    
-    
     
     if alert != None: View.Page.html(alert)
     View.Page.html(table)
