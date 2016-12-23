@@ -41,107 +41,167 @@ from show import *
 #===============================================================================
 # Create your views here.
 #===============================================================================
+@pageview(Manager)
+def overview(R, M, V):
+    health = M.getHealth()
+    
+    topo_hist = Line(*health['_tstamp'], **(Chart.NOXLY100 + Chart.RATIO_2 + Chart.NOLEGEND))
+    node_hist = Line(*health['_tstamp'], **(Chart.NOXLY100 + Chart.RATIO_4 + Chart.NOLEGEND))
+    epgs_hist = Line(*health['_tstamp'], **(Chart.NOXLY100 + Chart.RATIO_2 + Chart.NOLEGEND))
+    
+    node_cur = []
+    epgs_cur = []
+    
+    dns = health.keys()
+    
+    for dn in dns:
+        if dn == '_tstamp': continue
+        elif '/epg-' in dn:
+            name = re.sub('(uni/|tn-|ap-|epg-)', '', dn)
+            epgs_hist.Data(name, fill=False, *health[dn])
+            epgs_cur.append((name, health[dn][-1]))
+        elif '/node-' in dn:
+            name = re.sub('(topology/|pod-|node-)', '', dn)
+            node_hist.Data(name, fill=False, *health[dn])
+            node_cur.append((name, health[dn][-1]))
+        elif '/' not in dn or '/topology' in dn:
+            topo_hist.Data(dn, fill=False, *health[dn])
+    
+    node_cols = []
+    node_vals = []
+    epgs_cols = []
+    epgs_vals = []
+    node_cur = sorted(node_cur, key=lambda node: node[1])
+    epgs_cur = sorted(epgs_cur, key=lambda node: node[1])
+    for nc in node_cur: node_cols.append(nc[0]); node_vals.append(nc[1])
+    for ec in epgs_cur: epgs_cols.append(ec[0]); epgs_vals.append(ec[1])
+    
+    node_now = HealthBar(*node_cols, **(Chart.NOXLY100 + Chart.RATIO_4 + Chart.NOLEGEND)).Data(V('Current Health'), *node_vals)
+    epgs_now = HealthBar(*epgs_cols, **(Chart.NOXLY100 + Chart.RATIO_2 + Chart.NOLEGEND)).Data(V('Current Health'), *epgs_vals)
+    
+    
+    V.Page.html(
+        ROW().html(
+            COL(6).html(topo_hist),
+            COL(6).html(
+                ROW().html(
+                    COL(12).html(node_hist)
+                ),
+                ROW().html(
+                    COL(12).html(node_now)
+                ),
+            ),
+        ),
+        ROW().html(
+            COL(6).html(epgs_hist),
+            COL(6).html(epgs_now)
+        )
+    )
 
 @pageview(Manager)
-def device(Req, Man, View):
-    if Req.Method == 'GET':
-        plen = len(Req.Path)
-        if plen > 4: return device_one(Req, Man, View)
-        elif plen > 3: return device_all(Req, Man, View)
-        else: return device_all(Req, Man, View)
+def device(R, M, V):
+    if R.Method == 'GET':
+        plen = len(R.Path)
+        if plen > 4: return device_one(R, M, V)
+        elif plen > 3: return device_all(R, M, V)
+        else: return device_all(R, M, V)
      
 @pageview(Manager)
-def tenant(Req, Man, View):
-    if Req.Method == 'GET':
-        if len(Req.Path) > 3: return tenant_one(Req, Man, View)
-        else: return tenant_all(Req, Man, View) 
+def tenant(R, M, V):
+    if R.Method == 'GET':
+        if len(R.Path) > 3: return tenant_one(R, M, V)
+        else: return tenant_all(R, M, V) 
 
 @pageview(Manager)
-def epg(Req, Man, View):
-    return 'Endpoint Group'
+def epg(R, M, V):
+    if R.Method == 'GET':
+        if len(R.Path) > 3: return epg_one(R, M, V)
+        else: return epg_all(R, M, V)
+    
+@pageview(Manager)
+def endpoint(R, M, V):
+    if R.Method == 'GET':
+        if len(R.Path) > 3: return ep_one(R, M, V)
+        else: return ep_all(R, M, V)
 
 @pageview(Manager)
-def ep(Req, Man, View):
-    return 'Endpoint'
-
-@pageview(Manager)
-def contract(Req, Man, View):
+def contract(R, M, V):
     return 'Contract'
 
 @pageview(Manager)
-def external(Req, Man, View):
+def external(R, M, V):
     return 'External Network'
 
 @pageview(Manager)
-def fault(Req, Man, View):
+def fault(R, M, V):
     return 'Fault'
 
 
 @pageview(Manager)
-def intf_util(Req, Man, View):
+def intf_util(R, M, V):
     return 'Interface Utilization'
 
 @pageview(Manager)
-def epg_util(Req, Man, View):
+def epg_util(R, M, V):
     return 'Epg Utilization'
 
 
 @pageview(Manager)
-def eptracker(Req, Man, View):
+def eptracker(R, M, V):
     return 'EP Tracker'
 
 @pageview(Manager)
-def ofinder(Req, Man, View):
+def ofinder(R, M, V):
     return 'Object Finder'
 
 
 @pageview(Manager)
-def config(Req, Man, View):
+def config(R, M, V):
     
     alert = None
     
-    if Req.Method == 'POST':
-        if Man.addDomain(Req.Data['domain_name'], Req.Data['ip'], Req.Data['user'], Req.Data['passwd']):
-            alert = Alert(View('Connection Success'),
-                          View('Setting %s with %s') % (Req.Data['ip'], Req.Data['domain_name']),
+    if R.Method == 'POST':
+        if M.addDomain(R.Data['domain_name'], R.Data['ip'], R.Data['user'], R.Data['password']):
+            alert = Alert(V('Connection Success'),
+                          V('Setting %s with %s') % (R.Data['ip'], R.Data['domain_name']),
                           **{'class' : 'alert-success'})
         else:
-            alert = Alert(View('Connection Failed'),
-                          View('Incorrect Setting %s') % Req.Data['domain_name'],
+            alert = Alert(V('Connection Failed'),
+                          V('Incorrect Setting %s') % R.Data['domain_name'],
                           **{'class' : 'alert-danger'})
         
-    elif Req.Method == 'DELETE':
-        if Man.delDomain(Req.Path[2]):
-            alert = Alert(View('Disconnection Success'),
-                          View('Erasing %s') % Req.Path[2],
+    elif R.Method == 'DELETE':
+        if M.delDomain(R.Path[2]):
+            alert = Alert(V('Disconnection Success'),
+                          V('Erasing %s') % R.Path[2],
                           **{'class' : 'alert-success'})
         else:
-            alert = Alert(View('Disconnection Failed'),
-                          View('Incorrect Erasing %s') % Req.Path[2],
+            alert = Alert(V('Disconnection Failed'),
+                          V('Incorrect Erasing %s') % R.Path[2],
                           **{'class' : 'alert-danger'})
     
-    View.Menu.html(
-        Modal(View('Register APIC Domain'), BUTTON(**{'class' : 'btn-primary', 'style' : 'float:right;'}).html(View('Connect APIC'))).html(
-            Post('/aci/conf', View('Register'), **{'class' : 'btn-primary', 'style' : 'float:right;'}
-            ).Text('domain_name', Post.TopLabel(View('APIC Domain Name')), placeholder=View('Unique Name Required')
-            ).Text('ip', Post.TopLabel(View('APIC Address')), placeholder='XXX.XXX.XXX.XXX'
-            ).Text('user', Post.TopLabel(View('Admin ID')), placeholder='admin'
-            ).Password(label=Post.TopLabel(View('Password')))
+    V.Menu.html(
+        Modal(V('Register APIC Domain'), BUTTON(**{'class' : 'btn-primary', 'style' : 'float:right;'}).html(V('Connect APIC'))).html(
+            Post('/aci/conf', V('Register'), **{'class' : 'btn-primary', 'style' : 'float:right;'}
+            ).Text('domain_name', Post.TopLabel(V('APIC Domain Name')), placeholder=V('Unique Name Required')
+            ).Text('ip', Post.TopLabel(V('APIC Address')), placeholder='XXX.XXX.XXX.XXX'
+            ).Text('user', Post.TopLabel(V('Admin ID')), placeholder='admin'
+            ).Password(label=Post.TopLabel(V('Password')))
         )
     )
     
-    table = FooTable(View('Domain Name'), View('+APIC IP'), View('+Administrator ID'), View('+Start Connections'), View('+Max Connections'), '')
+    table = FooTable(V('Domain Name'), V('+APIC IP'), V('+Administrator ID'), V('+Start Connections'), V('+Max Connections'), '')
     
-    for domain_name in Man:
-        table.record(domain_name,
-                     Man[domain_name]['ip'],
-                     Man[domain_name]['user'],
-                     Man[domain_name]['conns'],
-                     Man[domain_name]['conn_max'],
-                     DelButton('/aci/conf/' + domain_name, View('Delete'), tail=True))
+    for domain_name in M:
+        table.Record(domain_name,
+                     M[domain_name]['ip'],
+                     M[domain_name]['user'],
+                     M[domain_name]['conns'],
+                     M[domain_name]['conn_max'],
+                     DelButton('/aci/conf/' + domain_name, V('Delete'), tail=True))
     
-    if alert != None: View.Page.html(alert)
-    View.Page.html(table)
+    if alert != None: V.Page.html(alert)
+    V.Page.html(table)
 
 
 

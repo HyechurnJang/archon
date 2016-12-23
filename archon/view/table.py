@@ -39,14 +39,13 @@ from core import *
 class DataTable(VIEW):
     
     def __init__(self, *heads, **attrs):
-        VIEW.setAttrs({'id' : VIEW.getUUID(), 'class' : 'table table-bordered table-hover', 'width' : '100%', 'lib' : 'datatable'}, attrs)
-        VIEW.__init__(self, 'TABLE', **attrs)
+        VIEW.__init__(self, 'TABLE', **ATTR.merge(attrs, {'id' : VIEW.getUUID(), 'class' : 'table table-bordered table-hover', 'width' : '100%', 'lib' : 'datatable'}))
         self.body = TBODY()
         tr = TR()
         for head in heads: tr.html(TH().html(head))
         self.html(THEAD().html(tr)).html(self.body)
         
-    def record(self, *cols, **attrs):
+    def Record(self, *cols, **attrs):
         tr = TR(**attrs)
         for col in cols: tr.html(TD().html(col))
         self.body.html(tr)
@@ -58,8 +57,7 @@ class DataTable(VIEW):
 class FooTable(VIEW):
     
     def __init__(self, *heads, **attrs):
-        VIEW.setAttrs({'id' : VIEW.getUUID(), 'class' : 'table', 'data-show-toggle' : 'true', 'data-paging' : 'true', 'width' : '100%', 'lib' : 'footable'}, attrs)
-        VIEW.__init__(self, 'TABLE', **attrs)
+        VIEW.__init__(self, 'TABLE', **ATTR.merge(attrs, {'id' : VIEW.getUUID(), 'class' : 'table', 'data-show-toggle' : 'true', 'data-paging' : 'true', 'width' : '100%', 'lib' : 'footable'}))
         self.body = TBODY()
         tr = TR()
         for head in heads:
@@ -67,7 +65,7 @@ class FooTable(VIEW):
             else: tr.html(TH(**{'data-type' : 'html'}).html(head))
         self.html(THEAD().html(tr)).html(self.body)
         
-    def record(self, *cols, **attrs):
+    def Record(self, *cols, **attrs):
         tr = TR(**attrs)
         for col in cols: tr.html(TD(**{'data-type' : 'html'}).html(col))
         self.body.html(tr)

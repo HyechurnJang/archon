@@ -81,7 +81,7 @@ $(document).ready(function() {
 					}
 				},
 				error : function(xhr, status, thrown) {
-					window.alert(status);
+					window.alert("Session Timeout!");
 					window.location.replace('/');
 				}
 			});
@@ -124,7 +124,7 @@ function GetData(url) {
 				page_current.collapse("show");
 			},
 			error : function(xhr, status, thrown) {
-				window.alert(status);
+				window.alert("Session Timeout!");
 				window.location.replace('/');
 			}
 		});
@@ -159,7 +159,7 @@ function PostData(uuid, url) {
 				page_current.collapse("show");
 			},
 			error : function(xhr, status, thrown) {
-				window.alert(status);
+				window.alert("Session Timeout!");
 				window.location.replace('/');
 			}
 		});
@@ -186,7 +186,7 @@ function DeleteData(url) {
 				page_current.collapse("show");
 			},
 			error : function(xhr, status, thrown) {
-				window.alert(status);
+				window.alert("Session Timeout!");
 				window.location.replace('/');
 			}
 		});
@@ -219,30 +219,24 @@ function ParseViewData(view) {
 		for (var i = 0, element; element = elements[i]; i++) { ParseViewData(element); }
 		switch(view.type) {
 		case "TABLE": UXTable(view); break;
+		case "DIV": UXChart(view); break;
+		case "CANVAS": UXChart(view); break;
 		}
 	}
 };
 
 function UXTable(view) {
-	if (view.attrs.lib == "datatable") {
-		$("#" + view.attrs.id).DataTable({
-			scrollX: false,
-	    	dom: 'Bfrtip',
-	        lengthMenu: [
-	            [ 10, 25, 50, -1 ],
-	            [ '10 rows', '25 rows', '50 rows', 'Show all' ]
-	        ],
-	        buttons: [
-	        	{extend:'pageLength', text:'<i class="fa fa-align-justify"></i>', titleAttr:'Rows'},
-	            {extend:'colvis', text:'<i class="fa fa-th-list"></i>', titleAttr:'Cols'},
-	            {extend:'excelHtml5', text:'<i class="fa fa-file-excel-o"></i>', titleAttr:'Excel'},
-	            {extend:'pdfHtml5', text:'<i class="fa fa-file-pdf-o"></i>', titleAttr:'PDF'},
-	            {extend:'print', text:'<i class="fa fa-print"></i>', titleAttr:'Print'}
-	        ],
-	        search: { "regex": false },
-	        destroy: true
-	    });
-	} else if (view.attrs.lib == "footable") {
-		$("#" + view.attrs.id).footable();
+	switch(view.attrs.lib) {
+	case "datatable": UXDataTable(view); break;
+	case "footable": UXFooTable(view); break;
 	}
 };
+
+function UXChart(view) {
+	switch(view.attrs.lib) {
+	case "chartjs": UXChartJS(view); break;
+	case "sigmajs": UXSigmaJS(view); break;
+	case "nextui": UXNextUI(view); break;
+	}
+}; 
+

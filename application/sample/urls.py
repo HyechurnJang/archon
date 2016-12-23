@@ -34,66 +34,19 @@
 #                                                                              #
 ################################################################################
 
-from core import *
+from django.conf.urls import url, include
+from . import views
 
-class Get(ANCH):
-    
-    def __init__(self, url, **attrs):
-        ANCH.__init__(self, **ATTR.merge(attrs, {'class' : 'data-action', 'onclick' : "GetData('%s');" % url}))
-        
-class Post(DIV):
-    
-    class TopLabel(LABEL):
-        def __init__(self, label, **attrs):
-            LABEL.__init__(self, **attrs)
-            self.html(label)
-            
-    class InLabel(SPAN):
-        def __init__(self, label, **attrs):
-            SPAN.__init__(self, **ATTR.merge(attrs, {'class' : 'input-group-addon'}))
-            self.html(label)
-     
-    def __init__(self, url, label='Submit', **attrs):
-        DIV.__init__(self)
-        self.uuid = VIEW.getUUID()
-        self.html(
-            DIV(**{'class' : 'input-group'}).html(
-                BUTTON(**ATTR.merge(attrs, {'onclick' : "PostData('." + self.uuid + "','%s');" % url})).html(label)
-            )
-        )
-         
-    def Text(self, name, label, **attrs):
-        self['elements'].insert(-1,
-            DIV(**{'class' : 'input-group'}).html(label).html(
-                INPUT(**ATTR.merge(attrs, {'type' : 'text', 'name' : name, 'class' : 'form-control ' + self.uuid}))
-            )
-        )
-        return self
-    
-    def Password(self, name='password', label='Password', **attrs):
-        self['elements'].insert(-1,
-            DIV(**{'class' : 'input-group'}).html(label).html(
-                INPUT(**ATTR.merge(attrs, {'type' : 'password', 'name' : name, 'class' : 'form-control ' + self.uuid}))
-            )
-        )
-        return self
-    
-class Delete(ANCH):
-    
-    def __init__(self, element, url, **attrs):
-        ANCH.__init__(self, **ATTR.merge(attrs, {'class' : 'data-action', 'onclick' : "DeleteData('%s');" % url}))
-        self.html(element)
+#===============================================================================
+# Link your view here.
+#===============================================================================
+url_sample = [
+    url(r'html/?', views.html, name=u'html'),
+    url(r'chartjs/?', views.chartjs, name=u'chartjs'),
+    url(r'nextui/?', views.nextui, name=u'nextui'),
+    url(r'sigmajs/?', views.sigmajs, name=u'sigmajs'),
+]
 
-class DelClick(VIEW):
-    
-    def __init__(self, url, tail=False, **attrs):
-        if tail: VIEW.__init__(self, 'button', **ATTR.merge(attrs, {'class' : 'close', 'onclick' : "DeleteData('%s');" % url}))
-        else: VIEW.__init__(self, 'button', **ATTR.merge(attrs, {'class' : 'close', 'onclick' : "DeleteData('%s');" % url, 'style' : 'float:none;'}))
-        self.html('&times;')
-
-class DelButton(BUTTON):
-    
-    def __init__(self, url, text='Delete', tail=False, **attrs):
-        if tail: BUTTON.__init__(self, **ATTR.merge(attrs, {'class' : 'btn-danger btn-xs', 'onclick' : "DeleteData('%s');" % url, 'style' : 'float:right;'}))
-        else: BUTTON.__init__(self, **ATTR.merge(attrs, {'class' : 'btn-danger btn-xs', 'onclick' : "DeleteData('%s');" % url}))
-        self.html(text)
+urlpatterns = [
+    url(r'samples/', include(url_sample, namespace=u'샘플예제')),
+]

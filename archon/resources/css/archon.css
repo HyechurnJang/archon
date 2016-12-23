@@ -150,14 +150,22 @@ td>p {
 }
 
 .keyval {
-	margin:0px;
+	width: 100%;
+	margin-top: 20px;
+	margin-bottom: 20px;
+	border-top: 2px solid #ddd;
+	padding: 8px 8px 8px 8px;
 }
-.keyval-key {
-	float:left;
-	font-weight:bold;
-	font-size:14px;
-	padding:0px;
-	margin:0px;
+.keyval>table {
+	width : 100%;
+}
+.keyval>table>tbody>tr>th,
+.keyval>table>tbody>tr>td {
+	border-bottom: 1px dashed #ddd;
+}
+
+.indent {
+	padding-left: 40px;
 }
 
 .data-action {
@@ -169,6 +177,37 @@ td>p {
 .data-action:focus {
 	font-weight: bold;
 	text-decoration: none;
+	color: #333;
+}
+
+.para {
+	margin: 0px;
+	padding: 0px;
+}
+
+.panelcol {
+	padding: 4px;
+	border: 1px solid #ddd;
+	border-radius: 2px;
+	-webkit-box-shadow: 0 1px 1px rgba(0, 0, 0, .5);
+    box-shadow: 0 1px 1px rgba(0, 0, 0, .5);
+}
+
+.colwrapper {
+	padding: 5px;
+}
+
+.row {
+	margin-left: -5px;
+	margin-right: -5px;
+}
+
+.chartwrapper {
+	width: 100%;
+	min-width: 300px;
+	max-width: 1920px;
+    margin: auto;
+    padding: 0px;
 }
 
 

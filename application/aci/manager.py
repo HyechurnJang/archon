@@ -55,7 +55,7 @@ class HealthMonitor(archon.ArchonTask):
         self.health = {'_tstamp' : []}
         init_time = time.time()
         for i in reversed(range(0, mon_cnt)):
-            self.health['_tstamp'].append(time.strftime("%Y-%m-%dT%H:%M:%S", time.localtime(init_time - (mon_sec * (i + 1)))))
+            self.health['_tstamp'].append('Unknown')
         
     def getNewHealthHist(self, dn, score):
         if dn in self.health:
@@ -72,7 +72,7 @@ class HealthMonitor(archon.ArchonTask):
         return self.health
     
     def sched(self):
-        now = time.strftime("%Y-%m-%dT%H:%M:%S", time.localtime(time.time()))
+        now = time.strftime("%H:%M:%S", time.localtime(time.time()))
         
         total = self.manager.health()
         pod = self.manager.Pod.health()
@@ -178,7 +178,7 @@ class EndpointTracker(acidipy.SubscribeHandler):
 
 class Manager(archon.ManagerAbstraction, acidipy.MultiDomain):
     
-    def __init__(self, mon_sec=60, mon_cnt=10, debug=False):
+    def __init__(self, mon_sec=5, mon_cnt=10, debug=False):
         acidipy.MultiDomain.__init__(self, conns=5, conn_max=10, debug=debug)
         EndpointTracker.initDatabase()
         self.scheduler = archon.Scheduler(10)
@@ -209,3 +209,6 @@ class Manager(archon.ManagerAbstraction, acidipy.MultiDomain):
         acidipy.MultiDomain.delDomain(self, domain_name)
         domain.delete()
         return True
+
+    def getHealth(self):
+        return self.healthmon.getHealth()

@@ -44,6 +44,9 @@ from django.http import JsonResponse
 from archon.settings import SESSION_COOKIE_AGE
 from archon.common import *
 from archon.view import *
+from PIL._imaging import path
+
+ARCHON_DEBUG = False
 
 class ManagerAbstraction:
     
@@ -53,6 +56,35 @@ class ManagerAbstraction:
     def instance(cls, *argv, **kargs):
         if cls.__MANAGER__ == None: cls.__MANAGER__ = cls(*argv, **kargs)
         return cls.__MANAGER__
+
+class ArchonView:
+        
+    def __init__(self, app, lang):
+        self.Menu = DIV()
+        self.Page = DIV()
+        self._app = app
+        self._lang = lang
+        
+    def __call__(self, key):
+        glb_locale = archon_locales['GLOBAL']
+        if self._app in archon_locales:
+            app_locale = archon_locales[self._app]
+            if key in app_locale:
+                key_locale = app_locale[key]
+                for lang in self._lang:
+                    if lang in key_locale: return key_locale[lang]
+        if key in glb_locale:
+            key_locale = glb_locale[key]
+            for lang in self._lang:
+                if lang in key_locale: return key_locale[lang]
+        return key
+        
+    def __render__(self):
+        return {'menu' : self.Menu, 'page' : self.Page}
+    
+    @classmethod
+    def __error__(cls, title, msg):
+        return {'menu' : DIV(), 'page' : Alert(title, msg, **{'class' : 'alert-danger'})}
 
 def pageview(manager_class):
     
@@ -65,36 +97,7 @@ def pageview(manager_class):
             self.Query = query
             self.Data = data
         
-    class View:
-        
-        def __init__(self, app, lang):
-            self.Menu = DIV()
-            self.Page = DIV()
-            self._app = app
-            self._lang = lang
-            
-        def __call__(self, key):
-            glb_locale = archon_locales['GLOBAL']
-            if self._app in archon_locales:
-                app_locale = archon_locales[self._app]
-                if key in app_locale:
-                    key_locale = app_locale[key]
-                    for lang in self._lang:
-                        if lang in key_locale: return key_locale[lang]
-            if key in glb_locale:
-                key_locale = glb_locale[key]
-                for lang in self._lang:
-                    if lang in key_locale: return key_locale[lang]
-            return key
-            
-        def __render__(self):
-            return {'menu' : self.Menu, 'page' : self.Page}
-        
-        @classmethod
-        def __error__(cls, title, msg):
-            return {'menu' : DIV(), 'page' : Alert(title, msg, **{'class' : 'alert-danger'})}
-    
-    def pageview_wrapper(view):
+    def wrapper(view):
         
         @login_required
         def decofunc(request):
@@ -105,7 +108,7 @@ def pageview(manager_class):
             lang = filter(None, re.split(';|,|q=0.\d', request.META['HTTP_ACCEPT_LANGUAGE']))
             app = view.__module__.split('.')[1]
             
-            v = View(app, lang)
+            v = ArchonView(app, lang)
             
             try:
                 if method == 'GET': query = request.GET; data = {}
@@ -113,19 +116,43 @@ def pageview(manager_class):
                 elif method == 'PUT': query = request.PUT; data = json.loads(request.body)
                 elif method == 'DELETE': query = {}; data = {}
                 else: query = {}; data = {}
-            except Exception as e: return JsonResponse(View.__error__(v('request error'), str(e)))
+            except Exception as e: return JsonResponse(ArchonView.__error__(v('request error'), str(e)))
             
             try: m = manager_class.instance()
-            except Exception as e: return JsonResponse(View.__error__(v('manager allocation error'), str(e)))
+            except Exception as e: return JsonResponse(ArchonView.__error__(v('manager allocation error'), str(e)))
 
             r = Req(request, method, path, query, data)
             try: view(r, m, v)
-            except Exception as e: return JsonResponse(View.__error__(v('application error'), str(e)))
+            except Exception as e: return JsonResponse(ArchonView.__error__(v('application error'), str(e)))
             return JsonResponse(v.__render__())
         
-        return decofunc
+        def decofunc_debug(request):
+            method = request.method
+            path = filter(None, request.path.split('/'))
+            lang = filter(None, re.split(';|,|q=0.\d', request.META['HTTP_ACCEPT_LANGUAGE']))
+            app = view.__module__.split('.')[1]
+            
+            print method
+            print path
+            
+            v = ArchonView(app, lang)
+            
+            if method == 'GET': query = request.GET; data = {}
+            elif method == 'POST': query = request.POST; data = json.loads(request.body)
+            elif method == 'PUT': query = request.PUT; data = json.loads(request.body)
+            elif method == 'DELETE': query = {}; data = {}
+            else: query = {}; data = {}
+            
+            m = manager_class.instance()
+
+            r = Req(request, method, path, query, data)
+            view(r, m, v)
+            return JsonResponse(v.__render__())
+        
+        if ARCHON_DEBUG: return decofunc_debug
+        else: return decofunc
     
-    return pageview_wrapper
+    return wrapper
 
 def modelview(model):
     admin.site.register(model, admin.ModelAdmin)

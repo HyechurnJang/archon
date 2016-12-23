@@ -43,16 +43,16 @@ from . import views
 url_show = [
     url(r'device/?', views.device, name=u'장치'),
     url(r'tenant/?', views.tenant, name=u'테넌트'),
-    url(r'epg/?', views.epg, name=u'엔드포인트그룹'),
-    url(r'ep/?', views.ep, name=u'엔드포인트'),
+    url(r'epgroup/?', views.epg, name=u'엔드포인트그룹'),
+    url(r'endpoint/?', views.endpoint, name=u'엔드포인트'),
     url(r'contract/?', views.contract, name=u'컨트랙'),
     url(r'external/?', views.external, name=u'외부네트워크'),
     url(r'fault/?', views.fault, name=u'오류')
 ]
 
 url_stat = [
-    url(r'intf/?', views.intf_util, name=u'인터페이스 사용율'),
-    url(r'epg/?', views.epg_util, name=u'엔드포인트그룹 사용율'),
+    url(r'intfstat/?', views.intf_util, name=u'인터페이스 사용율'),
+    url(r'epgstat/?', views.epg_util, name=u'엔드포인트그룹 사용율'),
 ]
 
 url_tool = [
@@ -61,6 +61,7 @@ url_tool = [
 ]
 
 urlpatterns = [
+    url(r'overview/?', views.overview, name=u'개요'),
     url(r'show/', include(url_show, namespace=u'점검')),
     url(r'stat/', include(url_stat, namespace=u'분석')),
     url(r'tool/', include(url_tool, namespace=u'도구')),

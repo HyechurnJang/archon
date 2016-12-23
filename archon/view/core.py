@@ -41,23 +41,70 @@ class VIEW(dict):
     @classmethod
     def getUUID(cls): return str(uuid.uuid4())
     
-    @classmethod
-    def setAttrs(cls, kv, attrs):
-        for key in kv: attrs[key] = kv[key] + ' ' + attrs[key] if key in attrs else kv[key]
-    
     def __init__(self, _type, **attrs):
         dict.__init__(self, type=_type, elements=[], attrs=attrs)
-        
-    def html(self, element):
-        self['elements'].append(element)
-        return self
     
     def __len__(self, *args, **kwargs):
         return self['elements'].__len__()
+        
+    def html(self, *elements):
+        for element in elements: self['elements'].append(element)
+        return self
     
     def isEmpty(self):
         return not self.__len__()
+
+class ATTR(dict):
     
+    @classmethod
+    def merge(cls, a1, a2):
+        ret = ATTR(**a2)
+        for key in a1: ret[key] = ret[key] + ' ' + a1[key] if key in ret else a1[key]
+        return ret
+    
+    @classmethod
+    def click(cls, url):
+        return ATTR(**{'onclick' : "GetData('%s');" % url}) 
+    
+    def __init__(self, **attrs):
+        dict.__init__(self, **attrs)
+        
+    def __add__(self, attr):
+        return ATTR(**dict(self.items() + attr.items()))
+    
+    def __lshift__(self, attr):
+        for key in attr: self[key] = self[key] + ' ' + attr[key] if key in self else attr[key]
+        return self
+    
+class RGB:
+    
+    MIXNUM = 161
+    
+    @classmethod
+    def __pos_mix__(cls, c):
+        return (c + cls.MIXNUM) % 256 
+    
+    @classmethod
+    def __neg_mix__(cls, c):
+        return (c + 255 - cls.MIXNUM) % 256
+    
+    def __init__(self, r=51, g=102, b=255):
+        self.r = r
+        self.g = g
+        self.b = b
+        
+    def getRGB(self):
+        return self.r, self.g, self.b
+    
+    def getNext(self):
+        r = self.r
+        g = self.g
+        b = self.b
+        self.r = RGB.__neg_mix__(self.r)
+        self.g = RGB.__neg_mix__(self.g)
+        self.b = RGB.__pos_mix__(self.b)
+        return r, g, b
+
 class DIV(VIEW):
     def __init__(self, **attrs):
         VIEW.__init__(self, 'div', **attrs)
@@ -72,7 +119,7 @@ class HEAD(VIEW):
 
 class PARA(VIEW):
     def __init__(self, **attrs):
-        VIEW.__init__(self, 'p', **attrs)
+        VIEW.__init__(self, 'p', **ATTR.merge(attrs, {'class' : 'para'}))
 
 class ANCH(VIEW):
     def __init__(self, **attrs):
@@ -132,5 +179,4 @@ class INPUT(VIEW):
 
 class BUTTON(VIEW):
     def __init__(self, **attrs):
-        VIEW.setAttrs({'class' : 'btn', 'type' : 'button'}, attrs)
-        VIEW.__init__(self, 'button', **attrs)
+        VIEW.__init__(self, 'button', **ATTR.merge(attrs, {'class' : 'btn', 'type' : 'button'}))
