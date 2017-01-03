@@ -41,6 +41,7 @@ from . import views
 # Link your view here.
 #===============================================================================
 url_show = [
+    url(r'host/?', views.host, name=u'호스트'),
     url(r'device/?', views.device, name=u'장치'),
     url(r'tenant/?', views.tenant, name=u'테넌트'),
     url(r'epgroup/?', views.epg, name=u'엔드포인트그룹'),

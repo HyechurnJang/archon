@@ -97,6 +97,12 @@ def overview(R, M, V):
             COL(6).html(epgs_now)
         )
     )
+    
+@pageview(Manager)
+def host(R, M, V):
+    if R.Method == 'GET':
+        if len(R.Path) > 3: return host_one(R, M, V)
+        else: return host_all(R, M, V)
 
 @pageview(Manager)
 def device(R, M, V):

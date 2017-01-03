@@ -62,11 +62,6 @@ class Icon(VIEW):
     def __init__(self, icon, **attrs):
         VIEW.__init__(self, 'i', **ATTR.merge(attrs, {'class' : 'fa fa-%s' % icon}))
 
-# class KeyVal(PARA):
-#     def __init__(self, key, val, **attrs):
-#         PARA.__init__(self, **ATTR.merge(attrs, {'class' : 'keyval'}))
-#         self.html(SPAN(**{'class' : 'keyval-key'}).html(key).html(' :&nbsp;')).html(SPAN().html(val + '&nbsp;'))
-
 class KeyVal(DIV):
     
     def __init__(self, **attrs):
@@ -82,6 +77,9 @@ class KeyVal(DIV):
                 TD().html(val)
             )
         )
+    
+    def __len__(self, *args, **kwargs):
+        return self.table.__len__()
 
 class Alert(DIV):
     

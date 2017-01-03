@@ -36,11 +36,11 @@
 
 from core import *
 
-class Get(ANCH):
+class Get(STRONG):
     
     def __init__(self, url, **attrs):
-        ANCH.__init__(self, **ATTR.merge(attrs, {'class' : 'data-action', 'onclick' : "GetData('%s');" % url}))
-        
+        STRONG.__init__(self, **ATTR.merge(attrs, {'class' : 'data-action', 'onclick' : "GetData('%s');" % url}))
+
 class Post(DIV):
     
     class TopLabel(LABEL):
