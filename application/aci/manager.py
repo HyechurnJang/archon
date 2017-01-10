@@ -55,7 +55,7 @@ class HealthMonitor(archon.ArchonTask):
         self.health = {'_tstamp' : []}
         init_time = time.time()
         for i in reversed(range(0, mon_cnt)):
-            self.health['_tstamp'].append('Unknown')
+            self.health['_tstamp'].append('00:00:00')
         
     def getNewHealthHist(self, dn, score):
         if dn in self.health:
@@ -64,7 +64,7 @@ class HealthMonitor(archon.ArchonTask):
             return ret
         else:
             ret = []
-            for i in range(0, self.count - 1): ret.append(None)
+            for i in range(0, self.count - 1): ret.append(0)
             ret.append(score)
             return ret
         
@@ -113,6 +113,7 @@ class EndpointTracker(acidipy.SubscribeHandler):
     @classmethod
     def initDatabase(cls):
         EPTracker.objects.all().delete()
+        pass
     
     def __init__(self, manager, domain_name):
         self.manager = manager
@@ -126,22 +127,29 @@ class EndpointTracker(acidipy.SubscribeHandler):
         return resp_ts
     
     def getIfName(self, ep):
-        epcs = ep.children()
+        epcs = ep.Class('fvRsCEpToPathEp').list(sort='dn')
         if_dn = []
         for epc in epcs:
-            if 'tDn' in epc: if_dn.append(re.sub('(topology/|pod-|protpaths-|paths-|pathep-|\[|\])', '', epc['tDn']))
+            if_dn.append(re.sub('(topology/|pod-|protpaths-|paths-|pathep-|\[|\])', '', epc['tDn']))
         return if_dn
     
     def getInitData(self):
         ep_list = self.manager[self.domain_name].Endpoint.list(detail=True)
         for ep in ep_list:
             sdn = ep['dn'].split('/')
-            EPTracker.objects.create(mac=ep['mac'],
+            try:
+                ept = EPTracker.objects.get(domain=self.domain_name,
+                                            dn=ep['dn'],
+                                            start=self.convertTstamp(ep['modTs']),
+                                            stop='0000-00-00 00:00:00')
+            except:
+                EPTracker.objects.create(mac=ep['mac'],
                                          ip=ep['ip'],
                                          domain=self.domain_name,
                                          tenant=sdn[1].replace('tn-', ''),
                                          app=sdn[2].replace('ap-', ''),
                                          epg=sdn[3].replace('epg-', ''),
+                                         dn=ep['dn'],
                                          intf=','.join(self.getIfName(ep)),
                                          start=self.convertTstamp(ep['modTs']),
                                          stop='0000-00-00 00:00:00')
@@ -157,30 +165,30 @@ class EndpointTracker(acidipy.SubscribeHandler):
 
         try:        
             ept = EPTracker.objects.get(mac=mac,
-                                            domain=self.domain_name,
-                                            tenant=tenant,
-                                            app=app,
-                                            epg=epg,
-                                            stop='0000-00-00 00:00:00')
+                                        domain=self.domain_name,
+                                        tenant=tenant,
+                                        app=app,
+                                        epg=epg,
+                                        stop='0000-00-00 00:00:00')
             ept.update(stop=self.convertTstamp(obj['modTs']))
         except: pass
         
         EPTracker.objects.create(mac=mac,
-                                     ip=ip,
-                                     domain=self.domain_name,
-                                     tenant=sdn[1].replace('tn-', ''),
-                                     app=sdn[2].replace('ap-', ''),
-                                     epg=sdn[3].replace('epg-', ''),
-                                     intf=', '.join(self.getIfName(obj)),
-                                     start=self.convertTstamp(obj['modTs']),
-                                     stop='0000-00-00 00:00:00')
+                                 ip=ip,
+                                 domain=self.domain_name,
+                                 tenant=sdn[1].replace('tn-', ''),
+                                 app=sdn[2].replace('ap-', ''),
+                                 epg=sdn[3].replace('epg-', ''),
+                                 dn=obj['dn'],
+                                 intf=', '.join(self.getIfName(obj)),
+                                 start=self.convertTstamp(obj['modTs']),
+                                 stop='0000-00-00 00:00:00')
         
 
 class Manager(archon.ManagerAbstraction, acidipy.MultiDomain):
     
     def __init__(self, mon_sec=5, mon_cnt=10, debug=False):
         acidipy.MultiDomain.__init__(self, conns=5, conn_max=10, debug=debug)
-        EndpointTracker.initDatabase()
         self.scheduler = archon.Scheduler(10)
         self.healthmon = HealthMonitor(self, mon_sec, mon_cnt)
         self.scheduler.register(self.healthmon)
@@ -212,3 +220,7 @@ class Manager(archon.ManagerAbstraction, acidipy.MultiDomain):
 
     def getHealth(self):
         return self.healthmon.getHealth()
+    
+    def initEndpoint(self):
+        EndpointTracker.initDatabase()
+        for domain_name in self: self[domain_name].eptracker.getInitData()

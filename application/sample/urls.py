@@ -41,12 +41,10 @@ from . import views
 # Link your view here.
 #===============================================================================
 url_sample = [
-    url(r'html/?', views.html, name=u'html'),
-    url(r'chartjs/?', views.chartjs, name=u'chartjs'),
-    url(r'nextui/?', views.nextui, name=u'nextui'),
-    url(r'sigmajs/?', views.sigmajs, name=u'sigmajs'),
+    url(r'^dimple/?', views.dimple, name=u'dimple'),
+    url(r'^html/?', views.html, name=u'html'),
 ]
 
 urlpatterns = [
-    url(r'samples/', include(url_sample, namespace=u'샘플예제')),
+    url(r'^samples/', include(url_sample, namespace=u'샘플예제')),
 ]

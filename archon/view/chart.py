@@ -36,153 +36,179 @@
 
 from core import *
 
-class Chart(DIV):
-    
-    RATIO_1 = ATTR(**{'ratio' : '1:1'})
-    RATIO_2 = ATTR(**{'ratio' : '2:1'})
-    RATIO_3 = ATTR(**{'ratio' : '3:1'})
-    RATIO_4 = ATTR(**{'ratio' : '4:1'})
-    RATIO_5 = ATTR(**{'ratio' : '5:1'})
-    RATIO_6 = ATTR(**{'ratio' : '6:1'})
-    RATIO_7 = ATTR(**{'ratio' : '7:1'})
-    RATIO_8 = ATTR(**{'ratio' : '8:1'})
-    RATIO_9 = ATTR(**{'ratio' : '9:1'})
-    RATIO_A = ATTR(**{'ratio' : '10:1'})
-    RATIO_B = ATTR(**{'ratio' : '11:1'})
-    RATIO_C = ATTR(**{'ratio' : '12:1'})
-    
-    XSLEGEND = ATTR(**{'legend' : {'labels' : {'boxWidth' : 10, 'fontSize' : 8, 'padding' : 5}}})
-    NOLEGEND = ATTR(**{'legend' : {'display' : False}})
-    SCALE100 = ATTR(**{'scales' : {'yAxes' : [{'ticks' : {'min' : 0, 'max' : 100}}]}})
-    NOXLABEL = ATTR(**{'scales' : {'xAxes' : [{'display' : False}]}})
-    NOXLY100 = ATTR(**{'scales' : {'yAxes' : [{'ticks' : {'min' : 0, 'max' : 100}}], 'xAxes' : [{'display' : False}]}})
-    
+class Chart(VIEW):
+       
     def __init__(self, _type, *labels, **options):
-        if 'ratio' in options:
-            ratio = options.pop('ratio').split(':')
-            ratioW = ratio[0]
-            ratioH = ratio[1]
-        else:
-            ratioW = '1'
-            ratioH = '1'
-        DIV.__init__(self, **{'class' : 'chartwrapper'})
-        self.datasets = []
-        canvas = VIEW('CANVAS', **{'id' : VIEW.getUUID(), 'lib' : 'chartjs', 'width' : ratioW, 'height' : ratioH})
-        canvas['chart'] = {
+        VIEW.__init__(self, 'DIV', **{'id' : VIEW.getUUID(), 'lib' : 'dimple'})
+        if 'xkey' not in options: options['xkey'] = 'X'
+        if 'ykey' not in options: options['ykey'] = 'Y'
+        if 'xaxis' not in options: options['xaxis'] = True
+        if 'yaxis' not in options: options['yaxis'] = True
+        if 'width' not in options: options['width'] = 0
+        if 'height' not in options: options['height'] = 0
+        if 'min' not in options: options['min'] = None
+        if 'max' not in options: options['max'] = None
+        if 'health' not in options: options['health'] = False
+        if 'legend' not in options: options['legend'] = False
+        self.series = []
+        self.labels = labels
+        self.label_len = len(labels)
+        self.xkey = options['xkey']
+        self.ykey = options['ykey']
+        self.options = options
+        self['chart'] = {
             'type' : _type,
-            'data' : {'labels' : labels, 'datasets' : self.datasets},
+            'series' : self.series,
             'options' : options
-            }
-        self.html(canvas)
-    
+        }
+  
 class Line(Chart):
-    
+      
     def __init__(self, *labels, **options):
         Chart.__init__(self, 'line', *labels, **options)
-        self.rgb = RGB()
-    
-    def Data(self, label, *data, **desc):
-        desc['label'] = label
-        desc['data'] = data
-        rgb = self.rgb.getNext()
-        if 'borderColor' not in desc: desc['borderColor'] = 'rgba(%d,%d,%d,1)' % rgb
-        if 'backgroundColor' not in desc: desc['backgroundColor'] = 'rgba(%d,%d,%d,0.3)' % rgb
-        self.datasets.append(desc)
+         
+    def Data(self, series, *vals):
+        datasets = []
+        series = {'series' : series, 'datasets' : datasets}
+        for i in range(0, self.label_len):
+            datasets.append({self.xkey : self.labels[i], self.ykey : vals[i]})
+        self.series.append(series)
         return self
-
+    
 class Bar(Chart):
-    
-    LABEL = ATTR(**{'colortype' : 'label'})
-    DATA = ATTR(**{'colortype' : 'data'})
-    
+     
     def __init__(self, *labels, **options):
-        if 'colortype' in options: self.colortype = options.pop('colortype')
-        else: self.colortype = 'label'
-        if self.colortype == 'label':
-            rgb = RGB()
-            self.bdcolors = []
-            self.bgcolors = []
-            for l in labels:
-                color = rgb.getNext()
-                self.bdcolors.append('rgba(%d,%d,%d,1)' % color)
-                self.bgcolors.append('rgba(%d,%d,%d,0.8)' % color)
-        else: self.rgb = RGB()
         Chart.__init__(self, 'bar', *labels, **options)
-    
-    def Data(self, label, *data, **desc):
-        desc['label'] = label
-        desc['data'] = data
-        if self.colortype == 'label':
-            if 'borderColor' not in desc: desc['borderColor'] = self.bdcolors
-            if 'backgroundColor' not in desc: desc['backgroundColor'] = self.bgcolors
-        else:
-            rgb = self.rgb.getNext()
-            if 'borderColor' not in desc: desc['borderColor'] = 'rgba(%d,%d,%d,1)' % rgb
-            if 'backgroundColor' not in desc: desc['backgroundColor'] = 'rgba(%d,%d,%d,0.8)' % rgb
-        self.datasets.append(desc)
-        return self
-
-class HealthBar(Chart):
-    
-    def __init__(self, *labels, **options):
-        Chart.__init__(self, 'bar', *labels, **(Chart.NOLEGEND + options))
-
-    def Data(self, label, *data, **desc):
-        desc['label'] = label
-        desc['data'] = data
-        bdcolors = []
-        bgcolors = []
-        for d in data:
-            if d == None:
-                bdcolors.append('rgba(0,0,0,1)')
-                bgcolors.append('rgba(0,0,0,0.8)')
-            else:
-                r = 255 - int( ( 0.01 * d ) * 255 )
-                g = int( ( 0.01 * d ) * 255 )
-                bdcolors.append('rgba(%d,%d,0,1)' % (r, g))
-                bgcolors.append('rgba(%d,%d,0,0.8)' % (r, g))
-        desc['borderColor'] = bdcolors
-        desc['backgroundColor'] = bgcolors
-        desc['borderWidth'] = 1
-        self.datasets.append(desc)
+         
+    def Data(self, series, *vals):
+        for i in range(0, self.label_len):
+            self.series.append({self.xkey : self.labels[i], 'series' : series, self.ykey : vals[i]})
         return self
 
 class Pie(Chart):
     
     def __init__(self, *labels, **options):
         Chart.__init__(self, 'pie', *labels, **options)
-        rgb = RGB()
-        self.bdcolors = []
-        self.bgcolors = []
-        for l in labels:
-            color = rgb.getNext()
-            self.bdcolors.append('rgba(%d,%d,%d,1)' % color)
-            self.bgcolors.append('rgba(%d,%d,%d,0.8)' % color)
-        
-    def Data(self, label, *data, **desc):
-        desc['label'] = label
-        desc['data'] = data
-        if 'borderColor' not in desc: desc['borderColor'] = self.bdcolors
-        if 'backgroundColor' not in desc: desc['backgroundColor'] = self.bgcolors
-        self.datasets.append(desc)
+         
+    def Data(self, series, *vals):
+        datasets = []
+        series = {'series' : series, 'datasets' : datasets}
+        for i in range(0, self.label_len):
+            datasets.append({self.xkey : self.labels[i], self.ykey : vals[i]})
+        self.series.append(series)
         return self
 
 class Donut(Chart):
-    
     def __init__(self, *labels, **options):
-        Chart.__init__(self, 'doughnut', *labels, **options)
-        rgb = RGB()
-        self.bdcolors = []
-        self.bgcolors = []
-        for l in labels:
-            color = rgb.getNext()
-            self.bdcolors.append('rgba(%d,%d,%d,1)' % color)
-            self.bgcolors.append('rgba(%d,%d,%d,0.8)' % color)
-        
-    def Data(self, label, *data, **desc):
-        desc['label'] = label
-        desc['data'] = data
-        if 'borderColor' not in desc: desc['borderColor'] = self.bdcolors
-        if 'backgroundColor' not in desc: desc['backgroundColor'] = self.bgcolors
-        self.datasets.append(desc)
+        if 'size' not in options: options['size'] = 10
+        Chart.__init__(self, 'donut', *labels, **options)
+         
+    def Data(self, series, *vals):
+        datasets = []
+        series = {'series' : series, 'datasets' : datasets}
+        for i in range(0, self.label_len):
+            datasets.append({self.xkey : self.labels[i], self.ykey : vals[i]})
+        self.series.append(series)
         return self
+
+class HealthLine(Line):
+      
+    def __init__(self, *labels, **options):
+        options['health'] = True
+        options['min'] = 0
+        options['max'] = 100
+        Line.__init__(self, *labels, **options)
+        self['chart']['options']['health_min_r'] = "0"
+        self['chart']['options']['health_min_g'] = "0"
+        self['chart']['options']['health_max_r'] = "0"
+        self['chart']['options']['health_max_g'] = "0"
+        self.health_min = 100
+        self.health_max = 0
+         
+    def Data(self, series, *vals):
+        datasets = []
+        series = {'series' : series, 'datasets' : datasets}
+        for i in range(0, self.label_len):
+            val = vals[i]
+            if val == None: val = 0
+            if val < self.health_min: self.health_min = val
+            if val > self.health_max: self.health_max = val
+            datasets.append({self.xkey : self.labels[i], self.ykey : val})
+        self.series.append(series)
+        min_r = str(255 - int( ( 0.01 * self.health_min ) * 255 ))
+        min_g = str(int( ( 0.01 * self.health_min ) * 255 ))
+        max_r = str(255 - int( ( 0.01 * self.health_max ) * 255 ))
+        max_g = str(int( ( 0.01 * self.health_max ) * 255 ))
+        self['chart']['options']['health_min_r'] = min_r
+        self['chart']['options']['health_min_g'] = min_g
+        self['chart']['options']['health_max_r'] = max_r
+        self['chart']['options']['health_max_g'] = max_g
+        return self
+
+class HealthBar(Bar):
+     
+    def __init__(self, *labels, **options):
+        options['health'] = True
+        options['min'] = 0
+        options['max'] = 100
+        Bar.__init__(self, *labels, **options)
+        self['chart']['options']['health_min_r'] = "0"
+        self['chart']['options']['health_min_g'] = "0"
+        self['chart']['options']['health_max_r'] = "0"
+        self['chart']['options']['health_max_g'] = "0"
+        self.health_min = 100
+        self.health_max = 0
+         
+    def Data(self, series, *vals):
+        for i in range(0, self.label_len):
+            val = vals[i]
+            if val == None: val = 0
+            if val < self.health_min: self.health_min = val
+            if val > self.health_max: self.health_max = val
+            self.series.append({self.xkey : self.labels[i], 'series' : series, self.ykey : vals[i]})
+        min_r = str(255 - int( ( 0.01 * self.health_min ) * 255 ))
+        min_g = str(int( ( 0.01 * self.health_min ) * 255 ))
+        max_r = str(255 - int( ( 0.01 * self.health_max ) * 255 ))
+        max_g = str(int( ( 0.01 * self.health_max ) * 255 ))
+        self['chart']['options']['health_min_r'] = min_r
+        self['chart']['options']['health_min_g'] = min_g
+        self['chart']['options']['health_max_r'] = max_r
+        self['chart']['options']['health_max_g'] = max_g
+        return self
+
+class Topo(VIEW):
+    
+    def __init__(self, **options):
+        if 'width' not in options: options['width'] = 0
+        if 'height' not in options: options['height'] = 400
+        VIEW.__init__(self, 'CANVAS', **{'id' : VIEW.getUUID(), 'lib' : 'arbor', 'class' : 'arborwrapper'})
+        self.nodes = {}
+        self.edges = {}
+        self['topo'] = {
+            'datasets' : {'nodes' : self.nodes, 'edges' : self.edges},
+            'options' : options
+        }
+    
+    def Node(self, name, label=None, color='grey', dot=False):
+        if label == None: label = name
+        if dot: self.nodes[name] = {'label' : label, 'color' : color, 'shape' : 'dot'}
+        else: self.nodes[name] = {'label' : label, 'color' : color}
+        return self
+
+    def Edge(self, src, dst, color='grey'):
+        if src not in self.edges: self.edges[src] = {}
+        self.edges[src][dst] = {}
+        return self
+    
+    def __len__(self, *args, **kwargs):
+        return self.nodes.__len__()
+    
+    def isNode(self, name):
+        if name in self.nodes: return True
+        return False
+
+class Gauge(VIEW):
+    
+    def __init__(self, title, value, min=0, max=100, **attrs):
+        VIEW.__init__(self, 'DIV', **ATTR.merge(attrs, {'id' : VIEW.getUUID(), 'lib' : 'justgage'}))
+        self['chart'] = {'title' : title, 'value' : value, 'min' : min, 'max' : max}

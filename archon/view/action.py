@@ -94,6 +94,6 @@ class DelClick(VIEW):
 class DelButton(BUTTON):
     
     def __init__(self, url, text='Delete', tail=False, **attrs):
-        if tail: BUTTON.__init__(self, **ATTR.merge(attrs, {'class' : 'btn-danger btn-xs', 'onclick' : "DeleteData('%s');" % url, 'style' : 'float:right;'}))
-        else: BUTTON.__init__(self, **ATTR.merge(attrs, {'class' : 'btn-danger btn-xs', 'onclick' : "DeleteData('%s');" % url}))
+        if tail: BUTTON.__init__(self, **ATTR.merge(attrs, {'class' : 'btn-danger', 'onclick' : "DeleteData('%s');" % url, 'style' : 'float:right;'}))
+        else: BUTTON.__init__(self, **ATTR.merge(attrs, {'class' : 'btn-danger', 'onclick' : "DeleteData('%s');" % url}))
         self.html(text)

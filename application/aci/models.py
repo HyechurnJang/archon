@@ -59,8 +59,18 @@ class EPTracker(models.Model):
     tenant = models.CharField(max_length=100)
     app = models.CharField(max_length=100)
     epg = models.CharField(max_length=100)
+    dn = models.CharField(max_length=2048)
     intf = models.CharField(max_length=2048)
     start = models.CharField(max_length=24)
     stop = models.CharField(max_length=24)
 
 modelview(EPTracker)
+
+class FaultMessage(models.Model):
+    code = models.CharField(max_length=8)
+    title = models.CharField(max_length=512)
+    syslog = models.TextField()
+    explan = models.TextField()
+    actions = models.TextField()
+
+modelview(FaultMessage)

@@ -39,7 +39,7 @@ import uuid
 class VIEW(dict):
     
     @classmethod
-    def getUUID(cls): return str(uuid.uuid4())
+    def getUUID(cls): return 'A-' + str(uuid.uuid4())
     
     def __init__(self, _type, **attrs):
         dict.__init__(self, type=_type, elements=[], attrs=attrs)
@@ -136,6 +136,10 @@ class STRONG(VIEW):
 class SMALL(VIEW):
     def __init__(self, **attrs):
         VIEW.__init__(self, 'small', **attrs)
+        
+class IMG(VIEW):
+    def __init__(self, **attrs):
+        VIEW.__init__(self, 'img', **attrs)
 
 class TABLE(VIEW):
     def __init__(self, **attrs):

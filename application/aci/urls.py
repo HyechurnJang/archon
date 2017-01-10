@@ -41,31 +41,32 @@ from . import views
 # Link your view here.
 #===============================================================================
 url_show = [
-    url(r'host/?', views.host, name=u'호스트'),
-    url(r'device/?', views.device, name=u'장치'),
-    url(r'tenant/?', views.tenant, name=u'테넌트'),
-    url(r'epgroup/?', views.epg, name=u'엔드포인트그룹'),
-    url(r'endpoint/?', views.endpoint, name=u'엔드포인트'),
-    url(r'contract/?', views.contract, name=u'컨트랙'),
-    url(r'external/?', views.external, name=u'외부네트워크'),
-    url(r'fault/?', views.fault, name=u'오류')
+    url(r'^host/?', views.host, name=u'호스트'),
+    url(r'^device/?', views.device, name=u'장치'),
+    url(r'^tenant/?', views.tenant, name=u'테넌트'),
+    url(r'^epgroup/?', views.epg, name=u'엔드포인트그룹'),
+    url(r'^endpoint/?', views.endpoint, name=u'엔드포인트'),
+    url(r'^contract/?', views.contract, name=u'컨트랙'),
+    url(r'^external/?', views.external, name=u'외부네트워크'),
+    url(r'^fault/?', views.fault, name=u'오류')
 ]
 
 url_stat = [
-    url(r'intfstat/?', views.intf_util, name=u'인터페이스 사용율'),
-    url(r'epgstat/?', views.epg_util, name=u'엔드포인트그룹 사용율'),
+    url(r'^epgstat/?', views.epg_util, name=u'엔드포인트그룹 사용율'),
+    url(r'^intfstat/?', views.intf_util, name=u'인터페이스 사용율'),
 ]
 
 url_tool = [
-    url(r'eptracker/?', views.eptracker, name=u'엔드포인트 추적기'),
-    url(r'ofinder/?', views.ofinder, name=u'오브젝트 검색기'),
+    url(r'^eptracker/?', views.eptracker, name=u'엔드포인트 추적기'),
+    url(r'^ofinder/?', views.ofinder, name=u'오브젝트 검색기'),
 ]
 
 urlpatterns = [
-    url(r'overview/?', views.overview, name=u'개요'),
-    url(r'show/', include(url_show, namespace=u'점검')),
-    url(r'stat/', include(url_stat, namespace=u'분석')),
-    url(r'tool/', include(url_tool, namespace=u'도구')),
-    url(r'conf/?', views.config, name=u'설정'),
+    url(r'^overview/?', views.overview, name=u'개요'),
+    url(r'^topoview/?', views.topoview, name=u'관계도'),
+    url(r'^show/', include(url_show, namespace=u'점검')),
+    url(r'^stat/', include(url_stat, namespace=u'분석')),
+    url(r'^tool/', include(url_tool, namespace=u'도구')),
+    url(r'^conf/?', views.config, name=u'설정'),
 ]
 

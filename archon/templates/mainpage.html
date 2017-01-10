@@ -19,7 +19,6 @@
 	<link rel="stylesheet" href="/resources/css/font-awesome.min.css" />
 	<link rel="stylesheet" href="/resources/css/datatables.min.css"/>
 	<link rel="stylesheet" href="/resources/css/footable.bootstrap.min.css"/>
-	<link rel="stylesheet" href="/resources/css/next.css"> 
 	<link rel="stylesheet" href="/resources/css/archon.css" />
 
 
@@ -35,11 +34,15 @@
 	<!-- Javascripts -->
 	<script src="/resources/js/jquery-2.2.4.min.js"></script>
 	<script src="/resources/js/bootstrap.min.js"></script>
+	<script src="/resources/js/d3.min.js"></script>
+	<script src="/resources/js/raphael-2.1.4.min.js"></script>
 	<script src="/resources/js/datatables.min.js"></script>
 	<script src="/resources/js/footable.min.js"></script>
-	<script src="/resources/js/Chart.js"></script>
-	<script src="/resources/js/next.js"></script>
-	<script src="/resources/js/sigma.min.js"></script>
+	<script src="/resources/js/dimple.v2.3.0.min.js"></script>
+	<script src="/resources/js/arbor.js"></script>
+	<script src="/resources/js/arbor-tween.js"></script>
+	<script src="/resources/js/arbor-graphics.js"></script>
+	<script src="/resources/js/justgage.js"></script>
 	<script src="/resources/js/archonUX.js"></script>
 	<script src="/resources/js/archon.js"></script>
 
@@ -93,12 +96,20 @@
 					            <div class="modal-content">
 					                <div class="modal-header">
 					                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-					                    <h4 class="modal-title" id="InformationDocumentLabel">Modal title</h4>
+					                    <h4 class="modal-title" id="InformationDocumentLabel">What is this?</h4>
 					                </div>
 					                <div class="modal-body">
-Contact us<br/>
-Hyung-Soo Kim : hyungsok@cisco.com<br/>
-Hye-Churn Jang : hyjang@cisco.com
+<h5>This is open-source platform for cisco product.</h5>
+<h5>We hope your success story using programmability with cisco products.</h5>
+<br/>
+<h1 style="text-align:center;">Enjoy Cisco!</h1>
+<br/>
+<div style="text-align:right;">
+<h3>Contact us</h3>
+<h4>Woo-Hyung Choi : whchoi@cisco.com</h4>
+<h4>Hyung-Soo Kim : hyungsok@cisco.com</h4>
+<h4>Hye-Churn Jang : hyjang@cisco.com</h4>
+</div>
 					                </div>
 					                <div class="modal-footer">
 					                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
@@ -116,7 +127,6 @@ Hye-Churn Jang : hyjang@cisco.com
 {{ user_menu }}
 <!--  -->
 							
-							<li><a href="#">Profile</a></li>
 							<li><a href="/account/logout">Logout</a></li>
 						</ul>
 					</li>

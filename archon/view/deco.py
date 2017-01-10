@@ -46,21 +46,15 @@ class COL(DIV):
     def __init__(self, size, scr='xs', **attrs):
         DIV.__init__(self, **ATTR.merge(attrs, {'class' : 'col-%s-%d colwrapper' % (scr, size)}))
 
-class POL(DIV):
-    
-    def __init__(self, size, scr='xs', **attrs):
-        DIV.__init__(self, **{'class' : 'col-%s-%d colwrapper' % (scr, size)})
-        self.idiv = DIV(**ATTR.merge(attrs, {'class' : 'panelcol'}))
-        self['elements'].append(self.idiv)
-    
-    def html(self, *elements):
-        self.idiv.html(*elements)
-        return self
-
 class Icon(VIEW):
     
     def __init__(self, icon, **attrs):
         VIEW.__init__(self, 'i', **ATTR.merge(attrs, {'class' : 'fa fa-%s' % icon}))
+
+class StrWrap(DIV):
+    
+    def __init__(self, width=100, **attrs):
+        DIV.__init__(self, **ATTR.merge(attrs, {'class' : 'strwrap', 'style' : 'width:%dpx;' % width}))
 
 class KeyVal(DIV):
     
@@ -68,15 +62,13 @@ class KeyVal(DIV):
         DIV.__init__(self, **ATTR.merge(attrs, {'class' : 'keyval'}))
         self.table = TABLE()
         self.html(self.table)
+        self.first = False
     
     def Data(self, key, val):
-        self.table.html(
-            TR().html(
-                TH().html(key)
-            ).html(
-                TD().html(val)
-            )
-        )
+        if self.first: self.table.html(TR().html(TH().html(key)).html(TD().html(val)))
+        else:
+            self.table.html(TR().html(TH(**{'class' : 'keyval-first'}).html(key)).html(TD(**{'class' : 'keyval-first'}).html(val)))
+            self.first = True
     
     def __len__(self, *args, **kwargs):
         return self.table.__len__()
@@ -99,18 +91,18 @@ class Panel(DIV):
         self.body = DIV(**{'class' : 'panel-body'})
         self.foot = DIV(**{'class' : 'panel-footer'})
     
-    def Head(self, element):
-        self.head.html(element)
+    def Head(self, *elements):
+        self.head.html(*elements)
         if self.head not in self['elements']: self['elements'].insert(0, self.head)
         return self
     
-    def Body(self, element):
-        self.body.html(element)
-        if self.body not in self['elements']: self['elements'].insert(-1, self.body)
+    def Body(self, *elements):
+        self.body.html(*elements)
+        if self.body not in self['elements']: self['elements'].append(self.body)
         return self
     
-    def Foot(self, element):
-        self.foot.html(element)
+    def Foot(self, *elements):
+        self.foot.html(*elements)
         if self.foot not in self['elements']: self['elements'].append(self.foot)
         return self
 
@@ -149,6 +141,15 @@ class Section(DIV):
         
     def html(self, *elements):
         for element in elements: self.body.html(element)
+        return self
+
+class ListGroup(UL):
+    
+    def __init__(self, **attrs):
+        UL.__init__(self, **ATTR.merge(attrs, {'class' : 'list-group'}))
+    
+    def html(self, *elements):
+        for element in elements: self['elements'].append(LI(**{'class' : 'list-group-item'}).html(element))
         return self
 
 class Navigation(DIV):

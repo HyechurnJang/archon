@@ -1,7 +1,6 @@
 var page_current = null;
 
 $(document).ready(function() {
-
 	var brand = $(".navbar-brand");
 	var apps = $(".app");
 	var pages = $(".page");
@@ -60,12 +59,12 @@ $(document).ready(function() {
 		dynpages.collapse("hide");
 		loading_page.collapse("show");
 		
-		setTimeout(function() {
-			$.ajax({
-				url : url,
-				dataType : "json",
-				success : function(data) {
-					if ( page_current == page ) {
+		$.ajax({
+			url : url,
+			dataType : "json",
+			success : function(data) {
+				if ( page_current == page ) {
+					setTimeout(function() {
 						$("#subject-title").html(selector.html());
 						$("#subject-title").attr("onclick", "GetData('" + url + "');");
 						$("#subject-menu").html(ParseViewDom(page.attr("id") + '-m-', data.menu))
@@ -78,14 +77,14 @@ $(document).ready(function() {
 						page.fadeIn(350);
 						subject_page.collapse("show");
 						page.collapse("show");
-					}
-				},
-				error : function(xhr, status, thrown) {
-					window.alert("Session Timeout!");
-					window.location.replace('/');
+					}, 400);
 				}
-			});
-		}, 400);
+			},
+			error : function(xhr, status, thrown) {
+				window.alert("Session Timeout!");
+				window.location.replace('/');
+			}
+		});
 		
 	});
 });
@@ -109,12 +108,12 @@ function GetData(url) {
 	var subject_page = $("#subject-page");
 	dynpages.fadeOut(350);
 	dynpages.collapse("hide");
-	setTimeout(function() {
-		$.ajax({
-			type: "GET",
-			url: url,
-			dataType: "json",
-			success : function(data) {
+	$.ajax({
+		type: "GET",
+		url: url,
+		dataType: "json",
+		success : function(data) {
+			setTimeout(function(){
 				$("#subject-menu").html(ParseViewDom(page_current.attr("id") + '-m-', data.menu))
 				ParseViewData(data.menu);
 				page_current.html(ParseViewDom(page_current.attr("id") + '-', data.page));
@@ -122,13 +121,13 @@ function GetData(url) {
 				page_current.css("height", "calc(100% - 100px)");
 				page_current.fadeIn(350);
 				page_current.collapse("show");
-			},
-			error : function(xhr, status, thrown) {
-				window.alert("Session Timeout!");
-				window.location.replace('/');
-			}
-		});
-	}, 400);
+			}, 400);
+		},
+		error : function(xhr, status, thrown) {
+			window.alert("Session Timeout!");
+			window.location.replace('/');
+		}
+	});
 };
 
 function PostData(uuid, url) {
@@ -150,13 +149,15 @@ function PostData(uuid, url) {
 			dataType: "json",
 			data: JSON.stringify(data),
 			success : function(data) {
-				$("#subject-menu").html(ParseViewDom(page_current.attr("id") + '-m-', data.menu))
-				ParseViewData(data.menu);
-				page_current.html(ParseViewDom(page_current.attr("id") + '-', data.page));
-				ParseViewData(data.page);
-				page_current.css("height", "calc(100% - 100px)");
-				page_current.fadeIn(350);
-				page_current.collapse("show");
+				setTimeout(function() {
+					$("#subject-menu").html(ParseViewDom(page_current.attr("id") + '-m-', data.menu))
+					ParseViewData(data.menu);
+					page_current.html(ParseViewDom(page_current.attr("id") + '-', data.page));
+					ParseViewData(data.page);
+					page_current.css("height", "calc(100% - 100px)");
+					page_current.fadeIn(350);
+					page_current.collapse("show");
+				});
 			},
 			error : function(xhr, status, thrown) {
 				window.alert("Session Timeout!");
@@ -171,12 +172,12 @@ function DeleteData(url) {
 	var subject_page = $("#subject-page");
 	dynpages.fadeOut(350);
 	dynpages.collapse("hide");
-	setTimeout(function() {
-		$.ajax({
-			type: "DELETE",
-			url: url,
-			dataType: "json",
-			success : function(data) {
+	$.ajax({
+		type: "DELETE",
+		url: url,
+		dataType: "json",
+		success : function(data) {
+			setTimeout(function() {
 				$("#subject-menu").html(ParseViewDom(page_current.attr("id") + '-m-', data.menu))
 				ParseViewData(data.menu);
 				page_current.html(ParseViewDom(page_current.attr("id") + '-', data.page));
@@ -184,13 +185,13 @@ function DeleteData(url) {
 				page_current.css("height", "calc(100% - 100px)");
 				page_current.fadeIn(350);
 				page_current.collapse("show");
-			},
-			error : function(xhr, status, thrown) {
-				window.alert("Session Timeout!");
-				window.location.replace('/');
-			}
-		});
-	}, 400);
+			});
+		},
+		error : function(xhr, status, thrown) {
+			window.alert("Session Timeout!");
+			window.location.replace('/');
+		}
+	});
 };
 
 function ParseViewDom(page, view) {
@@ -234,9 +235,9 @@ function UXTable(view) {
 
 function UXChart(view) {
 	switch(view.attrs.lib) {
-	case "chartjs": UXChartJS(view); break;
-	case "sigmajs": UXSigmaJS(view); break;
-	case "nextui": UXNextUI(view); break;
+	case "dimple": UXDimple(view); break;
+	case "arbor": UXArbor(view); break;
+	case "justgage": UXJustgage(view); break;
 	}
 }; 
 
