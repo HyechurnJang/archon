@@ -140,31 +140,29 @@ function PostData(uuid, url) {
 	});
 	dynpages.fadeOut(350);
 	dynpages.collapse("hide");
-	setTimeout(function() {
-		$.ajax({
-			type: "POST",
-			url: url,
-			contentType: "application/json; charset=utf-8",
-			headers: { "X-CSRFToken": GetCookie("csrftoken") },
-			dataType: "json",
-			data: JSON.stringify(data),
-			success : function(data) {
-				setTimeout(function() {
-					$("#subject-menu").html(ParseViewDom(page_current.attr("id") + '-m-', data.menu))
-					ParseViewData(data.menu);
-					page_current.html(ParseViewDom(page_current.attr("id") + '-', data.page));
-					ParseViewData(data.page);
-					page_current.css("height", "calc(100% - 100px)");
-					page_current.fadeIn(350);
-					page_current.collapse("show");
-				});
-			},
-			error : function(xhr, status, thrown) {
-				window.alert("Session Timeout!");
-				window.location.replace('/');
-			}
-		});
-	}, 400);
+	$.ajax({
+		type: "POST",
+		url: url,
+		contentType: "application/json; charset=utf-8",
+		headers: { "X-CSRFToken": GetCookie("csrftoken") },
+		dataType: "json",
+		data: JSON.stringify(data),
+		success : function(data) {
+			setTimeout(function() {
+				$("#subject-menu").html(ParseViewDom(page_current.attr("id") + '-m-', data.menu))
+				ParseViewData(data.menu);
+				page_current.html(ParseViewDom(page_current.attr("id") + '-', data.page));
+				ParseViewData(data.page);
+				page_current.css("height", "calc(100% - 100px)");
+				page_current.fadeIn(350);
+				page_current.collapse("show");
+			}, 400);
+		},
+		error : function(xhr, status, thrown) {
+			window.alert("Session Timeout!");
+			window.location.replace('/');
+		}
+	});
 };
 
 function DeleteData(url) {
@@ -185,7 +183,7 @@ function DeleteData(url) {
 				page_current.css("height", "calc(100% - 100px)");
 				page_current.fadeIn(350);
 				page_current.collapse("show");
-			});
+			}, 400);
 		},
 		error : function(xhr, status, thrown) {
 			window.alert("Session Timeout!");
