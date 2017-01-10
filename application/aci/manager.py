@@ -187,7 +187,7 @@ class EndpointTracker(acidipy.SubscribeHandler):
 
 class Manager(archon.ManagerAbstraction, acidipy.MultiDomain):
     
-    def __init__(self, mon_sec=5, mon_cnt=10, debug=False):
+    def __init__(self, mon_sec=60, mon_cnt=10, debug=False):
         acidipy.MultiDomain.__init__(self, conns=5, conn_max=10, debug=debug)
         self.scheduler = archon.Scheduler(10)
         self.healthmon = HealthMonitor(self, mon_sec, mon_cnt)
