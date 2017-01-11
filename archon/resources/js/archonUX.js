@@ -40,6 +40,8 @@ function UXJustgage(view) {
 		    	stroke_width: 3,
 		    	stroke_linecap: 'round'
 	        },
+	        startAnimationTime: 0,
+	        refreshAnimationTime: 0,
 		});
 	}, 0);
 };
