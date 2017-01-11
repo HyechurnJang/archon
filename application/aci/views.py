@@ -68,19 +68,21 @@ def overview(R, M, V):
         panel = Panel(**{'class' : 'panel-default'}).Head('%s %s' % (domain_name, V('Domain')))
         panel.Body(
             ROW().html(
-                COL(2, 'md').html(Gauge('Node', *resolution(cnt_nd[domain_name], 100), style='height:100px;')),
-                COL(2, 'md').html(Gauge('Tenant', *resolution(cnt_tt[domain_name], 100), style='height:100px;')),
-                COL(2, 'md').html(Gauge('BD', *resolution(cnt_bd[domain_name], 100), style='height:100px;')),
-                COL(2, 'md').html(Gauge('EPG', *resolution(cnt_epg[domain_name], 100), style='height:100px;')),
-                COL(2, 'md').html(Gauge('EP', *resolution(cnt_ep[domain_name], 100), style='height:100px;')),
-                COL(2, 'md').html(Gauge('Filter', *resolution(cnt_ft[domain_name], 100), style='height:100px;')),
+                COL(1, 'md').html(Gauge('Node', *resolution(cnt_nd[domain_name], 100), style='height:100px;')),
+                COL(1, 'md').html(Gauge('Tenant', *resolution(cnt_tt[domain_name], 100), style='height:100px;')),
+                COL(1, 'md').html(Gauge('BD', *resolution(cnt_bd[domain_name], 100), style='height:100px;')),
+                COL(1, 'md').html(Gauge('EPG', *resolution(cnt_epg[domain_name], 100), style='height:100px;')),
+                COL(1, 'md').html(Gauge('EP', *resolution(cnt_ep[domain_name], 100), style='height:100px;')),
+                COL(1, 'md').html(Gauge('Filter', *resolution(cnt_ft[domain_name], 100), style='height:100px;')),
                 
-                COL(2, 'md').html(Gauge('Contract', *resolution(cnt_ct[domain_name], 100), style='height:100px;')),
-                COL(2, 'md').html(Gauge('L4/7Devices', *resolution(cnt_47d[domain_name], 100), style='height:100px;')),
-                COL(2, 'md').html(Gauge('L4/7Graphs', *resolution(cnt_47g[domain_name], 100), style='height:100px;')),
-                COL(2, 'md').html(' '),
-                COL(4, 'md').html(
-                    DIV(style='text-align:center;font-size:11px;font-weight:bold;color:#999;margin:0px;padding-top:5px;').html('Faults'),
+                COL(1, 'md').html(Gauge('Contract', *resolution(cnt_ct[domain_name], 100), style='height:100px;')),
+                COL(1, 'md').html(Gauge('L4/7Devices', *resolution(cnt_47d[domain_name], 100), style='height:100px;')),
+                COL(1, 'md').html(Gauge('L4/7Graphs', *resolution(cnt_47g[domain_name], 100), style='height:100px;')),
+                
+#                 COL(1, 'md').html(' '),
+                
+                COL(3, 'md').html(
+                    DIV(style='text-align:center;font-size:10px;font-weight:bold;color:#999;margin:0px;padding-top:6px;').html('Faults'),
                     ROW().html(
                         COL(3, style='padding-top:0px;').html(Gauge('critical', *resolution(len(cnt_fc[domain_name]), 100), style='height:70px;')),
                         COL(3, style='padding-top:0px;').html(Gauge('major', *resolution(len(cnt_fj[domain_name]), 100), style='height:70px;')),
