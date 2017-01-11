@@ -101,6 +101,11 @@ td>p {
   text-decoration: none;
 }
 
+#sched-toggle-btn {
+	float: right;
+	padding: 10px;
+}
+
 #pages {
 	position: fixed;
     overflow-y: hidden;
