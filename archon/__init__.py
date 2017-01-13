@@ -44,7 +44,6 @@ from django.http import JsonResponse
 from archon.settings import SESSION_COOKIE_AGE
 from archon.common import *
 from archon.view import *
-from PIL._imaging import path
 
 ARCHON_DEBUG = False
 

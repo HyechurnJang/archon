@@ -79,8 +79,6 @@ def overview(R, M, V):
                 COL(1, 'md').html(Gauge('L4/7Devices', *resolution(cnt_47d[domain_name], 100), style='height:100px;')),
                 COL(1, 'md').html(Gauge('L4/7Graphs', *resolution(cnt_47g[domain_name], 100), style='height:100px;')),
                 
-#                 COL(1, 'md').html(' '),
-                
                 COL(3, 'md').html(
                     DIV(style='text-align:center;font-size:10px;font-weight:bold;color:#999;margin:0px;padding-top:6px;').html('Faults'),
                     ROW().html(
