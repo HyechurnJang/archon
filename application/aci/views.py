@@ -434,7 +434,7 @@ def acl_deny(R, M, V):
 @pageview(Manager)
 def eptracker(R, M, V):
     if R.Method == 'GET' and len(R.Path) > 3 and R.Path[3] == 'init': M.initEndpoint()
-    table = DataTable(V('Domain'), V('MAC'), V('IP'), V('EPG'), V('Interface'), V('Time Start'), V('Time Stop'))
+    table = DataTable(V('Domain'), V('MAC'), V('IP'), V('EPG'), V('Interface'), V('Start'), V('Stop'))
     eps = EPTracker.objects.all()
     for ep in eps:
         epg = ep.tenant + '/' + ep.app + '/' + ep.epg
