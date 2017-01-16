@@ -116,7 +116,6 @@ def host_all(R, M, V):
                 hv_table
             )
     
-    if not V.Page: V.Page.html(Alert(V('Info'), V('Non-exist APIC Connection'), **{'class' : 'alert-info'}))
     V.Menu.html(BUTTON(**(ATTR.click('/'.join(R.Path)) + {'class' : 'btn-primary'})).html(V('Refresh')))
         
 def host_one(R, M, V):

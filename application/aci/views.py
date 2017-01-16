@@ -45,6 +45,7 @@ from platform import node
 #===============================================================================
 @pageview(Manager)
 def overview(R, M, V):
+    if not M: V.Page.html(Alert(V('Info'), V('Non-exist APIC Connection'), **{'class' : 'alert-info'})); return
     
     cnt_nd = M.Node.count()
     cnt_tt = M.Tenant.count()
@@ -153,6 +154,8 @@ def overview(R, M, V):
 
 @pageview(Manager)
 def topoview(R, M, V):
+    if not M: V.Page.html(Alert(V('Info'), V('Non-exist APIC Connection'), **{'class' : 'alert-info'})); return
+    
     tns = M.Tenant.list()
     aps = M.AppProfile.list()
     epgs = M.EPG.list()
@@ -191,12 +194,14 @@ def topoview(R, M, V):
 
 @pageview(Manager)
 def host(R, M, V):
+    if not M: V.Page.html(Alert(V('Info'), V('Non-exist APIC Connection'), **{'class' : 'alert-info'})); return
     if R.Method == 'GET':
         if len(R.Path) > 3: host_one(R, M, V)
         else: host_all(R, M, V)
 
 @pageview(Manager)
 def device(R, M, V):
+    if not M: V.Page.html(Alert(V('Info'), V('Non-exist APIC Connection'), **{'class' : 'alert-info'})); return
     if R.Method == 'GET':
         plen = len(R.Path)
         if plen > 4: device_one(R, M, V)
@@ -205,36 +210,42 @@ def device(R, M, V):
      
 @pageview(Manager)
 def tenant(R, M, V):
+    if not M: V.Page.html(Alert(V('Info'), V('Non-exist APIC Connection'), **{'class' : 'alert-info'})); return
     if R.Method == 'GET':
         if len(R.Path) > 3: tenant_one(R, M, V)
         else: tenant_all(R, M, V)
 
 @pageview(Manager)
 def epg(R, M, V):
+    if not M: V.Page.html(Alert(V('Info'), V('Non-exist APIC Connection'), **{'class' : 'alert-info'})); return
     if R.Method == 'GET':
         if len(R.Path) > 3: epg_one(R, M, V)
         else: epg_all(R, M, V)
     
 @pageview(Manager)
 def endpoint(R, M, V):
+    if not M: V.Page.html(Alert(V('Info'), V('Non-exist APIC Connection'), **{'class' : 'alert-info'})); return
     if R.Method == 'GET':
         if len(R.Path) > 3: ep_one(R, M, V)
         else: ep_all(R, M, V)
 
 @pageview(Manager)
 def contract(R, M, V):
+    if not M: V.Page.html(Alert(V('Info'), V('Non-exist APIC Connection'), **{'class' : 'alert-info'})); return
     if R.Method == 'GET':
         if len(R.Path) > 3: contract_one(R, M, V)
         else: contract_all(R, M, V)
 
 @pageview(Manager)
 def external(R, M, V):
+    if not M: V.Page.html(Alert(V('Info'), V('Non-exist APIC Connection'), **{'class' : 'alert-info'})); return
     if R.Method == 'GET':
         if len(R.Path) > 3: external_one(R, M, V)
         else: external_all(R, M, V)
 
 @pageview(Manager)
 def fault(R, M, V):
+    if not M: V.Page.html(Alert(V('Info'), V('Non-exist APIC Connection'), **{'class' : 'alert-info'})); return
     if R.Method == 'GET':
         plen = len(R.Path)
         if plen > 4: fault_one(R, M, V)
@@ -243,10 +254,11 @@ def fault(R, M, V):
 
 @pageview(Manager)
 def epg_util(R, M, V):
+    if not M: V.Page.html(Alert(V('Info'), V('Non-exist APIC Connection'), **{'class' : 'alert-info'})); return
     domain_name = None
     if len(R.Path) > 3: domain_name = R.Path[3]
     elif len(M) == 1: domain_name = M.keys()[0]
-        
+    
     if domain_name != None:
     #===========================================================================
     # Get Data
@@ -310,6 +322,7 @@ def epg_util(R, M, V):
 
 @pageview(Manager)
 def intf_util(R, M, V):
+    if not M: V.Page.html(Alert(V('Info'), V('Non-exist APIC Connection'), **{'class' : 'alert-info'})); return
     domain_name = None
     node_dn = None
     if len(R.Path) > 3:
@@ -377,6 +390,7 @@ def intf_util(R, M, V):
 
 @pageview(Manager)
 def acl_permit(R, M, V):
+    if not M: V.Page.html(Alert(V('Info'), V('Non-exist APIC Connection'), **{'class' : 'alert-info'})); return
     domain_name = None
     if len(R.Path) > 3: domain_name = R.Path[3]
     if domain_name != None:
@@ -419,6 +433,7 @@ def acl_permit(R, M, V):
 
 @pageview(Manager)
 def acl_deny(R, M, V):
+    if not M: V.Page.html(Alert(V('Info'), V('Non-exist APIC Connection'), **{'class' : 'alert-info'})); return
     domain_name = None
     if len(R.Path) > 3: domain_name = R.Path[3]
     if domain_name != None:
@@ -461,6 +476,7 @@ def acl_deny(R, M, V):
 
 @pageview(Manager)
 def eptracker(R, M, V):
+    if not M: V.Page.html(Alert(V('Info'), V('Non-exist APIC Connection'), **{'class' : 'alert-info'})); return
     if R.Method == 'GET' and len(R.Path) > 3 and R.Path[3] == 'init': M.initEndpoint()
     table = DataTable(V('Domain'), V('MAC'), V('IP'), V('EPG'), V('Interface'), V('Start'), V('Stop'))
     eps = EPTracker.objects.all()
@@ -485,6 +501,7 @@ def eptracker(R, M, V):
 
 @pageview(Manager)
 def ofinder(R, M, V):
+    if not M: V.Page.html(Alert(V('Info'), V('Non-exist APIC Connection'), **{'class' : 'alert-info'})); return
     if R.Method == 'GET' and len(R.Path) > 3:
         domain_name = R.Path[3]
         obj_name = '/'.join(R.Path[4:])

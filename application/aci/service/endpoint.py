@@ -102,18 +102,16 @@ def ep_all(R, M, V):
     #===========================================================================
     # View
     #===========================================================================
-    if not table: V.Page.html(Alert(V('Info'), V('Non-exist APIC Connection'), **{'class' : 'alert-info'}))
-    else:
-        V.Page.html(
-            ROW().html(
-                COL(2).html(CountPanel(V('Endpoints'), 'plug', ep_cnt, **{'class' : 'panel-dgrey'})),
-                COL(2).html(CountPanel(V('Discovered'), 'flag-checkered', dcv_cnt, **{'class' : 'panel-dgrey'})),
-                COL(2).html(CountPanel(V('Management'), 'cog', mng_cnt, **{'class' : 'panel-dgrey'})),
-                COL(2).html(CountPanel(V('Physical'), 'server', phy_cnt, **{'class' : 'panel-dgrey'})),
-                COL(2).html(CountPanel(V('Hypervisor'), 'cubes', hyp_cnt, **{'class' : 'panel-dgrey'})),
-                COL(2).html(CountPanel(V('Virtual'), 'cube', vir_cnt, **{'class' : 'panel-dgrey'}))
-            )
-        ).html(table)
+    V.Page.html(
+        ROW().html(
+            COL(2).html(CountPanel(V('Endpoints'), 'plug', ep_cnt, **{'class' : 'panel-dgrey'})),
+            COL(2).html(CountPanel(V('Discovered'), 'flag-checkered', dcv_cnt, **{'class' : 'panel-dgrey'})),
+            COL(2).html(CountPanel(V('Management'), 'cog', mng_cnt, **{'class' : 'panel-dgrey'})),
+            COL(2).html(CountPanel(V('Physical'), 'server', phy_cnt, **{'class' : 'panel-dgrey'})),
+            COL(2).html(CountPanel(V('Hypervisor'), 'cubes', hyp_cnt, **{'class' : 'panel-dgrey'})),
+            COL(2).html(CountPanel(V('Virtual'), 'cube', vir_cnt, **{'class' : 'panel-dgrey'}))
+        )
+    ).html(table)
     V.Menu.html(BUTTON(**(ATTR.click('/'.join(R.Path)) + {'class' : 'btn-primary'})).html(V('Refresh')))
 
 def ep_one(R, M, V):

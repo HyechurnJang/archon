@@ -79,15 +79,13 @@ def contract_all(R, M, V):
     #===========================================================================
     # View
     #===========================================================================
-    if not table: V.Page.html(Alert(V('Info'), V('Non-exist APIC Connection'), **{'class' : 'alert-info'}))
-    else:
-        V.Page.html(
-            ROW().html(
-                COL(4).html(CountPanel(V('Contracts'), 'ticket', ctrt_cnt, **{'class' : 'panel-dgrey'})),
-                COL(4).html(CountPanel(V('Provider'), 'truck', prov_cnt, **{'class' : 'panel-dgrey'})),
-                COL(4).html(CountPanel(V('Consumer'), 'shopping-cart', cons_cnt, **{'class' : 'panel-dgrey'}))
-            )
-        ).html(table)
+    V.Page.html(
+        ROW().html(
+            COL(4).html(CountPanel(V('Contracts'), 'ticket', ctrt_cnt, **{'class' : 'panel-dgrey'})),
+            COL(4).html(CountPanel(V('Provider'), 'truck', prov_cnt, **{'class' : 'panel-dgrey'})),
+            COL(4).html(CountPanel(V('Consumer'), 'shopping-cart', cons_cnt, **{'class' : 'panel-dgrey'}))
+        )
+    ).html(table)
     V.Menu.html(BUTTON(**(ATTR.click('/'.join(R.Path)) + {'class' : 'btn-primary'})).html(V('Refresh')))
 
 def contract_one(R, M, V):

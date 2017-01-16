@@ -104,10 +104,8 @@ def tenant_all(R, M, V):
     #===========================================================================
     # View
     #===========================================================================
-    if not table: V.Page.html(Alert(V('Info'), V('Non-exist APIC Connection'), **{'class' : 'alert-info'}))
-    else:
-#         if alert != None: V.Page.html(alert)
-        V.Page.html(CountPanel(V('Tenants'), 'users', tn_cnt, **{'class' : 'panel-dgrey'})).html(table)
+#     if alert != None: V.Page.html(alert)
+    V.Page.html(CountPanel(V('Tenants'), 'users', tn_cnt, **{'class' : 'panel-dgrey'})).html(table)
 
     V.Menu.html(
         BUTTON(**(ATTR.click('/'.join(R.Path)) + {'class' : 'btn-primary'})).html(V('Refresh')),

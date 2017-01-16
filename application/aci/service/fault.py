@@ -86,18 +86,16 @@ def fault_all(R, M, V):
     #===========================================================================
     # View
     #===========================================================================
-    if not table: V.Page.html(Alert(V('Info'), V('Non-exist APIC Connection'), **{'class' : 'alert-info'}))
-    else:
-        if len(R.Path) < 4:
-            V.Page.html(
-                ROW().html(
-                    COL(3).html(CountPanel(V('Critical'), 'bolt', cri_cnt, **(ATTR.click('/aci/show/fault/critical') + {'class' : 'panel-red'}))),
-                    COL(3).html(CountPanel(V('Major'), 'exclamation-triangle', maj_cnt, **(ATTR.click('/aci/show/fault/major') + {'class' : 'panel-danger'}))),
-                    COL(3).html(CountPanel(V('Minor'), 'exclamation-circle', min_cnt, **(ATTR.click('/aci/show/fault/minor') + {'class' : 'panel-yellow'}))),
-                    COL(3).html(CountPanel(V('Warning'), 'exclamation', war_cnt, **(ATTR.click('/aci/show/fault/warning') + {'class' : 'panel-warning'})))
-                )
+    if len(R.Path) < 4:
+        V.Page.html(
+            ROW().html(
+                COL(3).html(CountPanel(V('Critical'), 'bolt', cri_cnt, **(ATTR.click('/aci/show/fault/critical') + {'class' : 'panel-red'}))),
+                COL(3).html(CountPanel(V('Major'), 'exclamation-triangle', maj_cnt, **(ATTR.click('/aci/show/fault/major') + {'class' : 'panel-danger'}))),
+                COL(3).html(CountPanel(V('Minor'), 'exclamation-circle', min_cnt, **(ATTR.click('/aci/show/fault/minor') + {'class' : 'panel-yellow'}))),
+                COL(3).html(CountPanel(V('Warning'), 'exclamation', war_cnt, **(ATTR.click('/aci/show/fault/warning') + {'class' : 'panel-warning'})))
             )
-        V.Page.html(table)
+        )
+    V.Page.html(table)
     V.Menu.html(BUTTON(**(ATTR.click('/'.join(R.Path)) + {'class' : 'btn-primary'})).html(V('Refresh')))
 
 def fault_one(R, M, V):

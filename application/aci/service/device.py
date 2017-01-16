@@ -113,8 +113,7 @@ def device_all(R, M, V):
                 )
             )
         V.Page.html(table)
-     
-    if not V.Page: V.Page.html(Alert(V('Info'), V('Non-exist APIC Connection'), **{'class' : 'alert-info'}))
+    
     V.Menu.html(BUTTON(**(ATTR.click('/'.join(R.Path)) + {'class' : 'btn-primary'})).html(V('Refresh')))
 
 def device_one(R, M, V):
