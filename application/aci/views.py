@@ -65,7 +65,7 @@ def overview(R, M, V):
         return data, res * div, res * (div + 1)
     
     for domain_name in M:
-        panel = Panel(**{'class' : 'panel-default'}).Head('%s %s' % (domain_name, V('Domain')))
+        panel = Panel(**{'class' : 'panel-default'}).Head('<strong>%s %s</strong>' % (domain_name, V('Domain')))
         panel.Body(
             ROW().html(
                 COL(1, 'md').html(Gauge('Node', *resolution(cnt_nd[domain_name], 100), style='height:100px;')),
@@ -131,16 +131,16 @@ def overview(R, M, V):
     V.Page.html(
         ROW().html(
             COL(6).html(
-                Panel(**{'class' : 'panel-default'}).Head(V('Total Health')).Body(topo_hist)
+                Panel(**{'class' : 'panel-default'}).Head(STRONG().html(V('Total Health'))).Body(topo_hist)
             ),
             COL(6).html(
-                Panel(**{'class' : 'panel-default'}).Head(V('Node Health')).Body(
+                Panel(**{'class' : 'panel-default'}).Head(STRONG().html(V('Node Health'))).Body(
                     node_hist,
                     node_now
                 )
             )
         ),
-        Panel(**{'class' : 'panel-default'}).Head(V('EPG Health')).Body(
+        Panel(**{'class' : 'panel-default'}).Head(STRONG().html(V('EPG Health'))).Body(
             ROW().html(
                 COL(6).html(epgs_hist),
                 COL(6).html(epgs_now)
@@ -402,19 +402,19 @@ def ofinder(R, M, V):
         domain_name = R.Path[3]
         obj_name = '/'.join(R.Path[4:])
     elif R.Method == 'POST':
-        domain_name = R.Data['domain_name']
-        obj_name = R.Data['obj_name']
+        domain_name = R.Data['domain_name'] if R.Data['domain_name'] != '' else None
+        obj_name = R.Data['obj_name'] if R.Data['obj_name'] != '' else None
     else:
         domain_name = None
         obj_name = None
         
     V.Page.html(
         Post('/aci/tool/ofinder', V('Search'), **{'class' : 'btn-primary', 'style' : 'float:right;'}
-        ).Text('domain_name', Post.TopLabel(V('APIC Domain Name')), placeholder=V('Unique Name Required')
+        ).Select('domain_name', Post.TopLabel(V('APIC Domain Name')), *M.keys()
         ).Text('obj_name', Post.TopLabel(V('Object Name')), placeholder=V('DN or Class Name'))
     )
     
-    if domain_name != None:
+    if domain_name != None and obj_name != None:
         if '/' in obj_name:
             nav = Navigation()
             obj = M[domain_name](obj_name, detail=True)

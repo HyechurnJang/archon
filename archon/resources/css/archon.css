@@ -292,6 +292,11 @@ td>p {
 	border: 1px solid #e7e7e7;
 }
 
+.flip-clock-wrapper {
+	width: 460px;
+	margin: 0 auto;
+}
+
 .dt-buttons {
 	float: left;
 }

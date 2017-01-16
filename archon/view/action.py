@@ -78,6 +78,15 @@ class Post(DIV):
         )
         return self
     
+    def Select(self, name, label='select', *elements, **attrs):
+        
+        select = SELECT(**ATTR.merge(attrs, {'name' : name, 'class' : 'form-control ' + self.uuid}))
+        for element in elements: select.html(OPTION().html(element))
+        self['elements'].insert(-1,
+            DIV(**{'class' : 'input-group'}).html(label).html(select)
+        )
+        return self
+    
 class Delete(ANCH):
     
     def __init__(self, element, url, **attrs):

@@ -22,6 +22,10 @@ function UXFooTable(view) {
 	$("#" + view.attrs.id).footable();
 };
 
+function UXFlipClock(view) {
+	$("#" + view.attrs.id).FlipClock({clockFace: 'TwentyFourHourClock'});
+}
+
 function UXJustgage(view) {
 	setTimeout(function() {
 		var g = new JustGage({

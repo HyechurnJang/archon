@@ -212,3 +212,4 @@ class Gauge(VIEW):
     def __init__(self, title, value, min=0, max=100, **attrs):
         VIEW.__init__(self, 'DIV', **ATTR.merge(attrs, {'id' : VIEW.getUUID(), 'lib' : 'justgage'}))
         self['chart'] = {'title' : title, 'value' : value, 'min' : min, 'max' : max}
+    

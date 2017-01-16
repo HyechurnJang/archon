@@ -213,3 +213,14 @@ class Modal(DIV):
     def html(self, *elements):
         for element in elements: self.body.html(element)
         return self
+
+class JumboTron(DIV):
+    
+    def __init__(self, **attrs):
+        DIV.__init__(self, **ATTR.merge(attrs, {'class' : 'jumbotron'}))
+
+class FlipClock(VIEW):
+    
+    def __init__(self, **attrs):
+        VIEW.__init__(self, 'DIV', **ATTR.merge(attrs, {'id' : VIEW.getUUID(), 'lib' : 'flipclock'}))
+    

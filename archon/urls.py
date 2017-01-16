@@ -63,6 +63,7 @@ from django.contrib.auth import views as auth_views
 from django.contrib.auth.decorators import login_required
 
 from .settings import INSTALLED_APPS
+import dashboard
 
 class MainPage:
     
@@ -106,7 +107,7 @@ class MainPage:
         self.app_selectors = Template(app_selectors).render(Context())
         self.page_selectors = Template(page_selectors).render(Context())
         self.pages = Template(pages).render(Context())
-        self.admin = Template('<li><a href="/admin/">Admin</a></li><li class="divider"></li>').render(Context())
+        self.admin = Template('<li><a href="/admin/">Admin Tool</a></li><li class="divider"></li>').render(Context())
         self.user = Template('').render(Context())
 
     @method_decorator(login_required)
@@ -126,15 +127,14 @@ class MainPage:
     
 mainpage = MainPage()
 
-
 urlpatterns = [
     url(r'^favicon\.ico$', RedirectView.as_view(url='/resources/images/favicon.ico')),
     url(r'account/login/?$', auth_views.login, {'template_name': 'login.html'}, name='login'),
     url(r'account/logout/?$', auth_views.logout, {'next_page': '/'}, name='logout'),
     url(r'^admin/', admin.site.urls),
+    url(r'^dashboard/', dashboard.dashboard),
     url(r'^', mainpage.sendMainPage),
 ]
-
 
 def parse_urls(parent, urls):
     parent_url = '/' + '/'.join(parent)

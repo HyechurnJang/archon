@@ -45,7 +45,6 @@ $(document).ready(function() {
 
 	apps.hide();
 	pages.collapse({'toggle': false});
-	dashboard_page.collapse("show");
 	
 	$("#sched-toggle-btn").click(function() {
 		if (sched_toggle == false) { SetSchedBtnOn(); }
@@ -54,10 +53,10 @@ $(document).ready(function() {
 	
 	brand.click(function() {
 		SetSchedBtnOff();
-		url_current = null;
+		page_current = dashboard_page;
+		url_current = "/dashboard/";
 		app_selector.css("background-color", "transparent");
 		page_selector.css("color", "#777");
-		page_current = dashboard_page;
 		apps.fadeOut(350);
 		dashboard_page.fadeOut(350);
 		subject_page.fadeOut(350);
@@ -66,12 +65,26 @@ $(document).ready(function() {
 		subject_page.collapse("hide");
 		dynpages.collapse("hide");
 		loading_page.collapse("show");
-		setTimeout(function() {
-			loading_page.collapse("hide");
-			dashboard_page.css("height", "calc(100% - 50px)");
-			dashboard_page.fadeIn(350);
-			dashboard_page.collapse("show");
-		}, 400);
+		$.ajax({
+			url : "/dashboard/",
+			dataType : "json",
+			success : function(data) {
+				if ( page_current == dashboard_page ) {
+					setTimeout(function() {
+						dashboard_page.html(ParseViewDom(dashboard_page.attr("id") + '-', data.page));
+						ParseViewData(data.page);
+						dashboard_page.css("height", "calc(100% - 100px)");
+						loading_page.collapse("hide");
+						dashboard_page.fadeIn(350);
+						dashboard_page.collapse("show");
+					}, 400);
+				}
+			},
+			error : function(xhr, status, thrown) {
+				window.alert("Session Timeout!");
+				window.location.replace('/');
+			}
+		});
 	});
 	
 	app_selector.click(function() {
@@ -125,8 +138,9 @@ $(document).ready(function() {
 				window.location.replace('/');
 			}
 		});
-		
 	});
+	
+	if (page_current == null) { brand.click(); }
 });
 
 function GetData(url) {
@@ -291,6 +305,7 @@ function UXChart(view) {
 	case "dimple": UXDimple(view); break;
 	case "arbor": UXArbor(view); break;
 	case "justgage": UXJustgage(view); break;
+	case "flipclock": UXFlipClock(view); break;
 	}
 }; 
 

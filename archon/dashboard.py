@@ -34,11 +34,20 @@
 #                                                                              #
 ################################################################################
 
-from core import VIEW, ATTR, RGB, DIV, SPAN, HEAD, PARA, ANCH, LABEL, STRONG, SMALL, IMG, TABLE, THEAD, TBODY, TH, TR, TD, UL, LI, FORM, INPUT, SELECT, OPTION, BUTTON
-from deco import ROW, COL, Icon, StrWrap, KeyVal, Alert, Panel, CountPanel, Indent, Section, ListGroup, Navigation, Modal, JumboTron, FlipClock
-from action import Get, Post, Delete, DelClick, DelButton
+from archon import *
 
-from table import DataTable, FooTable
-from chart import Chart, Line, Bar, Pie, Donut, HealthLine, HealthBar, Topo, Gauge
+class Manager(ManagerAbstraction):
+    
+    def __init__(self):
+        pass
 
-
+@pageview(Manager)
+def dashboard(R, M, V):
+    
+    V.Page.html(
+        DIV(style='text-align:center;').html(
+            IMG(src='/resources/images/customer/KRHS.png'),
+            HEAD(1).html(V('Korea Research Institute for Human Settlements')),
+            FlipClock(),
+        )
+    )

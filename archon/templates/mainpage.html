@@ -19,6 +19,7 @@
 	<link rel="stylesheet" href="/resources/css/font-awesome.min.css" />
 	<link rel="stylesheet" href="/resources/css/datatables.min.css"/>
 	<link rel="stylesheet" href="/resources/css/footable.bootstrap.min.css"/>
+	<link rel="stylesheet" href="/resources/css/flipclock.css" />
 	<link rel="stylesheet" href="/resources/css/archon.css" />
 
 
@@ -35,14 +36,15 @@
 	<script src="/resources/js/jquery-2.2.4.min.js"></script>
 	<script src="/resources/js/bootstrap.min.js"></script>
 	<script src="/resources/js/d3.min.js"></script>
-	<script src="/resources/js/raphael-2.1.4.min.js"></script>
 	<script src="/resources/js/datatables.min.js"></script>
 	<script src="/resources/js/footable.min.js"></script>
 	<script src="/resources/js/dimple.v2.3.0.min.js"></script>
 	<script src="/resources/js/arbor.js"></script>
 	<script src="/resources/js/arbor-tween.js"></script>
 	<script src="/resources/js/arbor-graphics.js"></script>
+	<script src="/resources/js/raphael-2.1.4.min.js"></script>
 	<script src="/resources/js/justgage.js"></script>
+	<script src="/resources/js/flipclock.min.js"></script>
 	<script src="/resources/js/archonUX.js"></script>
 	<script src="/resources/js/archon.js"></script>
 
@@ -59,8 +61,7 @@
 			        <span class="icon-bar"></span>
       			</button>
       			<!-- <a class="navbar-brand"><img src="/resources/images/logo.png" /></a> -->
-      			<!-- <a class="navbar-brand" style="padding:5px 15px !important;"><img src="/resources/images/customer/KRHS.png" /></a> -->
-      			<a class="navbar-brand" style="padding:5px 15px !important;"><img src="/resources/images/customer/ShinHan.png" /></a>
+      			<a class="navbar-brand" style="padding:5px 15px !important;"><img src="/resources/images/customer/KRHS.png" /></a>
       			
       			
 <!-- ------------------------Application Selector------------------------ -->
@@ -100,16 +101,17 @@
 					                    <h4 class="modal-title" id="InformationDocumentLabel">What is this?</h4>
 					                </div>
 					                <div class="modal-body">
-<h5>This is open-source platform for cisco product.</h5>
+<h5>This is <a href="https://github.com/HyechurnJang/archon">open-source</a> platform for cisco product.</h5>
 <h5>We hope your success story using programmability with cisco products.</h5>
 <br/>
+<img src="/resources/images/logo.png" />
 <h1 style="text-align:center;">Enjoy Cisco!</h1>
 <br/>
 <div style="text-align:right;">
 <h3>Contact us</h3>
-<h4>Woo-Hyung Choi : whchoi@cisco.com</h4>
-<h4>Hyung-Soo Kim : hyungsok@cisco.com</h4>
-<h4>Hye-Churn Jang : hyjang@cisco.com</h4>
+<h4>Woo-Hyung Choi : whchoi AT cisco.com</h4>
+<h4>Hyung-Soo Kim : hyungsok AT cisco.com</h4>
+<h4>Hye-Churn Jang : hyjang AT cisco.com</h4>
 </div>
 					                </div>
 					                <div class="modal-footer">
@@ -143,12 +145,8 @@
 			<h1 id="subject-title"></h1>
 			<div id="subject-menu"></div>
 		</div>
-		<div id="loading-page" class="page collapse">
-			<!-- <img src="/resources/images/loading.jpg" alt="Loading..." width="100%" /> -->
-		</div>
-		<div id="dashboard-page" class="container-fluid page collapse in">
-			<h1>Dashboard</h1>
-		</div>
+		<div id="loading-page" class="page collapse"></div>
+		<div id="dashboard-page" class="container-fluid page collapse in"></div>
 
 
 <!-- ------------------------Pages------------------------ -->

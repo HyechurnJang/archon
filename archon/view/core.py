@@ -181,6 +181,14 @@ class INPUT(VIEW):
         def __init__(self, **attrs):
             VIEW.__init__(self, 'input', **attrs)
 
+class SELECT(VIEW):
+    def __init__(self, **attrs):
+        VIEW.__init__(self, 'select', **attrs)
+
+class OPTION(VIEW):
+    def __init__(self, **attrs):
+        VIEW.__init__(self, 'option', **attrs)
+
 class BUTTON(VIEW):
     def __init__(self, **attrs):
         VIEW.__init__(self, 'button', **ATTR.merge(attrs, {'class' : 'btn', 'type' : 'button'}))
