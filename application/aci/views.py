@@ -379,23 +379,37 @@ def intf_util(R, M, V):
 def acl_permit(R, M, V):
     domain_name = None
     if len(R.Path) > 3: domain_name = R.Path[3]
-        
     if domain_name != None:
-        table = DataTable(V('Time Stamp'), V('Source'), V('Destination'), V('Protocol'), V('Path'), V('Length'))
-        drops = M[domain_name].Class('acllogPermitL3Pkt').list(detail=True)
-        for drop in drops:
-            if drop['protocol'] in ['udp', 'tcp']:
-                src = '<small>%s / %s / %s</small>' % (drop['srcMacAddr'], drop['srcIp'], drop['srcPort'])
-                dst = '<small>%s / %s / %s</small>' % (drop['dstMacAddr'], drop['dstIp'], drop['dstPort'])
+        cnt_dict = {}
+        cnt_table = DataTable(V('Source'), V('Destination'), V('Protocol'), V('Count'))
+        ts_table = DataTable(V('Time Stamp'), V('Source'), V('Destination'), V('Protocol'), V('Path'), V('Length'))
+        pkts = M[domain_name].Class('acllogPermitL3Pkt').list(detail=True)
+        for pkt in pkts:
+            if pkt['protocol'] in ['udp', 'tcp']:
+                src = '<small>%s / %s / %s</small>' % (pkt['srcMacAddr'], pkt['srcIp'], pkt['srcPort'])
+                dst = '<small>%s / %s / %s</small>' % (pkt['dstMacAddr'], pkt['dstIp'], pkt['dstPort'])
             else:
-                src = '<small>%s / %s</small>' % (drop['srcMacAddr'], drop['srcIp'])
-                dst = '<small>%s / %s</small>' % (drop['dstMacAddr'], drop['dstIp'])
-            proto = '<small>%s</small>' % drop['protocol']
-            path = '<small>%s / %s(%s)</small>' % (re.sub('(topology/|pod-|node-)', '', drop['dn'].split('/ndbgs')[0]), drop['srcIntf'], drop['vrfEncap'])
-            pktlen = '<small>%s</small>' % drop['pktLen']
-            tstamp = '<small>%s</small>' % drop['timeStamp'][:-10]
-            table.Record(tstamp, src, dst, proto, path, pktlen)
-        V.Page.html(table)
+                src = '<small>%s / %s</small>' % (pkt['srcMacAddr'], pkt['srcIp'])
+                dst = '<small>%s / %s</small>' % (pkt['dstMacAddr'], pkt['dstIp'])
+            proto = '<small>%s</small>' % pkt['protocol']
+            path = '<small>%s / %s(%s)</small>' % (re.sub('(topology/|pod-|node-)', '', pkt['dn'].split('/ndbgs')[0]), pkt['srcIntf'], pkt['vrfEncap'])
+            pktlen = '<small>%s</small>' % pkt['pktLen']
+            tstamp = '<small>%s</small>' % pkt['timeStamp'][:-10]
+            ckey = src + dst + proto
+            if ckey not in cnt_dict: cnt_dict[ckey] = {'src' : src, 'dst' : dst, 'proto' : proto, 'cnt' : 1}
+            else: cnt_dict[ckey]['cnt'] += 1
+            ts_table.Record(tstamp, src, dst, proto, path, pktlen)
+        for ckey in cnt_dict:
+            pkt = cnt_dict[ckey]
+            cnt = '<small>%d</small>' % pkt['cnt']
+            cnt_table.Record(pkt['src'], pkt['dst'], pkt['proto'], cnt)
+        V.Page.html(
+            HEAD(1).html(domain_name),
+            HEAD(3).html(V('Count Table')),
+            cnt_table,
+            HEAD(3).html(V('TimeStamp Table')),
+            ts_table
+        )
     else:
         lg = ListGroup()
         for domain_name in M: lg.html(HEAD(3, **ATTR.click('/aci/stat/acl_permit/%s' % domain_name)).html(domain_name))
@@ -407,23 +421,37 @@ def acl_permit(R, M, V):
 def acl_deny(R, M, V):
     domain_name = None
     if len(R.Path) > 3: domain_name = R.Path[3]
-        
     if domain_name != None:
-        table = DataTable(V('Time Stamp'), V('Source'), V('Destination'), V('Protocol'), V('Path'), V('Length'))
-        drops = M[domain_name].Class('acllogDropL3Pkt').list(detail=True)
-        for drop in drops:
-            if drop['protocol'] in ['udp', 'tcp']:
-                src = '<small>%s / %s / %s</small>' % (drop['srcMacAddr'], drop['srcIp'], drop['srcPort'])
-                dst = '<small>%s / %s / %s</small>' % (drop['dstMacAddr'], drop['dstIp'], drop['dstPort'])
+        cnt_dict = {}
+        cnt_table = DataTable(V('Source'), V('Destination'), V('Protocol'), V('Count'))
+        ts_table = DataTable(V('Time Stamp'), V('Source'), V('Destination'), V('Protocol'), V('Path'), V('Length'))
+        pkts = M[domain_name].Class('acllogDropL3Pkt').list(detail=True)
+        for pkt in pkts:
+            if pkt['protocol'] in ['udp', 'tcp']:
+                src = '<small>%s / %s / %s</small>' % (pkt['srcMacAddr'], pkt['srcIp'], pkt['srcPort'])
+                dst = '<small>%s / %s / %s</small>' % (pkt['dstMacAddr'], pkt['dstIp'], pkt['dstPort'])
             else:
-                src = '<small>%s / %s</small>' % (drop['srcMacAddr'], drop['srcIp'])
-                dst = '<small>%s / %s</small>' % (drop['dstMacAddr'], drop['dstIp'])
-            proto = '<small>%s</small>' % drop['protocol']
-            path = '<small>%s / %s(%s)</small>' % (re.sub('(topology/|pod-|node-)', '', drop['dn'].split('/ndbgs')[0]), drop['srcIntf'], drop['vrfEncap'])
-            pktlen = '<small>%s</small>' % drop['pktLen']
-            tstamp = '<small>%s</small>' % drop['timeStamp'][:-10]
-            table.Record(tstamp, src, dst, proto, path, pktlen)
-        V.Page.html(table)
+                src = '<small>%s / %s</small>' % (pkt['srcMacAddr'], pkt['srcIp'])
+                dst = '<small>%s / %s</small>' % (pkt['dstMacAddr'], pkt['dstIp'])
+            proto = '<small>%s</small>' % pkt['protocol']
+            path = '<small>%s / %s(%s)</small>' % (re.sub('(topology/|pod-|node-)', '', pkt['dn'].split('/ndbgs')[0]), pkt['srcIntf'], pkt['vrfEncap'])
+            pktlen = '<small>%s</small>' % pkt['pktLen']
+            tstamp = '<small>%s</small>' % pkt['timeStamp'][:-10]
+            ckey = src + dst + proto
+            if ckey not in cnt_dict: cnt_dict[ckey] = {'src' : src, 'dst' : dst, 'proto' : proto, 'cnt' : 1}
+            else: cnt_dict[ckey]['cnt'] += 1
+            ts_table.Record(tstamp, src, dst, proto, path, pktlen)
+        for ckey in cnt_dict:
+            pkt = cnt_dict[ckey]
+            cnt = '<small>%d</small>' % pkt['cnt']
+            cnt_table.Record(pkt['src'], pkt['dst'], pkt['proto'], cnt)
+        V.Page.html(
+            HEAD(1).html(domain_name),
+            HEAD(3).html(V('Count Table')),
+            cnt_table,
+            HEAD(3).html(V('TimeStamp Table')),
+            ts_table
+        )
     else:
         lg = ListGroup()
         for domain_name in M: lg.html(HEAD(3, **ATTR.click('/aci/stat/acl_deny/%s' % domain_name)).html(domain_name))
