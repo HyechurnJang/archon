@@ -62,13 +62,13 @@ def epg_all(R, M, V):
             children = epg.children(detail=True)
             for child in children:
                 if child.class_name == 'fvRsBd' and child['state'] == 'formed':
-                    bd_data += '<p><small>' + child['tDn'].split('/BD-')[1] + '&nbsp;&nbsp;</small></p>'
+                    bd_data += '<p><small>' + child['tDn'].split('/BD-')[1] + ',&nbsp;</small></p>'
                 elif child.class_name == 'fvRsProv' and child['state'] == 'formed':
-                    prov_data += '<p><small>' + child['tDn'].split('/brc-')[1] + '&nbsp;&nbsp;</small></p>'
+                    prov_data += '<p><small>' + child['tDn'].split('/brc-')[1] + ',&nbsp;</small></p>'
                 elif child.class_name == 'fvRsCons' and child['state'] == 'formed':
-                    cons_data += '<p><small>' + child['tDn'].split('/brc-')[1] + '&nbsp;&nbsp;</small></p>'
+                    cons_data += '<p><small>' + child['tDn'].split('/brc-')[1] + ',&nbsp;</small></p>'
                 elif child.class_name == 'fvRsPathAtt' and child['state'] == 'formed':
-                    path_data += '<p><small>' + re.sub('(topology/|pod-|protpaths-|paths-|pathep-|\[|\])', '', child['tDn']) + '&nbsp;(%s)&nbsp;</small></p>' % child['encap']
+                    path_data += '<p><small>' + re.sub('(topology/|pod-|protpaths-|paths-|pathep-|\[|\])', '', child['tDn']) + '(%s),&nbsp;</small></p>' % child['encap']
             table.Record(domain_name, name, bd_data, prov_data, cons_data, path_data)
     
     #===========================================================================

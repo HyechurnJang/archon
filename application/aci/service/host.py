@@ -66,8 +66,8 @@ def host_all(R, M, V):
                 os_name, _ = get_host_os(V, host['os'], host['cfgdOs'])
                 for nic in nic_data[domain_name]:
                     if dn2nic in nic['dn']:
-                        ip_data += '<p><small>' + nic['ip'] + '&nbsp;&nbsp;</small></p>'
-                        mac_data += '<p><small>' + nic['mac'] + '&nbsp;&nbsp;</small></p>'
+                        ip_data += '<p><small>' + nic['ip'] + ',&nbsp;</small></p>'
+                        mac_data += '<p><small>' + nic['mac'] + ',&nbsp;</small></p>'
                 if host.class_name == 'compPhys':
                     cnt_phy += 1
                     ph_table.Record(oid, host['name'], ip_data, mac_data, os_name, host['state'])

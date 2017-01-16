@@ -68,13 +68,13 @@ def external_all(R, M, V):
             extn_prov = ' '
             extn_cons = ' '
             for ctxt in ctxts[domain_name]:
-                if scope == ctxt['scope']: extn_ctxt += '<p><small>' + ctxt['name'] + '</small></p>'
+                if scope == ctxt['scope']: extn_ctxt += '<p><small>' + ctxt['name'] + ',&nbsp;</small></p>'
             for subn in subns[domain_name]:
-                if dn in subn['dn']: extn_subn += '<p><small>' + subn['ip'] + '</small></p>'
+                if dn in subn['dn']: extn_subn += '<p><small>' + subn['ip'] + ',&nbsp;</small></p>'
             for prov in provs[domain_name]:
-                if dn in prov['dn']: extn_prov += '<p><small>' + re.sub('/\w+-', '/', prov['tDn']).replace('uni/', '') + '</small></p>'
+                if dn in prov['dn']: extn_prov += '<p><small>' + re.sub('/\w+-', '/', prov['tDn']).replace('uni/', '') + ',&nbsp;</small></p>'
             for cons in conss[domain_name]:
-                if dn in cons['dn']: extn_cons += '<p><small>' + re.sub('/\w+-', '/', cons['tDn']).replace('uni/', '') + '</small></p>'
+                if dn in cons['dn']: extn_cons += '<p><small>' + re.sub('/\w+-', '/', cons['tDn']).replace('uni/', '') + ',&nbsp;</small></p>'
             table.Record(domain_name, name, extn_ctxt, extn_subn, extn_prov, extn_cons)
     
     #===========================================================================

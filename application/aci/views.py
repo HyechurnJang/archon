@@ -39,6 +39,7 @@ from manager import Manager
 
 from service import *
 from application.aci.models import EPTracker
+from platform import node
 #===============================================================================
 # Create your views here.
 #===============================================================================
@@ -68,16 +69,16 @@ def overview(R, M, V):
         panel = Panel(**{'class' : 'panel-default'}).Head('<strong>%s %s</strong>' % (domain_name, V('Domain')))
         panel.Body(
             ROW().html(
-                COL(1, 'md').html(Gauge('Node', *resolution(cnt_nd[domain_name], 100), style='height:100px;')),
-                COL(1, 'md').html(Gauge('Tenant', *resolution(cnt_tt[domain_name], 100), style='height:100px;')),
-                COL(1, 'md').html(Gauge('BD', *resolution(cnt_bd[domain_name], 100), style='height:100px;')),
-                COL(1, 'md').html(Gauge('EPG', *resolution(cnt_epg[domain_name], 100), style='height:100px;')),
-                COL(1, 'md').html(Gauge('EP', *resolution(cnt_ep[domain_name], 100), style='height:100px;')),
-                COL(1, 'md').html(Gauge('Filter', *resolution(cnt_ft[domain_name], 100), style='height:100px;')),
+                COL(1, 'md').html(Gauge('Node', *resolution(cnt_nd[domain_name], 1000), style='height:100px;')),
+                COL(1, 'md').html(Gauge('Tenant', *resolution(cnt_tt[domain_name], 1000), style='height:100px;')),
+                COL(1, 'md').html(Gauge('BD', *resolution(cnt_bd[domain_name], 1000), style='height:100px;')),
+                COL(1, 'md').html(Gauge('EPG', *resolution(cnt_epg[domain_name], 1000), style='height:100px;')),
+                COL(1, 'md').html(Gauge('EP', *resolution(cnt_ep[domain_name], 1000), style='height:100px;')),
+                COL(1, 'md').html(Gauge('Filter', *resolution(cnt_ft[domain_name], 1000), style='height:100px;')),
                 
-                COL(1, 'md').html(Gauge('Contract', *resolution(cnt_ct[domain_name], 100), style='height:100px;')),
-                COL(1, 'md').html(Gauge('L4/7Devices', *resolution(cnt_47d[domain_name], 100), style='height:100px;')),
-                COL(1, 'md').html(Gauge('L4/7Graphs', *resolution(cnt_47g[domain_name], 100), style='height:100px;')),
+                COL(1, 'md').html(Gauge('Contract', *resolution(cnt_ct[domain_name], 1000), style='height:100px;')),
+                COL(1, 'md').html(Gauge('L4/7Devices', *resolution(cnt_47d[domain_name], 1000), style='height:100px;')),
+                COL(1, 'md').html(Gauge('L4/7Graphs', *resolution(cnt_47g[domain_name], 1000), style='height:100px;')),
                 
                 COL(3, 'md').html(
                     DIV(style='text-align:center;font-size:10px;font-weight:bold;color:#999;margin:0px;padding-top:6px;').html('Faults'),
@@ -375,6 +376,62 @@ def intf_util(R, M, V):
     V.Menu.html(BUTTON(**(ATTR.click('/'.join(R.Path)) + {'class' : 'btn-primary'})).html(V('Refresh')))
 
 @pageview(Manager)
+def acl_permit(R, M, V):
+    domain_name = None
+    if len(R.Path) > 3: domain_name = R.Path[3]
+        
+    if domain_name != None:
+        table = DataTable(V('Time Stamp'), V('Source'), V('Destination'), V('Protocol'), V('Path'), V('Length'))
+        drops = M[domain_name].Class('acllogPermitL3Pkt').list(detail=True)
+        for drop in drops:
+            if drop['protocol'] in ['udp', 'tcp']:
+                src = '<small>%s/%s/%s</small>' % (drop['srcMacAddr'], drop['srcIp'], drop['srcPort'])
+                dst = '<small>%s/%s/%s</small>' % (drop['dstMacAddr'], drop['dstIp'], drop['dstPort'])
+            else:
+                src = '<small>%s/%s</small>' % (drop['srcMacAddr'], drop['srcIp'])
+                dst = '<small>%s/%s</small>' % (drop['dstMacAddr'], drop['dstIp'])
+            proto = '<small>%s</small>' % drop['protocol']
+            path = '<small>%s/%s(%s)</small>' % (re.sub('(topology/|pod-|node-)', '', drop['dn'].split('/ndbgs')[0]), drop['srcIntf'], drop['vrfEncap'])
+            pktlen = '<small>%s</small>' % drop['pktLen']
+            tstamp = '<small>%s</small>' % drop['timeStamp'][:-10]
+            table.Record(tstamp, src, dst, proto, path, pktlen)
+        V.Page.html(table)
+    else:
+        lg = ListGroup()
+        for domain_name in M: lg.html(HEAD(3, **ATTR.click('/aci/stat/acl_permit/%s' % domain_name)).html(domain_name))
+        V.Page.html(lg)
+    
+    V.Menu.html(BUTTON(**(ATTR.click('/'.join(R.Path)) + {'class' : 'btn-primary'})).html(V('Refresh')))
+
+@pageview(Manager)
+def acl_deny(R, M, V):
+    domain_name = None
+    if len(R.Path) > 3: domain_name = R.Path[3]
+        
+    if domain_name != None:
+        table = DataTable(V('Time Stamp'), V('Source'), V('Destination'), V('Protocol'), V('Path'), V('Length'))
+        drops = M[domain_name].Class('acllogDropL3Pkt').list(detail=True)
+        for drop in drops:
+            if drop['protocol'] in ['udp', 'tcp']:
+                src = '<small>%s/%s/%s</small>' % (drop['srcMacAddr'], drop['srcIp'], drop['srcPort'])
+                dst = '<small>%s/%s/%s</small>' % (drop['dstMacAddr'], drop['dstIp'], drop['dstPort'])
+            else:
+                src = '<small>%s/%s</small>' % (drop['srcMacAddr'], drop['srcIp'])
+                dst = '<small>%s/%s</small>' % (drop['dstMacAddr'], drop['dstIp'])
+            proto = '<small>%s</small>' % drop['protocol']
+            path = '<small>%s/%s(%s)</small>' % (re.sub('(topology/|pod-|node-)', '', drop['dn'].split('/ndbgs')[0]), drop['srcIntf'], drop['vrfEncap'])
+            pktlen = '<small>%s</small>' % drop['pktLen']
+            tstamp = '<small>%s</small>' % drop['timeStamp'][:-10]
+            table.Record(tstamp, src, dst, proto, path, pktlen)
+        V.Page.html(table)
+    else:
+        lg = ListGroup()
+        for domain_name in M: lg.html(HEAD(3, **ATTR.click('/aci/stat/acl_deny/%s' % domain_name)).html(domain_name))
+        V.Page.html(lg)
+    
+    V.Menu.html(BUTTON(**(ATTR.click('/'.join(R.Path)) + {'class' : 'btn-primary'})).html(V('Refresh')))
+
+@pageview(Manager)
 def eptracker(R, M, V):
     if R.Method == 'GET' and len(R.Path) > 3 and R.Path[3] == 'init': M.initEndpoint()
     table = DataTable(V('Domain'), V('MAC'), V('IP'), V('EPG'), V('Interface'), V('Time Start'), V('Time Stop'))
@@ -382,7 +439,7 @@ def eptracker(R, M, V):
     for ep in eps:
         epg = ep.tenant + '/' + ep.app + '/' + ep.epg
         intf = ' '
-        for iname in ep.intf.split(','): intf += '<p><small>' + iname + '</small></p>'
+        for iname in ep.intf.split(','): intf += '<p><small>' + iname + ',&nbsp;</small></p>'
         table.Record(ep.domain,
                      Get('/aci/show/endpoint/%s/%s' % (ep.domain, ep.dn)).html(ep.mac),
                      ep.ip,
@@ -390,6 +447,8 @@ def eptracker(R, M, V):
                      intf,
                      '<small>' + ep.start + '</small>',
                      '<small>' + ep.stop + '</small>')
+        
+        
     V.Page.html(table)
     V.Menu.html(
         BUTTON(**(ATTR.click('/aci/tool/eptracker') + {'class' : 'btn-primary'})).html(V('Refresh')),

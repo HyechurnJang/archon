@@ -90,15 +90,15 @@ def tenant_all(R, M, V):
             ctr_data = ' '
             flt_data = ' '
             for epg in epgs[domain_name]:
-                if tn['dn'] in epg['dn']: epg_data += '<p><small>' + re.sub('(ap-|epg-)', '', '/'.join(epg['dn'].split('/')[2:])) + '&nbsp;&nbsp;</small></p>'
+                if tn['dn'] in epg['dn']: epg_data += '<p><small>' + re.sub('(ap-|epg-)', '', '/'.join(epg['dn'].split('/')[2:])) + ',&nbsp;</small></p>'
             for bd in bds[domain_name]:
-                if tn['dn'] in bd['dn']: bd_data += '<p><small>' + bd['name'] + '&nbsp;&nbsp;</small></p>'
+                if tn['dn'] in bd['dn']: bd_data += '<p><small>' + bd['name'] + ',&nbsp;</small></p>'
             for ctx in ctxs[domain_name]:
-                if tn['dn'] in ctx['dn']: ctx_data += '<p><small>' + ctx['name'] + '&nbsp;&nbsp;</small></p>'
+                if tn['dn'] in ctx['dn']: ctx_data += '<p><small>' + ctx['name'] + ',&nbsp;</small></p>'
             for ctr in ctrs[domain_name]:
-                if tn['dn'] in ctr['dn']: ctr_data += '<p><small>' + ctr['name'] + '&nbsp;&nbsp;</small></p>'
+                if tn['dn'] in ctr['dn']: ctr_data += '<p><small>' + ctr['name'] + ',&nbsp;</small></p>'
             for flt in flts[domain_name]:
-                if tn['dn'] in flt['dn']: flt_data += '<p><small>' + flt['name'] + '&nbsp;&nbsp;</small></p>'
+                if tn['dn'] in flt['dn']: flt_data += '<p><small>' + flt['name'] + ',&nbsp;</small></p>'
             table.Record(domain_name, name, epg_data, bd_data, ctx_data, ctr_data, flt_data)
     
     #===========================================================================

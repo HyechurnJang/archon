@@ -65,15 +65,15 @@ def contract_all(R, M, V):
             ctrt_prov = ' '
             ctrt_cons = ' '
             for subj in subjs[domain_name]:
-                if dn in subj['dn']: ctrt_subj += '<p><small>' + subj['name'] + '</small></p>'
+                if dn in subj['dn']: ctrt_subj += '<p><small>' + subj['name'] + ',&nbsp;</small></p>'
             for prov in provs[domain_name]:
                 if dn in prov['dn']:
                     prov_cnt += 1
-                    ctrt_prov += '<p><small>' + re.sub('/\w+-', '/', prov['tDn']).replace('uni/', '') + '</small></p>'
+                    ctrt_prov += '<p><small>' + re.sub('/\w+-', '/', prov['tDn']).replace('uni/', '') + ',&nbsp;</small></p>'
             for cons in conss[domain_name]:
                 if dn in cons['dn']:
                     cons_cnt += 1
-                    ctrt_cons += '<p><small>' + re.sub('/\w+-', '/', cons['tDn']).replace('uni/', '') + '</small></p>'
+                    ctrt_cons += '<p><small>' + re.sub('/\w+-', '/', cons['tDn']).replace('uni/', '') + ',&nbsp;</small></p>'
             table.Record(domain_name, name, ctrt['scope'], ctrt_subj, ctrt_prov, ctrt_cons)
     
     #===========================================================================

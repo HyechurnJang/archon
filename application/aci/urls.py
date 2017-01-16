@@ -54,6 +54,8 @@ url_show = [
 url_stat = [
     url(r'^epgstat/?', views.epg_util, name=u'엔드포인트그룹 사용율'),
     url(r'^intfstat/?', views.intf_util, name=u'인터페이스 사용율'),
+    url(r'^acl_permit/?', views.acl_permit, name=u'허용패킷로그'),
+    url(r'^acl_deny/?', views.acl_deny, name=u'차단패킷로그'),
 ]
 
 url_tool = [

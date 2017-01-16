@@ -70,19 +70,19 @@ def ep_all(R, M, V):
                     if mac == nic['mac']:
                         if nic.class_name == 'compDNic':
                             dcv_cnt += 1
-                            nic_type += '<p><small>Discovered</small></p>'
+                            nic_type += '<p><small>Discovered,&nbsp;</small></p>'
                         elif nic.class_name == 'compMgmtNic':
                             mng_cnt += 1
-                            nic_type += '<p><small>Management : ' + re.sub('(comp/|prov-|ctrlr-|hv-|mgmtnic-|\[|\])', '', nic['dn']) + '</small></p>'
+                            nic_type += '<p><small>Management : ' + re.sub('(comp/|prov-|ctrlr-|hv-|mgmtnic-|\[|\])', '', nic['dn']) + ',&nbsp;</small></p>'
                         elif nic.class_name == 'compHpNic':
                             hyp_cnt += 1
-                            nic_type += '<p><small>Hypervisor : ' + re.sub('(comp/|prov-|ctrlr-|hv-|hpnic-|\[|\])', '', nic['dn']) + '</small></p>'
+                            nic_type += '<p><small>Hypervisor : ' + re.sub('(comp/|prov-|ctrlr-|hv-|hpnic-|\[|\])', '', nic['dn']) + ',&nbsp;</small></p>'
                         elif nic.class_name == 'compPpNic':
                             phy_cnt += 1
-                            nic_type += '<p><small>Physical</small></p>'
+                            nic_type += '<p><small>Physical,&nbsp;</small></p>'
                         elif nic.class_name == 'compVNic':
                             vir_cnt += 1
-                            nic_type += '<p><small>Virtual : ' + re.sub('(comp/|prov-|ctrlr-|vm-|/vnic-[a-zA-Z0-9:]+|\[|\])', '', nic['dn']) + '</small></p>'
+                            nic_type += '<p><small>Virtual : ' + re.sub('(comp/|prov-|ctrlr-|vm-|/vnic-[a-zA-Z0-9:]+|\[|\])', '', nic['dn']) + ',&nbsp;</small></p>'
             else:
                 epg_name = ' '
                 nic_type = 'Logical Device'
