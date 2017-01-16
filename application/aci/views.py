@@ -69,16 +69,16 @@ def overview(R, M, V):
         panel = Panel(**{'class' : 'panel-default'}).Head('<strong>%s %s</strong>' % (domain_name, V('Domain')))
         panel.Body(
             ROW().html(
-                COL(1, 'md').html(Gauge('Node', *resolution(cnt_nd[domain_name], 1000), style='height:100px;')),
-                COL(1, 'md').html(Gauge('Tenant', *resolution(cnt_tt[domain_name], 1000), style='height:100px;')),
-                COL(1, 'md').html(Gauge('BD', *resolution(cnt_bd[domain_name], 1000), style='height:100px;')),
-                COL(1, 'md').html(Gauge('EPG', *resolution(cnt_epg[domain_name], 1000), style='height:100px;')),
-                COL(1, 'md').html(Gauge('EP', *resolution(cnt_ep[domain_name], 1000), style='height:100px;')),
-                COL(1, 'md').html(Gauge('Filter', *resolution(cnt_ft[domain_name], 1000), style='height:100px;')),
+                COL(1, 'md').html(Gauge('Node', *resolution(cnt_nd[domain_name], 100), style='height:100px;')),
+                COL(1, 'md').html(Gauge('Tenant', *resolution(cnt_tt[domain_name], 100), style='height:100px;')),
+                COL(1, 'md').html(Gauge('BD', *resolution(cnt_bd[domain_name], 100), style='height:100px;')),
+                COL(1, 'md').html(Gauge('EPG', *resolution(cnt_epg[domain_name], 100), style='height:100px;')),
+                COL(1, 'md').html(Gauge('EP', *resolution(cnt_ep[domain_name], 5000), style='height:100px;')),
+                COL(1, 'md').html(Gauge('Filter', *resolution(cnt_ft[domain_name], 100), style='height:100px;')),
                 
-                COL(1, 'md').html(Gauge('Contract', *resolution(cnt_ct[domain_name], 1000), style='height:100px;')),
-                COL(1, 'md').html(Gauge('L4/7Devices', *resolution(cnt_47d[domain_name], 1000), style='height:100px;')),
-                COL(1, 'md').html(Gauge('L4/7Graphs', *resolution(cnt_47g[domain_name], 1000), style='height:100px;')),
+                COL(1, 'md').html(Gauge('Contract', *resolution(cnt_ct[domain_name], 100), style='height:100px;')),
+                COL(1, 'md').html(Gauge('L4/7Devices', *resolution(cnt_47d[domain_name], 100), style='height:100px;')),
+                COL(1, 'md').html(Gauge('L4/7Graphs', *resolution(cnt_47g[domain_name], 100), style='height:100px;')),
                 
                 COL(3, 'md').html(
                     DIV(style='text-align:center;font-size:10px;font-weight:bold;color:#999;margin:0px;padding-top:6px;').html('Faults'),
