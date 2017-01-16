@@ -48,6 +48,6 @@ def dashboard(R, M, V):
         DIV(style='text-align:center;').html(
             IMG(src='/resources/images/customer/KRHS.png'),
             HEAD(1).html(V('Korea Research Institute for Human Settlements')),
-            FlipClock(),
+            FlipClock()
         )
     )
