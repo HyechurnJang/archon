@@ -413,13 +413,13 @@ def acl_deny(R, M, V):
         drops = M[domain_name].Class('acllogDropL3Pkt').list(detail=True)
         for drop in drops:
             if drop['protocol'] in ['udp', 'tcp']:
-                src = '<small>%s/%s/%s</small>' % (drop['srcMacAddr'], drop['srcIp'], drop['srcPort'])
-                dst = '<small>%s/%s/%s</small>' % (drop['dstMacAddr'], drop['dstIp'], drop['dstPort'])
+                src = '<small>%s / %s / %s</small>' % (drop['srcMacAddr'], drop['srcIp'], drop['srcPort'])
+                dst = '<small>%s / %s / %s</small>' % (drop['dstMacAddr'], drop['dstIp'], drop['dstPort'])
             else:
-                src = '<small>%s/%s</small>' % (drop['srcMacAddr'], drop['srcIp'])
-                dst = '<small>%s/%s</small>' % (drop['dstMacAddr'], drop['dstIp'])
+                src = '<small>%s / %s</small>' % (drop['srcMacAddr'], drop['srcIp'])
+                dst = '<small>%s / %s</small>' % (drop['dstMacAddr'], drop['dstIp'])
             proto = '<small>%s</small>' % drop['protocol']
-            path = '<small>%s/%s(%s)</small>' % (re.sub('(topology/|pod-|node-)', '', drop['dn'].split('/ndbgs')[0]), drop['srcIntf'], drop['vrfEncap'])
+            path = '<small>%s / %s(%s)</small>' % (re.sub('(topology/|pod-|node-)', '', drop['dn'].split('/ndbgs')[0]), drop['srcIntf'], drop['vrfEncap'])
             pktlen = '<small>%s</small>' % drop['pktLen']
             tstamp = '<small>%s</small>' % drop['timeStamp'][:-10]
             table.Record(tstamp, src, dst, proto, path, pktlen)
