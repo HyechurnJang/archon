@@ -97,13 +97,14 @@ def overview(R, M, V):
     # Health Chart
     #===========================================================================
     health = M.getHealth()
+    dns = sorted(health)
     topo_hist = Line(height=295, min=0, max=100, *health['_tstamp'])
     node_hist = Line(height=145, min=0, max=100, *health['_tstamp'])
     epgs_hist = Line(height=200, min=0, max=100, *health['_tstamp'])
     node_cur = []
     epgs_cur = []
     
-    for dn in health:
+    for dn in dns:
         if dn == '_tstamp': continue
         elif '/epg-' in dn:
             name = re.sub('(uni/|tn-|ap-|epg-)', '', dn)
@@ -149,6 +150,7 @@ def overview(R, M, V):
 def healthview(R, M, V):
     if not M: V.Page.html(Alert(V('Info'), V('Non-exist APIC Connection'), **{'class' : 'alert-info'})); return
     health = M.getHealth()
+    dns = sorted(health)
     node_list = ROW()
     epgs_list = ROW()
     
@@ -158,14 +160,14 @@ def healthview(R, M, V):
         g = int((val * 255) / 100)
         return 'rgb(%s,%s,0)' % (r, g)
     
-    for dn in health:
+    for dn in dns:
         if dn == '_tstamp': continue
         elif '/epg-' in dn:
             name = re.sub('(uni/|tn-|ap-|epg-)', '', dn)
             val = health[dn][-1]
             epgs_list.html(
                 COL(6).html(
-                    DIV(style='text-align:center;font-size:14px;font-weight:bold;color:#fff;background-color:%s;width:50px;height:20px;float:left;' % hcolor(val)).html(val),
+                    DIV(style='text-align:center;font-size:14px;font-weight:bold;color:#fff;background-color:%s;width:50px;height:20px;float:left;border-right:1px solid #fff;border-radius:3px;' % hcolor(val)).html(val),
                     DIV(style='float:left;').html(SmallHealthLine(*health[dn], width=80, height=20)),
                     DIV(style='padding-left:135px;font-weight:bold;', **ATTR.click('/aci/show/epgroup/%s' % dn)).html(SMALL().html(name))
                 )
@@ -175,7 +177,7 @@ def healthview(R, M, V):
             val = health[dn][-1]
             node_list.html(
                 COL(3).html(
-                    DIV(style='text-align:center;font-size:14px;font-weight:bold;color:#fff;background-color:%s;width:50px;height:20px;float:left;' % hcolor(val)).html(val),
+                    DIV(style='text-align:center;font-size:14px;font-weight:bold;color:#fff;background-color:%s;width:50px;height:20px;float:left;border-right:1px solid #fff;border-radius:3px;' % hcolor(val)).html(val),
                     DIV(style='float:left;').html(SmallHealthLine(*health[dn], width=80, height=20)),
                     DIV(style='padding-left:135px;font-weight:bold;', **ATTR.click('/aci/show/device/%s' % dn)).html(SMALL().html(name))
                 )
