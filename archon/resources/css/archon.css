@@ -205,6 +205,10 @@ td>p {
 	color: #0386d2;
 }
 
+.clickable {
+	cursor: pointer;
+}
+
 .para {
 	margin: 0px;
 	padding: 0px;

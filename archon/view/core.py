@@ -64,7 +64,7 @@ class ATTR(dict):
     
     @classmethod
     def click(cls, url):
-        return ATTR(**{'onclick' : "GetData('%s');" % url}) 
+        return ATTR(**{'class' : 'clickable', 'onclick' : "GetData('%s');" % url})
     
     def __init__(self, **attrs):
         dict.__init__(self, **attrs)
@@ -76,35 +76,6 @@ class ATTR(dict):
         for key in attr: self[key] = self[key] + ' ' + attr[key] if key in self else attr[key]
         return self
     
-class RGB:
-    
-    MIXNUM = 161
-    
-    @classmethod
-    def __pos_mix__(cls, c):
-        return (c + cls.MIXNUM) % 256 
-    
-    @classmethod
-    def __neg_mix__(cls, c):
-        return (c + 255 - cls.MIXNUM) % 256
-    
-    def __init__(self, r=51, g=102, b=255):
-        self.r = r
-        self.g = g
-        self.b = b
-        
-    def getRGB(self):
-        return self.r, self.g, self.b
-    
-    def getNext(self):
-        r = self.r
-        g = self.g
-        b = self.b
-        self.r = RGB.__neg_mix__(self.r)
-        self.g = RGB.__neg_mix__(self.g)
-        self.b = RGB.__pos_mix__(self.b)
-        return r, g, b
-
 class DIV(VIEW):
     def __init__(self, **attrs):
         VIEW.__init__(self, 'div', **attrs)

@@ -22,7 +22,7 @@ function GetCookie(c_name)
 function SetSchedBtnOn() {
 	sched_toggle = true;
 	sched_id = new Date().getTime();
-	GetDataRefresh(sched_id);
+	Scheduler(sched_id);
 	$("#sched-toggle-btn").html('<i class="fa fa-refresh fa-2x fa-spin"></i>');
 };
 
@@ -30,6 +30,31 @@ function SetSchedBtnOff() {
 	sched_toggle = false;
 	sched_id = null;
 	$("#sched-toggle-btn").html('<i class="fa fa-refresh fa-2x"></i>');
+};
+
+function Scheduler(id) {
+	if (sched_toggle == true && sched_id == id && url_current != null) {
+		var start = new Date().getTime();
+		$.ajax({
+			type: "GET",
+			url: url_current,
+			dataType: "json",
+			success : function(data) {
+				$("#subject-menu").html(ParseViewDom(page_current.attr("id") + '-m-', data.menu))
+				ParseViewData(data.menu);
+				page_current.html(ParseViewDom(page_current.attr("id") + '-', data.page));
+				ParseViewData(data.page);
+				var end = new Date().getTime();
+				var delay_time = sched_msec - (end - start);
+				if (delay_time <= 0) { delay_time = 0; }
+				setTimeout(function() { Scheduler(id); }, delay_time);
+			},
+			error : function(xhr, status, thrown) {
+				window.alert("Session Timeout!");
+				window.location.replace('/');
+			}
+		});
+	}
 };
 
 $(document).ready(function() {
@@ -64,6 +89,7 @@ $(document).ready(function() {
 		dashboard_page.collapse("hide");
 		subject_page.collapse("hide");
 		dynpages.collapse("hide");
+		dynpages.html(null);
 		loading_page.collapse("show");
 		$.ajax({
 			url : "/dashboard/",
@@ -111,6 +137,7 @@ $(document).ready(function() {
 		dashboard_page.collapse("hide");
 		subject_page.collapse("hide");
 		dynpages.collapse("hide");
+		dynpages.html(null);
 		loading_page.collapse("show");
 		$.ajax({
 			url : url,
@@ -170,31 +197,6 @@ function GetData(url) {
 			window.location.replace('/');
 		}
 	});
-};
-
-function GetDataRefresh(id) {
-	if (sched_toggle == true && sched_id == id && url_current != null) {
-		var start = new Date().getTime();
-		$.ajax({
-			type: "GET",
-			url: url_current,
-			dataType: "json",
-			success : function(data) {
-				$("#subject-menu").html(ParseViewDom(page_current.attr("id") + '-m-', data.menu))
-				ParseViewData(data.menu);
-				page_current.html(ParseViewDom(page_current.attr("id") + '-', data.page));
-				ParseViewData(data.page);
-				var end = new Date().getTime();
-				var delay_time = sched_msec - (end - start);
-				if (delay_time <= 0) { delay_time = 0; }
-				setTimeout(function() { GetDataRefresh(id); }, delay_time);
-			},
-			error : function(xhr, status, thrown) {
-				window.alert("Session Timeout!");
-				window.location.replace('/');
-			}
-		});
-	}
 };
 
 function PostData(uuid, url) {
@@ -287,8 +289,11 @@ function ParseViewData(view) {
 		for (var i = 0, element; element = elements[i]; i++) { ParseViewData(element); }
 		switch(view.type) {
 		case "TABLE": UXTable(view); break;
-		case "DIV": UXChart(view); break;
-		case "CANVAS": UXChart(view); break;
+		case "DIV":
+		case "CANVAS":
+		case "SPAN":
+			UXChart(view);
+			break;
 		}
 	}
 };
@@ -303,6 +308,7 @@ function UXTable(view) {
 function UXChart(view) {
 	switch(view.attrs.lib) {
 	case "dimple": UXDimple(view); break;
+	case "peity": UXPeity(view); break;
 	case "arbor": UXArbor(view); break;
 	case "justgage": UXJustgage(view); break;
 	case "flipclock": UXFlipClock(view); break;

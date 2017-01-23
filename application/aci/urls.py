@@ -65,6 +65,7 @@ url_tool = [
 
 urlpatterns = [
     url(r'^overview/?', views.overview, name=u'개요'),
+    url(r'^healthview/?', views.healthview, name=u'상태'),
     url(r'^topoview/?', views.topoview, name=u'관계도'),
     url(r'^show/', include(url_show, namespace=u'점검')),
     url(r'^stat/', include(url_stat, namespace=u'분석')),

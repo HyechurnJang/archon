@@ -140,6 +140,28 @@ function UXDimple(view) {
 	}, 0);
 };
 
+function UXPeity(view) {
+	switch(view.chart.type) {
+	case "line": $("#" + view.attrs.id).peity("line", view.chart.options); break;
+	case "bar": $("#" + view.attrs.id).peity("bar", view.chart.options); break;
+	case "pie": $("#" + view.attrs.id).peity("pie", view.chart.options); break;
+	case "donut": $("#" + view.attrs.id).peity("donut", view.chart.options); break;
+	case "hline":
+		view.chart.options.min = 0;
+		view.chart.options.max = 100;
+		view.chart.options.fill = "rgb(" + parseInt(255 - ((view.chart.hval * 255) / 100)) + "," + parseInt((view.chart.hval * 255) / 100) + ",0)";
+		view.chart.options.stroke = "rgb(" + parseInt(255 - ((view.chart.hval * 255) / 100)) + "," + parseInt((view.chart.hval * 255) / 100) + ",0)";
+		$("#" + view.attrs.id).peity("line", view.chart.options);
+		break;
+	case "hbar":
+		view.chart.options.fill = function(value) { return "rgb(" + parseInt(255 - ((value * 255) / 100)) + "," + parseInt((value * 255) / 100) + ",0)"; };
+		view.chart.options.min = 0;
+		view.chart.options.max = 100;
+		$("#" + view.attrs.id).peity("bar", view.chart.options);
+		break;
+	}; 
+};
+
 var ArborRenderer1 = function(canvas){
 	var canvas = $(canvas).get(0)
 	var ctx = canvas.getContext("2d");

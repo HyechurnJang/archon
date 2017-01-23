@@ -46,7 +46,7 @@ def ep_all(R, M, V):
     #===========================================================================
     # Logic
     #===========================================================================
-    table = DataTable(V('Domain'), V('Name'), V('EPG'), V('Interface'), V('Encap'), V('IP'), V('NIC Type'))
+    table = DataTable(V('Domain'), V('Name'), V('EPG'), V('Path'), V('Encap'), V('IP'), V('NIC Type'))
     ep_cnt = 0
     dcv_cnt = 0
     mng_cnt = 0

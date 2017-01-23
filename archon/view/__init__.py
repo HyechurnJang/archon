@@ -34,11 +34,11 @@
 #                                                                              #
 ################################################################################
 
-from core import VIEW, ATTR, RGB, DIV, SPAN, HEAD, PARA, ANCH, LABEL, STRONG, SMALL, IMG, TABLE, THEAD, TBODY, TH, TR, TD, UL, LI, FORM, INPUT, SELECT, OPTION, BUTTON
+from core import VIEW, ATTR, DIV, SPAN, HEAD, PARA, ANCH, LABEL, STRONG, SMALL, IMG, TABLE, THEAD, TBODY, TH, TR, TD, UL, LI, FORM, INPUT, SELECT, OPTION, BUTTON
 from deco import ROW, COL, Icon, StrWrap, KeyVal, Alert, Panel, CountPanel, Indent, Section, ListGroup, Navigation, Modal, JumboTron, FlipClock
 from action import Get, Post, Delete, DelClick, DelButton
 
 from table import DataTable, FooTable
-from chart import Chart, Line, Bar, Pie, Donut, HealthLine, HealthBar, Topo, Gauge
+from chart import Chart, Line, Bar, Pie, Donut, HealthLine, HealthBar, SmallChart, SmallLine, SmallBar, SmallPie, SmallDonut, SmallHealthLine, SmallHealthBar, Topo, Gauge
 
 

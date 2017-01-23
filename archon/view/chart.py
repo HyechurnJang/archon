@@ -176,6 +176,52 @@ class HealthBar(Bar):
         self['chart']['options']['health_max_g'] = max_g
         return self
 
+class SmallChart(VIEW):
+    
+    def __init__(self, *vals, **options):
+        VIEW.__init__(self, 'SPAN', **{'id' : VIEW.getUUID(), 'lib' : 'peity'})
+        self['chart'] = {}
+        self['chart']['options'] = options
+        self.html(','.join(str(s) for s in vals))
+
+class SmallLine(SmallChart):
+    
+    def __init__(self, *vals, **options):
+        SmallChart.__init__(self, *vals, **options)
+        self['chart']['type'] = 'line'
+
+class SmallBar(SmallChart):
+    
+    def __init__(self, *vals, **options):
+        SmallChart.__init__(self, *vals, **options)
+        self['chart']['type'] = 'bar'
+        
+class SmallPie(SmallChart):
+    
+    def __init__(self, *vals, **options):
+        SmallChart.__init__(self, *vals, **options)
+        self['chart']['type'] = 'pie'
+
+class SmallDonut(SmallChart):
+    
+    def __init__(self, *vals, **options):
+        SmallChart.__init__(self, *vals, **options)
+        self['chart']['type'] = 'donut'
+        
+class SmallHealthLine(SmallChart):
+    
+    def __init__(self, *vals, **options):
+        SmallChart.__init__(self, *vals, **options)
+        if len(vals) > 0 and vals[-1] != None: self['chart']['hval'] = vals[-1]
+        else: self['chart']['hval'] = 0
+        self['chart']['type'] = 'hline'
+        
+class SmallHealthBar(SmallChart):
+    
+    def __init__(self, *vals, **options):
+        SmallChart.__init__(self, *vals, **options)
+        self['chart']['type'] = 'hbar'
+
 class Topo(VIEW):
     
     def __init__(self, **options):
