@@ -105,7 +105,12 @@ def tenant_all(R, M, V):
     # View
     #===========================================================================
 #     if alert != None: V.Page.html(alert)
-    V.Page.html(CountPanel(V('Tenants'), 'users', tn_cnt, **{'class' : 'panel-dgrey'})).html(table)
+    V.Page.html(
+        ROW().html(
+            COL(12).html(CountPanel(V('Tenants'), 'users', tn_cnt, **{'class' : 'panel-dgrey'}))
+        ),
+        table
+    )
 
     V.Menu.html(
         BUTTON(**(ATTR.click('/'.join(R.Path)) + {'class' : 'btn-primary'})).html(V('Refresh')),

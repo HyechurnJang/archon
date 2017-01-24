@@ -332,8 +332,12 @@ def epg_util(R, M, V):
                     COL(6).html(CountPanel(V('Start'), 'hourglass-start', start, **{'class' : 'panel-dgrey'})),
                     COL(6).html(CountPanel(V('End'), 'hourglass-end', end, **{'class' : 'panel-dgrey'}))
                 ),
-                CountPanel(V('Total Unicast Bytes'), 'arrow-circle-o-right', tub, **{'class' : 'panel-dgrey'}),
-                CountPanel(V('Total Multicast Bytes'), 'share-alt', tmb, **{'class' : 'panel-dgrey'})
+                ROW().html(
+                    COL(12).html(CountPanel(V('Total Unicast Bytes'), 'arrow-circle-o-right', tub, **{'class' : 'panel-dgrey'}))
+                ),
+                ROW().html(
+                    COL(12).html(CountPanel(V('Total Multicast Bytes'), 'share-alt', tmb, **{'class' : 'panel-dgrey'}))
+                )
             )
             V.Page.html(table)
     else:
@@ -389,8 +393,12 @@ def intf_util(R, M, V):
                     COL(6).html(CountPanel(V('Start'), 'hourglass-start', start, **{'class' : 'panel-dgrey'})),
                     COL(6).html(CountPanel(V('End'), 'hourglass-end', end, **{'class' : 'panel-dgrey'}))
                 ),
-                CountPanel(V('Total Ingress Bytes'), 'download', tib, **{'class' : 'panel-dgrey'}),
-                CountPanel(V('Total Egress Bytes'), 'upload', teb, **{'class' : 'panel-dgrey'})
+                ROW().html(
+                    COL(12).html(CountPanel(V('Total Ingress Bytes'), 'download', tib, **{'class' : 'panel-dgrey'}))
+                ),
+                ROW().html(
+                    COL(12).html(CountPanel(V('Total Egress Bytes'), 'upload', teb, **{'class' : 'panel-dgrey'}))
+                )
             )
             V.Page.html(table)
     

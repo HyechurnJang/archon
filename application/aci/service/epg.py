@@ -74,7 +74,12 @@ def epg_all(R, M, V):
     #===========================================================================
     # View
     #===========================================================================
-    V.Page.html(CountPanel(V('EPG'), 'object-group', epg_cnt, **{'class' : 'panel-dgrey'})).html(table)
+    V.Page.html(
+        ROW().html(
+            COL(12).html(CountPanel(V('EPG'), 'object-group', epg_cnt, **{'class' : 'panel-dgrey'}))
+        ),
+        table
+    )
     V.Menu.html(BUTTON(**(ATTR.click('/'.join(R.Path)) + {'class' : 'btn-primary'})).html(V('Refresh')))
 
 def epg_one(R, M, V):
