@@ -47,7 +47,7 @@ from models import *
 # Create your manager here.
 #===============================================================================
 
-APIC_MONSEC = 5
+APIC_MONSEC = 60
 
 class HealthMonitor(pygics.Task):
     
