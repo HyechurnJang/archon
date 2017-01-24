@@ -69,7 +69,7 @@ def overview(R, M, V):
     
     for domain_name in M:
         V.Page.html(
-            Panel(**{'class' : 'panel-default'}).Head('<strong>%s %s</strong>' % (domain_name, V('Domain'))).Body(
+            Panel(**{'class' : 'panel-dgrey'}).Head('<strong>%s %s</strong>' % (domain_name, V('Domain'))).Body(
                 ROW().html(
                     COL(1, 'md').html(Gauge('Node', *resolution(cnt_nd[domain_name], 100), style='height:100px;')),
                     COL(1, 'md').html(Gauge('Tenant', *resolution(cnt_tt[domain_name], 100), style='height:100px;')),
@@ -131,13 +131,13 @@ def overview(R, M, V):
     V.Page.html(
         ROW().html(
             COL(6).html(
-                Panel(**{'class' : 'panel-default'}).Head(STRONG().html(V('Total Health'))).Body(topo_hist)
+                Panel(**{'class' : 'panel-dgrey'}).Head(STRONG().html(V('Total Health'))).Body(topo_hist)
             ),
             COL(6).html(
-                Panel(**{'class' : 'panel-default'}).Head(STRONG().html(V('Node Health'))).Body(node_hist, node_now)
+                Panel(**{'class' : 'panel-dgrey'}).Head(STRONG().html(V('Node Health'))).Body(node_hist, node_now)
             )
         ),
-        Panel(**{'class' : 'panel-default'}).Head(STRONG().html(V('EPG Health'))).Body(
+        Panel(**{'class' : 'panel-dgrey'}).Head(STRONG().html(V('EPG Health'))).Body(
             ROW().html(
                 COL(6).html(epgs_hist),
                 COL(6).html(epgs_now)
@@ -184,8 +184,8 @@ def healthview(R, M, V):
             )
     
     V.Page.html(
-        Panel(**{'class' : 'panel-default'}).Head(STRONG().html(V('Node Health'))).Body(node_list),
-        Panel(**{'class' : 'panel-default'}).Head(STRONG().html(V('EPG Health'))).Body(epgs_list),
+        Panel(**{'class' : 'panel-dgrey'}).Head(STRONG().html(V('Node Health'))).Body(node_list),
+        Panel(**{'class' : 'panel-dgrey'}).Head(STRONG().html(V('EPG Health'))).Body(epgs_list),
     )
     
     V.Menu.html(BUTTON(**(ATTR.click('/'.join(R.Path)) + {'class' : 'btn-primary'})).html(V('Refresh')))

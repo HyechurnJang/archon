@@ -71,6 +71,13 @@ td>p {
 	padding-right: 15px;
 }
 
+.nav-tabs>li.active>a,
+.nav-tabs>li.active>a:hover,
+.nav-tabs>li.active>a:focus {
+	color: #fff;
+	background-color: #555;
+}
+
 .app-selector {
   float: left;
   height: 50px;
@@ -117,7 +124,7 @@ td>p {
 	padding-top: 10px;
     overflow-y: scroll;
     height: calc(100% - 100px);
-    background: #fff
+    background-color: rgba(255,255,255,0.91);
 }
 #loading-page {
 	height: calc(100% - 50px);
@@ -126,7 +133,7 @@ td>p {
 	padding-top: 10px;
     overflow-y: scroll;
     height: calc(100% - 50px);
-    background-color: rgba(255,255,255,0.9);
+    background-color: rgba(255,255,255,0.91);
 }
 #subject-page {
 	background-color: rgba(255,255,255,0.7);
@@ -153,6 +160,10 @@ td>p {
 	margin-left: 5px;
 	margin-right: 5px;
 	float: right;
+}
+
+.pagecontent {
+	height: 100%;
 }
 
 .strwrap {
@@ -214,6 +225,9 @@ td>p {
 	padding: 0px;
 }
 
+.panel {
+	margin-bottom: 5px;
+}
 .panel-red {border-color: #d9534f;}
 .panel-red>.panel-heading {
     border-color: #d9534f;
@@ -331,4 +345,8 @@ table.footable-details>tbody>tr>th:nth-child(1) {
 	min-width: 80px;
 	max-width: 400px;
 	width: 20%;
+}
+
+.table.table {
+	background-color: inherit;
 }

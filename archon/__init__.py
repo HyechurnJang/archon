@@ -56,10 +56,15 @@ class ManagerAbstraction:
         return cls.__MANAGER__
 
 class ArchonView:
+    
+    class PageContent(VIEW):
+        
+        def __init__(self):
+            VIEW.__init__(self, 'div', **{'class' : 'pagecontent'})
         
     def __init__(self, app, lang):
         self.Menu = DIV()
-        self.Page = DIV()
+        self.Page = ArchonView.PageContent()
         self._app = app
         self._lang = lang
         

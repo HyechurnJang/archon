@@ -152,7 +152,7 @@ def device_one(R, M, V):
         physif = node_data.System.PhysIf.list(detail=True, sort='id')
         if physif:
             phys_health = node_data.System.PhysIf.health()
-            active_intf = ROW()
+            active_intf = ROW(style='margin-bottom:20px;')
             sort_phys_health = {}
             key = node_data.System.PhysIf.keys()
             table = FooTable(*['+' + k if k != 'id' else V('ID') for k in key])
@@ -190,7 +190,7 @@ def device_one(R, M, V):
     )
     if active_intf != None:
         V.Page.html(
-            HEAD(3).html(V('Active Interface')),
+            HEAD(3).html(V('Active Interfaces')),
             active_intf
         )
     V.Page.html(nav)

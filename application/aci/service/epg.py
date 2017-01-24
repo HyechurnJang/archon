@@ -89,6 +89,7 @@ def epg_one(R, M, V):
     # Logic
     #===========================================================================
     nav = Navigation()
+    active_ep = None
     
     # Health
     hdata = M.getHealth()
@@ -161,6 +162,7 @@ def epg_one(R, M, V):
     # Endpoint
     datas = epg.Endpoint.list(detail=True)
     if datas:
+        active_ep = ROW(style='margin-bottom:20px;')
         key = epg.Endpoint.keys()
         col = []
         for k in key:
@@ -177,11 +179,22 @@ def epg_one(R, M, V):
                 else: val.append(data[k])
             table.Record(*val)
             set_topo(topo, data['dn'], color='black')
+            active_ep.html(
+                COL(2, style='padding:0px 5px 0px 5px').html(
+                    DIV(style='float:left;').html(IMG(src='/resources/images/tool/nic.png', width='20px')),
+                    DIV(style='padding-left:22px;').html(data['name'])
+                )
+            )
 
     #===========================================================================
     # View
     #===========================================================================
     V.Page.html(HEAD(1).html(epg['name']))
     if health != None: V.Page.html(ROW().html(health))
+    if active_ep != None:
+        V.Page.html(
+            HEAD(3).html(V('Active Endpoints')),
+            active_ep
+        )
     V.Page.html(nav)
     V.Menu.html(BUTTON(**(ATTR.click('/'.join(R.Path)) + {'class' : 'btn-primary'})).html(V('Refresh')))
