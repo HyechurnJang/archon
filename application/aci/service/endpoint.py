@@ -129,7 +129,7 @@ def ep_one(R, M, V):
     
     # Details
     kv = KeyVal()
-    for key in ep.attrs(): kv.Data(key, ep[key])
+    for key in ep.keys(): kv.Data(key, ep[key])
     nav.Tab(V('Details'), kv)
     
     # Topology
@@ -141,7 +141,7 @@ def ep_one(R, M, V):
     epg = ep.parent(detail=True)
     if epg and epg.class_name == 'fvAEPg':
         kv = KeyVal()
-        for key in epg.attrs(): kv.Data(key, epg[key])
+        for key in epg.keys(): kv.Data(key, epg[key])
         nav.Tab(V('EPG'), kv)
         
     # Path
@@ -149,7 +149,7 @@ def ep_one(R, M, V):
     for child in children:
         if child.class_name == 'fvRsCEpToPathEp':
             kv = KeyVal()
-            for key in child.attrs(): kv.Data(key, child[key])
+            for key in child.keys(): kv.Data(key, child[key])
             nav.Tab(V('Path'), kv)
             set_topo(topo, child['tDn'])
             topo.Edge(dn, child['tDn'])
@@ -174,7 +174,7 @@ def ep_one(R, M, V):
         hv_host = None
         
         for nic in nics:
-            key = nic.attrs()
+            key = nic.keys()
             host = nic.parent(detail=True)
             if nic.class_name == 'compPpNic':
                 if phy_nic == None: phy_nic = FooTable(*['+' + k if k != 'name' else V('Physical NIC') for k in key])
@@ -183,7 +183,7 @@ def ep_one(R, M, V):
                 topo.Edge(dn, nic['dn'])
                 if host and host['dn'] not in hosts:
                     hosts.append(host['dn'])
-                    key = host.attrs()
+                    key = host.keys()
                     if phy_host == None: phy_host = FooTable(*['+' + k if k != 'name' else V('Physical Hosts') for k in key])
                     phy_host.Record(*[host[k] for k in key])
             elif nic.class_name == 'compVNic':
@@ -193,7 +193,7 @@ def ep_one(R, M, V):
                 topo.Edge(dn, nic['dn'])
                 if host and host['dn'] not in hosts:
                     hosts.append(host['dn'])
-                    key = host.attrs()
+                    key = host.keys()
                     if vm_host == None: vm_host = FooTable(*['+' + k if k != 'name' else V('Virtual Hosts') for k in key])
                     vm_host.Record(*[host[k] for k in key])
             elif nic.class_name == 'compHpNic':
@@ -203,7 +203,7 @@ def ep_one(R, M, V):
                 topo.Edge(dn, nic['dn'])
                 if host and host['dn'] not in hosts:
                     hosts.append(host['dn'])
-                    key = host.attrs()
+                    key = host.keys()
                     if hv_host == None: hv_host = FooTable(*['+' + k if k != 'name' else V('Hypervisor Hosts') for k in key])
                     hv_host.Record(*[host[k] for k in key])
             elif nic.class_name == 'compMgmtNic':
@@ -213,7 +213,7 @@ def ep_one(R, M, V):
                 topo.Edge(dn, nic['dn'])
                 if host and host['dn'] not in hosts:
                     hosts.append(host['dn'])
-                    key = host.attrs()
+                    key = host.keys()
                     if hv_host == None: hv_host = FooTable(*['+' + k if k != 'name' else V('Hypervisor Hosts') for k in key])
                     hv_host.Record(*[host[k] for k in key])
         

@@ -138,7 +138,7 @@ def host_one(R, M, V):
     
     # Detail
     kv = KeyVal()
-    for key in host_data.attrs(): kv.Data(key, host_data[key])
+    for key in host_data.keys(): kv.Data(key, host_data[key])
     nav.Tab(V('Details'), kv)
     
     # Topology
@@ -151,7 +151,7 @@ def host_one(R, M, V):
     if host_data.class_name == 'compPhys':
         os_name, os_img = get_host_os(V, host_data['os'])
         
-        key = M[domain_name].Class('compPpNic').attrs()
+        key = M[domain_name].Class('compPpNic').keys()
         table = FooTable(*['+' + k if k != 'name' else V('NIC Name') for k in key])
         for child in children:
             if child.class_name == 'compPpNic':
@@ -172,7 +172,7 @@ def host_one(R, M, V):
     elif host_data.class_name == 'compVm':
         os_name, os_img = get_host_os(V, host_data['os'], host_data['cfgdOs'])
         hv_name, hv_img = get_host_os(V, host_data['dn'])
-        key = M[domain_name].Class('compVNic').attrs()
+        key = M[domain_name].Class('compVNic').keys()
         table = FooTable(*['+' + k if k != 'name' else V('NIC Name') for k in key])
         for child in children:
             if child.class_name == 'compVNic':
@@ -192,9 +192,9 @@ def host_one(R, M, V):
         
     elif host_data.class_name == 'compHv':
         os_name, os_img = get_host_os(V, host_data['dn'])
-        h_key = M[domain_name].Class('compHpNic').attrs()
+        h_key = M[domain_name].Class('compHpNic').keys()
         h_table = FooTable(*['+' + k if k != 'name' else V('NIC Name') for k in h_key])
-        m_key = M[domain_name].Class('compMgmtNic').attrs()
+        m_key = M[domain_name].Class('compMgmtNic').keys()
         m_table = FooTable(*['+' + k if k != 'name' else V('NIC Name') for k in m_key])
         for child in children:
             if child.class_name == 'compHpNic':

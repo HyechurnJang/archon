@@ -42,7 +42,6 @@ from django.contrib.auth.decorators import login_required
 from django.http import JsonResponse
 
 from archon.settings import SESSION_COOKIE_AGE
-from archon.common import *
 from archon.view import *
 
 ARCHON_DEBUG = False

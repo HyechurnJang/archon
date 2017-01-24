@@ -106,7 +106,7 @@ def contract_one(R, M, V):
     
     # Details
     kv = KeyVal()
-    for key in ctrt.attrs(): kv.Data(key, ctrt[key])
+    for key in ctrt.keys(): kv.Data(key, ctrt[key])
     nav.Tab(V('Details'), kv)
     
     # Topology
@@ -117,7 +117,7 @@ def contract_one(R, M, V):
     # Subject
     datas = ctrt.Subject.list(detail=True, sort='dn')
     if datas:
-        key = ctrt.Subject.attrs()
+        key = ctrt.Subject.keys()
         table = FooTable(*['+' + k if k != 'name' else V('Name') for k in key])
         for data in datas:
             table.Record(*[data[k] for k in key])
@@ -129,11 +129,11 @@ def contract_one(R, M, V):
         nav.Tab(V('Subjects'), table)
     
     
-    epg_key = M[domain_name].EPG.attrs()
+    epg_key = M[domain_name].EPG.keys()
     epg_prov_table = FooTable(*['+' + k if k != 'name' else V('Name') for k in epg_key])
     epg_cons_table = FooTable(*['+' + k if k != 'name' else V('Name') for k in epg_key])
     
-    ext_key = M[domain_name].Class('l3extInstP').attrs()
+    ext_key = M[domain_name].Class('l3extInstP').keys()
     ext_prov_table = FooTable(*['+' + k if k != 'name' else V('Name') for k in ext_key])
     ext_cons_table = FooTable(*['+' + k if k != 'name' else V('Name') for k in ext_key])
     

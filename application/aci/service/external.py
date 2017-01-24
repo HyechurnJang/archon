@@ -99,7 +99,7 @@ def external_one(R, M, V):
     
     # Detail
     kv = KeyVal()
-    for key in extn.attrs(): kv.Data(key, extn[key])
+    for key in extn.keys(): kv.Data(key, extn[key])
     nav.Tab(V('Details'), kv)
     
     # Topology
@@ -110,7 +110,7 @@ def external_one(R, M, V):
     
     # Out Network
     kv = KeyVal()
-    for key in outn.attrs(): kv.Data(key, outn[key])
+    for key in outn.keys(): kv.Data(key, outn[key])
     nav.Tab(V('Outside Network'), kv)
     
     
@@ -118,9 +118,9 @@ def external_one(R, M, V):
     prov = None
     cons = None
     
-    fold_key = M[domain_name].Class('vnsFolderInst').attrs()
-    prov_key = M[domain_name].Class('fvRsProv').attrs()
-    cons_key = M[domain_name].Class('fvRsCons').attrs()
+    fold_key = M[domain_name].Class('vnsFolderInst').keys()
+    prov_key = M[domain_name].Class('fvRsProv').keys()
+    cons_key = M[domain_name].Class('fvRsCons').keys()
     
     children = extn.children(detail=True)
     for child in children:

@@ -98,7 +98,7 @@ def epg_one(R, M, V):
     
     # Details
     kv = KeyVal()
-    for key in epg.attrs(): kv.Data(key, epg[key])
+    for key in epg.keys(): kv.Data(key, epg[key])
     nav.Tab(V('Details'), kv)
     
     # Topology
@@ -112,7 +112,7 @@ def epg_one(R, M, V):
     if datas:
         data = datas[0]
         kv = KeyVal()
-        for key in data.attrs(): kv.Data(key, data[key])
+        for key in data.keys(): kv.Data(key, data[key])
         set_topo(topo, data['tDn'], color='orange')
         topo.Edge(dn, data['tDn'])
         nav.Tab(V('Bridge Domains'), kv)
@@ -121,7 +121,7 @@ def epg_one(R, M, V):
     act = epg.Class('fvRsPathAtt')
     datas = act.list(detail=True)
     if datas:
-        key = act.attrs()
+        key = act.keys()
         key.remove('encap')
         key.append('encap')
         col = []
@@ -144,7 +144,7 @@ def epg_one(R, M, V):
     act = epg.Class('fvRsProv')
     datas = act.list(detail=True)
     if datas:
-        key = act.attrs()
+        key = act.keys()
         table = FooTable(*['+' + k if k != 'tnVzBrCPName' else V('Name') for k in key])
         nav.Tab(V('Provided Contracts'), table)
         for data in datas: table.Record(*[data[k] for k in key])
@@ -153,7 +153,7 @@ def epg_one(R, M, V):
     act = epg.Class('fvRsCons')
     datas = act.list(detail=True)
     if datas:
-        key = act.attrs()
+        key = act.keys()
         table = FooTable(*['+' + k if k != 'tnVzBrCPName' else V('Name') for k in key])
         nav.Tab(V('Consumed Contracts'), table)
         for data in datas: table.Record(*[data[k] for k in key])
@@ -161,7 +161,7 @@ def epg_one(R, M, V):
     # Endpoint
     datas = epg.Endpoint.list(detail=True)
     if datas:
-        key = epg.Endpoint.attrs()
+        key = epg.Endpoint.keys()
         col = []
         for k in key:
             if k == 'name': col.append(V('Name'))

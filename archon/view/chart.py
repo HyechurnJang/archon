@@ -222,6 +222,18 @@ class SmallHealthBar(SmallChart):
         SmallChart.__init__(self, *vals, **options)
         self['chart']['type'] = 'hbar'
 
+class SmallHealthPie(SmallChart):
+    
+    def __init__(self, val, **options):
+        SmallChart.__init__(self, *[val, 100 - val], **options)
+        self['chart']['type'] = 'hpie'
+
+class SmallHealthDonut(SmallChart):
+    
+    def __init__(self, val, **options):
+        SmallChart.__init__(self, *[val, 100 - val], **options)
+        self['chart']['type'] = 'hdonut'
+
 class Topo(VIEW):
     
     def __init__(self, **options):

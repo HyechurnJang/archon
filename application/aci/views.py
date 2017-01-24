@@ -166,7 +166,7 @@ def healthview(R, M, V):
             name = re.sub('(uni/|tn-|ap-|epg-)', '', dn)
             val = health[dn][-1]
             epgs_list.html(
-                COL(6).html(
+                COL(6, style='padding:0px 5px 0px 5px').html(
                     DIV(style='text-align:center;font-size:14px;font-weight:bold;color:#fff;background-color:%s;width:50px;height:20px;float:left;border-right:1px solid #fff;border-radius:3px;' % hcolor(val)).html(val),
                     DIV(style='float:left;').html(SmallHealthLine(*health[dn], width=80, height=20)),
                     DIV(style='padding-left:135px;font-weight:bold;', **ATTR.click('/aci/show/epgroup/%s' % dn)).html(SMALL().html(name))
@@ -176,7 +176,7 @@ def healthview(R, M, V):
             name = re.sub('(topology/|pod-|node-)', '', dn)
             val = health[dn][-1]
             node_list.html(
-                COL(3).html(
+                COL(3, style='padding:0px 5px 0px 5px').html(
                     DIV(style='text-align:center;font-size:14px;font-weight:bold;color:#fff;background-color:%s;width:50px;height:20px;float:left;border-right:1px solid #fff;border-radius:3px;' % hcolor(val)).html(val),
                     DIV(style='float:left;').html(SmallHealthLine(*health[dn], width=80, height=20)),
                     DIV(style='padding-left:135px;font-weight:bold;', **ATTR.click('/aci/show/device/%s' % dn)).html(SMALL().html(name))
@@ -185,7 +185,7 @@ def healthview(R, M, V):
     
     V.Page.html(
         Panel(**{'class' : 'panel-default'}).Head(STRONG().html(V('Node Health'))).Body(node_list),
-        Panel(**{'class' : 'panel-default'}).Head(STRONG().html(V('EPG Health'))).Body(epgs_list)
+        Panel(**{'class' : 'panel-default'}).Head(STRONG().html(V('EPG Health'))).Body(epgs_list),
     )
     
     V.Menu.html(BUTTON(**(ATTR.click('/'.join(R.Path)) + {'class' : 'btn-primary'})).html(V('Refresh')))
@@ -548,20 +548,20 @@ def ofinder(R, M, V):
             nav = Navigation()
             obj = M[domain_name](obj_name, detail=True)
             kv = KeyVal()
-            for key in obj.attrs(): kv.Data(key, obj[key])
+            for key in obj.keys(): kv.Data(key, obj[key])
             nav.Tab(V('Details'), kv)
             
             try: parent = obj.parent(detail=True)
             except: pass
             else:
                 kv = KeyVal()
-                for key in parent.attrs(): kv.Data(key, parent[key] if key != 'dn' else Get('/aci/tool/ofinder/%s/%s' % (domain_name, parent[key])).html(parent[key]))
+                for key in parent.keys(): kv.Data(key, parent[key] if key != 'dn' else Get('/aci/tool/ofinder/%s/%s' % (domain_name, parent[key])).html(parent[key]))
                 nav.Tab(V('Parent Details'), kv)
             
             citems = {}
             children = obj.children(detail=True, sort='dn')
             for child in children:
-                key = child.attrs()
+                key = child.keys()
                 if child.class_name not in citems: citems[child.class_name] = FooTable(*['+' + k if k != 'dn' else V('DN') for k in key])
                 citems[child.class_name].Record(*[child[k] if k != 'dn' else Get('/aci/tool/ofinder/%s/%s' % (domain_name, child[k])).html(child[k]) for k in key])
             
@@ -578,7 +578,7 @@ def ofinder(R, M, V):
             items = {}
             
             for obj in objs:
-                key = obj.attrs()
+                key = obj.keys()
                 if obj.class_name not in items: items[obj.class_name] = FooTable(*['+' + k if k != 'dn' else V('DN') for k in key])
                 items[obj.class_name].Record(*[obj[k] if k != 'dn' else Get('/aci/tool/ofinder/%s/%s' % (domain_name, obj[k])).html(obj[k]) for k in key])
             

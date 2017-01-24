@@ -129,10 +129,11 @@ def device_one(R, M, V):
     #===========================================================================
     nav = Navigation()
     health = None
+    active_intf = None
     
     # Detail
     kv = KeyVal()
-    for key in node_data.attrs(): kv.Data(key, node_data[key])
+    for key in node_data.keys(): kv.Data(key, node_data[key])
     nav.Tab(V('Details'), kv)
     
     # Topology
@@ -146,14 +147,36 @@ def device_one(R, M, V):
             try: health = HealthLine(*data['_tstamp']).Data(dn, *data[domain_name + '/' + dn])
             except: pass
         kv = KeyVal()
-        for key in node_data.System.attrs(): kv.Data(key, node_data.System[key])
+        for key in node_data.System.keys(): kv.Data(key, node_data.System[key])
         nav.Tab(V('System'), kv)
         physif = node_data.System.PhysIf.list(detail=True, sort='id')
         if physif:
-            key = node_data.System.PhysIf.attrs()
+            phys_health = node_data.System.PhysIf.health()
+            active_intf = ROW()
+            sort_phys_health = {}
+            key = node_data.System.PhysIf.keys()
             table = FooTable(*['+' + k if k != 'id' else V('ID') for k in key])
-            for pi in physif: table.Record(*[pi[k] for k in key])
+            for pi in physif:
+                table.Record(*[pi[k] for k in key])
+                sort_phys_health[pi['id']] = None
             nav.Tab(V('Physical Interface'), table)
+            for ph in phys_health: sort_phys_health[ph['name']] = ph['score']        
+            for ph_name in sorted(sort_phys_health, key=lambda name: int(name.split('/')[1])):
+                ph_val = sort_phys_health[ph_name]
+                if ph_val != None:
+                    active_intf.html(
+                        COL(2, style='padding:0px 5px 0px 5px').html(
+                            DIV(style='float:left;').html(SmallHealthDonut(ph_val, height=20)),
+                            DIV(style='padding-left:22px;').html(ph_name)
+                        )
+                    )
+                else:
+                    active_intf.html(
+                        COL(2, style='padding:0px 5px 0px 5px').html(
+                            DIV(style='float:left;').html(SmallDonut(ph_val, height=20, fill=['#eee'])),
+                            DIV(style='padding-left:22px;').html(ph_name)
+                        )
+                    )
     
     #===========================================================================
     # View
@@ -165,5 +188,10 @@ def device_one(R, M, V):
         HEAD(4).html(node_data['vendor'] + ' ' + node_data['model']),
         HEAD(4).html(node_data['serial'])
     )
+    if active_intf != None:
+        V.Page.html(
+            HEAD(3).html(V('Active Interface')),
+            active_intf
+        )
     V.Page.html(nav)
     V.Menu.html(BUTTON(**(ATTR.click('/'.join(R.Path)) + {'class' : 'btn-primary'})).html(V('Refresh')))

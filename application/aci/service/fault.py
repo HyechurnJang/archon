@@ -131,7 +131,7 @@ def fault_one(R, M, V):
     
     # Details
     kv = KeyVal()
-    for key in fault.attrs(): kv.Data(key, fault[key])
+    for key in fault.keys(): kv.Data(key, fault[key])
     nav.Tab(V('Details'), kv)
     
     # Object
@@ -143,7 +143,7 @@ def fault_one(R, M, V):
         except: pass
         else:
             kv = KeyVal()
-            for key in obj.attrs(): kv.Data(key, obj[key])
+            for key in obj.keys(): kv.Data(key, obj[key])
             nav.Tab(V('Object'), kv)
     
     #===========================================================================

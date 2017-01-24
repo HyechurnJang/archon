@@ -159,7 +159,16 @@ function UXPeity(view) {
 		view.chart.options.max = 100;
 		$("#" + view.attrs.id).peity("bar", view.chart.options);
 		break;
-	}; 
+	case "hpie":
+		view.chart.options.fill = ["green", "red"];
+		$("#" + view.attrs.id).peity("pie", view.chart.options);
+		break;
+	case "hdonut":
+		view.chart.options.fill = ["green", "red"];
+		$("#" + view.attrs.id).peity("donut", view.chart.options);
+		break;
+	};
+	
 };
 
 var ArborRenderer1 = function(canvas){

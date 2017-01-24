@@ -39,6 +39,7 @@ import time
 
 import acidipy
 import archon
+import pygics
 
 from models import *
 
@@ -46,12 +47,12 @@ from models import *
 # Create your manager here.
 #===============================================================================
 
-APIC_MONSEC = 60
+APIC_MONSEC = 5
 
-class HealthMonitor(archon.ArchonTask):
+class HealthMonitor(pygics.Task):
     
     def __init__(self, manager, mon_sec, mon_cnt):
-        archon.ArchonTask.__init__(self, tick=mon_sec)
+        pygics.Task.__init__(self, tick=mon_sec)
         self.manager = manager
         self.count = mon_cnt
         self.health = {'_tstamp' : []}
@@ -73,7 +74,7 @@ class HealthMonitor(archon.ArchonTask):
     def getHealth(self):
         return self.health
     
-    def sched(self):
+    def task(self):
         now = time.strftime("%H:%M:%S", time.localtime(time.time()))
         
         total = self.manager.health()
@@ -107,6 +108,7 @@ class HealthMonitor(archon.ArchonTask):
             for dp in epg[dom_name]:
                 dn = dom_name + '/' + dp['dn']
                 health[dn] = self.getNewHealthHist(dn, dp['score'])
+        
         
         self.health = health
     
@@ -191,7 +193,7 @@ class Manager(archon.ManagerAbstraction, acidipy.MultiDomain):
     
     def __init__(self, mon_sec=APIC_MONSEC, mon_cnt=10, debug=False):
         acidipy.MultiDomain.__init__(self, conns=5, conn_max=10, debug=debug)
-        self.scheduler = archon.Scheduler(10)
+        self.scheduler = pygics.Scheduler(10)
         self.healthmon = HealthMonitor(self, mon_sec, mon_cnt)
         self.scheduler.register(self.healthmon)
         self.scheduler.start()

@@ -137,7 +137,7 @@ def tenant_one(R, M, V):
     
     # Details
     kv = KeyVal()
-    for key in tenant.attrs(): kv.Data(key, tenant[key])
+    for key in tenant.keys(): kv.Data(key, tenant[key])
     nav.Tab(V('Details'), kv)
     
     # Topology
@@ -148,7 +148,7 @@ def tenant_one(R, M, V):
     # App Profile
     datas = tenant.AppProfile.list(detail=True, sort='name')
     if datas:
-        key = tenant.AppProfile.attrs()
+        key = tenant.AppProfile.keys()
         col = ['+' + k if k != 'name' else V('Name') for k in key]
         col.append(V('+EPG'))
         table = FooTable(*col)
@@ -166,7 +166,7 @@ def tenant_one(R, M, V):
     # Bridge Domain
     datas = tenant.BridgeDomain.list(detail=True, sort='name')
     if datas:
-        key = tenant.BridgeDomain.attrs()
+        key = tenant.BridgeDomain.keys()
         col = ['+' + k if k != 'name' else V('Name') for k in key]
         col.append(V('+Subnet'))
         table = FooTable(*col)
@@ -184,7 +184,7 @@ def tenant_one(R, M, V):
     # Context
     datas = tenant.Context.list(detail=True, sort='name')
     if datas:
-        key = tenant.Context.attrs()
+        key = tenant.Context.keys()
         table = FooTable(*['+' + k if k != 'name' else V('Name') for k in key])
         nav.Tab(V('Contexts'), table)
         for data in datas: table.Record(*[data[k] for k in key])
@@ -193,7 +193,7 @@ def tenant_one(R, M, V):
     # L3 External
     datas = tenant.L3Out.list(detail=True, sort='name')
     if datas:
-        key = tenant.L3Out.attrs()
+        key = tenant.L3Out.keys()
         table = FooTable(*['+' + k if k != 'name' else V('Name') for k in key])
         nav.Tab(V('L3 Externals'), table)
         for data in datas: table.Record(*[data[k] for k in key])
@@ -202,7 +202,7 @@ def tenant_one(R, M, V):
     # Contract
     datas = tenant.Contract.list(detail=True, sort='name')
     if datas:
-        key = tenant.Contract.attrs()
+        key = tenant.Contract.keys()
         col = ['+' + k if k != 'name' else V('Name') for k in key]
         col.append(V('+Subject'))
         table = FooTable(*col)
@@ -220,7 +220,7 @@ def tenant_one(R, M, V):
     # Filter
     datas = tenant.Filter.list(detail=True, sort='name')
     if datas:
-        key = tenant.Filter.attrs()
+        key = tenant.Filter.keys()
         col = ['+' + k if k != 'name' else V('Name') for k in key]
         col.append(V('+Filter Entry'))
         table = FooTable(*col)
