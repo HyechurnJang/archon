@@ -227,6 +227,7 @@ td>p {
 
 .panel {
 	margin-bottom: 5px;
+	background-color: inherit;
 }
 .panel-red {border-color: #d9534f;}
 .panel-red>.panel-heading {
