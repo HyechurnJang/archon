@@ -98,9 +98,9 @@ def overview(R, M, V):
     #===========================================================================
     health = M.getHealth()
     dns = sorted(health)
-    topo_hist = Line(height=295, min=0, max=100, *health['_tstamp'])
-    node_hist = Line(height=145, min=0, max=100, *health['_tstamp'])
-    epgs_hist = Line(height=200, min=0, max=100, *health['_tstamp'])
+    topo_hist = Chart.Line(height=295, min=0, max=100, *health['_tstamp'])
+    node_hist = Chart.Line(height=145, min=0, max=100, *health['_tstamp'])
+    epgs_hist = Chart.Line(height=200, min=0, max=100, *health['_tstamp'])
     node_cur = []
     epgs_cur = []
     
@@ -125,8 +125,8 @@ def overview(R, M, V):
     epgs_cur = sorted(epgs_cur, key=lambda node: node[1])
     for nc in node_cur: node_cols.append(nc[0]); node_vals.append(nc[1])
     for ec in epgs_cur: epgs_cols.append(ec[0]); epgs_vals.append(ec[1])
-    node_now = HealthBar(height=145, xaxis=False, *node_cols).Data(V('Current Health'), *node_vals)
-    epgs_now = HealthBar(height=200, xaxis=False, *epgs_cols).Data(V('Current Health'), *epgs_vals)
+    node_now = Chart.Bar(height=145, xaxis=False, order=Chart.ORDER_ASC, *node_cols, **Chart.THEME_HEALTH).Data(V('Current Health'), *node_vals)
+    epgs_now = Chart.Bar(height=200, xaxis=False, order=Chart.ORDER_ASC, *epgs_cols, **Chart.THEME_HEALTH).Data(V('Current Health'), *epgs_vals)
     
     V.Page.html(
         ROW().html(
@@ -168,7 +168,7 @@ def healthview(R, M, V):
             epgs_list.html(
                 COL(6, style='padding:0px 5px 0px 5px').html(
                     DIV(style='text-align:center;font-size:14px;font-weight:bold;color:#fff;background-color:%s;width:50px;height:20px;float:left;border-right:1px solid #fff;border-radius:3px;' % hcolor(val)).html(val),
-                    DIV(style='float:left;').html(SmallHealthLine(*health[dn], width=80, height=20)),
+                    DIV(style='float:left;').html(Figure.Line(*health[dn], width=80, height=20, **Figure.THEME_HEALTH)),
                     DIV(style='padding-left:135px;font-weight:bold;', **ATTR.click('/aci/show/epgroup/%s' % dn)).html(SMALL().html(name))
                 )
             )
@@ -178,7 +178,7 @@ def healthview(R, M, V):
             node_list.html(
                 COL(3, style='padding:0px 5px 0px 5px').html(
                     DIV(style='text-align:center;font-size:14px;font-weight:bold;color:#fff;background-color:%s;width:50px;height:20px;float:left;border-right:1px solid #fff;border-radius:3px;' % hcolor(val)).html(val),
-                    DIV(style='float:left;').html(SmallHealthLine(*health[dn], width=80, height=20)),
+                    DIV(style='float:left;').html(Figure.Line(*health[dn], width=80, height=20, **Figure.THEME_HEALTH)),
                     DIV(style='padding-left:135px;font-weight:bold;', **ATTR.click('/aci/show/device/%s' % dn)).html(SMALL().html(name))
                 )
             )

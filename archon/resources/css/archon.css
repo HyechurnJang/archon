@@ -131,7 +131,6 @@ td>p {
 	height: calc(100% - 50px);
 }
 #dashboard-page {
-	padding-top: 10px;
     overflow-y: scroll;
     height: calc(100% - 50px);
     background-color: rgba(255,255,255,0.91);
@@ -161,10 +160,6 @@ td>p {
 	margin-left: 5px;
 	margin-right: 5px;
 	float: right;
-}
-
-.pagecontent {
-	height: 100%;
 }
 
 .strwrap {

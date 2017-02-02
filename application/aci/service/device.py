@@ -144,7 +144,7 @@ def device_one(R, M, V):
     if hasattr(node_data, 'System'):
         if node_data['role'] != 'controller':
             data = M.getHealth()
-            try: health = HealthLine(*data['_tstamp']).Data(dn, *data[domain_name + '/' + dn])
+            try: health = Chart.Line(*data['_tstamp'], **Chart.THEME_HEALTH).Data(dn, *data[domain_name + '/' + dn])
             except: pass
         kv = KeyVal()
         for key in node_data.System.keys(): kv.Data(key, node_data.System[key])
@@ -164,16 +164,24 @@ def device_one(R, M, V):
             for ph_name in sorted(sort_phys_health, key=lambda name: int(name.split('/')[1])):
                 ph_val = sort_phys_health[ph_name]
                 if ph_val != None:
-                    active_intf.html(
-                        COL(2, style='padding:0px 5px 0px 5px').html(
-                            DIV(style='float:left;').html(SmallHealthDonut(ph_val, height=20)),
-                            DIV(style='padding-left:22px;').html(ph_name)
+                    if ph_val > 50:
+                        active_intf.html(
+                            COL(2, style='padding:0px 5px 0px 5px').html(
+                                DIV(style='float:left;').html(Figure.Donut(ph_val, 100 - ph_val, height=20, **Figure.THEME_HEALTH)),
+                                DIV(style='padding-left:22px;').html(ph_name)
+                            )
                         )
-                    )
+                    else:
+                        active_intf.html(
+                            COL(2, style='padding:0px 5px 0px 5px').html(
+                                DIV(style='float:left;').html(Figure.Donut(100 - ph_val, ph_val, height=20, **Figure.THEME_UTIL)),
+                                DIV(style='padding-left:22px;').html(ph_name)
+                            )
+                        )
                 else:
                     active_intf.html(
                         COL(2, style='padding:0px 5px 0px 5px').html(
-                            DIV(style='float:left;').html(SmallDonut(ph_val, height=20, fill=['#eee'])),
+                            DIV(style='float:left;').html(Figure.Donut(0, 100, height=20, **Figure.THEME_HEALTH)),
                             DIV(style='padding-left:22px;').html(ph_name)
                         )
                     )

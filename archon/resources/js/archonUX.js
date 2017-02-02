@@ -53,46 +53,92 @@ function UXJustgage(view) {
 function UXDimple(view) {
 	var width = view.chart.options.width;
     var height = view.chart.options.height;
-    if (width == 0) { width = "100%"; }
-    if (height == 0) { height = "100%"; }
+    if (width == null) { width = "100%"; }
+    if (height == null) { height = "100%"; }
     var svg = dimple.newSvg("#" + view.attrs.id, width, height);
     var chart = new dimple.chart(svg);
     chart.setMargins("30px", "20px", "20px", "20px");
     
-    var xAxis = null
+    var xAxis = null;
+    var yAxis = null;
+    
     switch (view.chart.type) {
     case "line":
-    	xAxis = chart.addCategoryAxis("x", view.chart.options.xkey);
-    	xAxis.addOrderRule(view.chart.options.xkey);
+    	if (view.chart.options.pivot == true) {
+    		xAxis = chart.addMeasureAxis("x", view.chart.options.ykey);
+    		yAxis = chart.addCategoryAxis("y", view.chart.options.xkey);
+    	} else {
+    		xAxis = chart.addCategoryAxis("x", view.chart.options.xkey);
+    		yAxis = chart.addMeasureAxis("y", view.chart.options.ykey);
+    	}
     	break;
     case "bar":
-    	xAxis = chart.addCategoryAxis("x", [view.chart.options.xkey, "series"]);
-    	if (view.chart.options.health == true) {
-    		xAxis.addOrderRule(view.chart.options.ykey);
+    	if (view.chart.options.pivot == true) {
+    		if (view.chart.options.stack == true) {
+    			xAxis = chart.addMeasureAxis("x", view.chart.options.ykey);
+        		yAxis = chart.addCategoryAxis("y", view.chart.options.xkey);
+    		} else {
+    			xAxis = chart.addMeasureAxis("x", view.chart.options.ykey);
+        		yAxis = chart.addCategoryAxis("y", [view.chart.options.xkey, "series"]);
+    		}
     	} else {
-    		xAxis.addOrderRule(view.chart.options.xkey);
+    		if (view.chart.options.stack == true) {
+    			xAxis = chart.addCategoryAxis("x", view.chart.options.xkey);
+        		yAxis = chart.addMeasureAxis("y", view.chart.options.ykey);
+    		} else {
+    			xAxis = chart.addCategoryAxis("x", [view.chart.options.xkey, "series"]);
+        		yAxis = chart.addMeasureAxis("y", view.chart.options.ykey);
+    		}
     	}
     	break;
     case "pie":
     case "donut":
-    	pAxis = chart.addMeasureAxis("p", view.chart.options.ykey);
+    	chart.addMeasureAxis("p", view.chart.options.ykey);
     	break;
     };
-    switch(view.chart.type) {
+    
+    switch (view.chart.type) {
     case "line":
     case "bar":
-        var yAxis = chart.addMeasureAxis("y", view.chart.options.ykey);
-        xAxis.title = null;
+    	if (view.chart.options.pivot == true) {
+    		if (view.chart.options.min != null) { xAxis.overrideMin = view.chart.options.min; }
+            if (view.chart.options.max != null) { xAxis.overrideMax = view.chart.options.max; }
+    		if (view.chart.options.xaxis == false) { yAxis.hidden = true; }
+            if (view.chart.options.yaxis == false) { xAxis.hidden = true; }
+            switch (view.chart.options.order) {
+        	case 0: yAxis.addOrderRule(view.chart.labels.reverse()); break;
+        	case 1: yAxis.addOrderRule(view.chart.options.ykey); break;
+        	case 2: break;
+        	}
+    	} else {
+    		if (view.chart.options.min != null) { yAxis.overrideMin = view.chart.options.min; }
+            if (view.chart.options.max != null) { yAxis.overrideMax = view.chart.options.max; }
+    		if (view.chart.options.xaxis == false) { xAxis.hidden = true; }
+            if (view.chart.options.yaxis == false) { yAxis.hidden = true; }
+            switch (view.chart.options.order) {
+        	case 0: xAxis.addOrderRule(view.chart.labels); break;
+        	case 1: xAxis.addOrderRule(view.chart.options.ykey); break;
+        	case 2: break;
+        	}
+    	}
+    	xAxis.title = null;
         yAxis.title = null;
-        if (view.chart.options.xaxis == false) { xAxis.hidden = true;}
-        if (view.chart.options.yaxis == false) { yAxis.hidden = true;}
-        if (view.chart.options.min != null) { yAxis.overrideMin = view.chart.options.min; }
-        if (view.chart.options.max != null) { yAxis.overrideMax = view.chart.options.max; }
         break;
     }
     
-    if (view.chart.options.health == true) {
-    	chart.addColorAxis(view.chart.options.ykey, ["rgb(" + view.chart.options.health_min_r + "," + view.chart.options.health_min_g + ",0)", "rgb(" + view.chart.options.health_max_r + "," + view.chart.options.health_max_g + ",0)"]);
+    switch (view.chart.options.color) {
+    case "A": break;
+    case "H":
+    case "U":
+    	chart.addColorAxis(view.chart.options.ykey, ["rgba(" + view.chart.options.min_r + "," + view.chart.options.min_g + ",0,0.8)", "rgba(" + view.chart.options.max_r + "," + view.chart.options.max_g + ",0,0.8)"]);
+    	break;
+    default:
+    	chart.addColorAxis(view.chart.options.ykey, [view.chart.options.color]);
+    	break;
+    }
+    
+    if (view.chart.options.legend == true) {
+    	chart.addLegend("30px", 0, "100%", "30px", "left");
     }
     
     switch (view.chart.type) {
@@ -100,20 +146,20 @@ function UXDimple(view) {
     	for (var i=0, series; series=view.chart.series[i]; i++) {
     		var s = chart.addSeries(series.series, dimple.plot.line);
     		s.data = series.datasets;
-    	    s.tooltipFontSize = "14px";
+    	    s.tooltipFontSize = "12px";
     	    s.lineMarkers = true;
     	}
     	break;
     case "bar":
-    	var s = chart.addSeries("series", dimple.plot.bar);
+		var s = chart.addSeries("series", dimple.plot.bar);
     	s.data = view.chart.series;
-    	s.tooltipFontSize = "14px";
+    	s.tooltipFontSize = "12px";
     	break;
     case "pie":
     	for (var i=0, series; series=view.chart.series[i]; i++) {
     		var s = chart.addSeries(view.chart.options.xkey, dimple.plot.pie);
     		s.data = series.datasets;
-    	    s.tooltipFontSize = "14px";
+    	    s.tooltipFontSize = "12px";
     	}
     	break;
     case "donut":
@@ -126,13 +172,9 @@ function UXDimple(view) {
     		s.innerRadius = size;
     		size = size - sub_size;
     		s.data = series.datasets;
-    	    s.tooltipFontSize = "14px";
+    	    s.tooltipFontSize = "12px";
     	}
     	break;
-    }
-    
-    if (view.chart.options.legend == true) {
-    	chart.addLegend("30px", 0, "100%", "30px", "left");
     }
 	
 	setTimeout(function() {
@@ -141,34 +183,71 @@ function UXDimple(view) {
 };
 
 function UXPeity(view) {
-	switch(view.chart.type) {
-	case "line": $("#" + view.attrs.id).peity("line", view.chart.options); break;
-	case "bar": $("#" + view.attrs.id).peity("bar", view.chart.options); break;
-	case "pie": $("#" + view.attrs.id).peity("pie", view.chart.options); break;
-	case "donut": $("#" + view.attrs.id).peity("donut", view.chart.options); break;
-	case "hline":
-		view.chart.options.min = 0;
-		view.chart.options.max = 100;
-		view.chart.options.fill = "rgb(" + parseInt(255 - ((view.chart.hval * 255) / 100)) + "," + parseInt((view.chart.hval * 255) / 100) + ",0)";
-		view.chart.options.stroke = "rgb(" + parseInt(255 - ((view.chart.hval * 255) / 100)) + "," + parseInt((view.chart.hval * 255) / 100) + ",0)";
-		$("#" + view.attrs.id).peity("line", view.chart.options);
+	switch(view.figure.type) {
+	case "line":
+		switch (view.figure.color) {
+	    case "A": break;
+	    case "H":
+	    	view.figure.options.fill = "rgb(" + parseInt(255 - ((view.figure.cval * 255) / 100)) + "," + parseInt((view.figure.cval * 255) / 100) + ",0)";
+	    	view.figure.options.stroke = "rgb(" + parseInt(255 - ((view.figure.cval * 255) / 100)) + "," + parseInt((view.figure.cval * 255) / 100) + ",0)";
+	    	break;
+	    case "U":
+	    	view.figure.options.fill = "rgb(" + parseInt((view.figure.cval * 255) / 100) + "," + parseInt(255 - ((view.figure.cval * 255) / 100)) + ",0)";
+	    	view.figure.options.stroke = "rgb(" + parseInt((view.figure.cval * 255) / 100) + "," + parseInt(255 - ((view.figure.cval * 255) / 100)) + ",0)";
+	    	break;
+	    default:
+	    	view.figure.options.fill = view.figure.color;
+	    	view.figure.options.stroke = view.figure.color;
+	    	break;
+	    }
+		$("#" + view.attrs.id).peity("line", view.figure.options);
 		break;
-	case "hbar":
-		view.chart.options.fill = function(value) { return "rgb(" + parseInt(255 - ((value * 255) / 100)) + "," + parseInt((value * 255) / 100) + ",0)"; };
-		view.chart.options.min = 0;
-		view.chart.options.max = 100;
-		$("#" + view.attrs.id).peity("bar", view.chart.options);
+	case "bar":
+		switch (view.figure.color) {
+	    case "A": break;
+	    case "H":
+	    	view.figure.options.fill = function(value) { return "rgb(" + parseInt(255 - ((value * 255) / 100)) + "," + parseInt((value * 255) / 100) + ",0)"; };
+	    	break;
+	    case "U":
+	    	view.figure.options.fill = function(value) { return "rgb(" + parseInt((value * 255) / 100) + "," + parseInt(255 - ((value * 255) / 100)) + ",0)"; };
+	    	break;
+	    default:
+	    	view.figure.options.fill = view.figure.color;
+	    	break;
+	    }
+		$("#" + view.attrs.id).peity("bar", view.figure.options);
 		break;
-	case "hpie":
-		view.chart.options.fill = ["green", "red"];
-		$("#" + view.attrs.id).peity("pie", view.chart.options);
+	case "pie":
+		switch (view.figure.color) {
+	    case "A": break;
+	    case "H":
+	    	view.figure.options.fill = ["rgb(" + parseInt(255 - ((view.figure.cval * 255) / 100)) + "," + parseInt((view.figure.cval * 255) / 100) + ",0)", "#eee"];
+	    	break;
+	    case "U":
+	    	view.figure.options.fill = ["rgb(" + parseInt((view.figure.cval * 255) / 100) + "," + parseInt(255 - ((view.figure.cval * 255) / 100)) + ",0)", "#eee"];
+	    	break;
+	    default:
+	    	view.figure.options.fill = [view.figure.color, "#eee"];
+	    	break;
+	    }
+		$("#" + view.attrs.id).peity("pie", view.figure.options);
 		break;
-	case "hdonut":
-		view.chart.options.fill = ["green", "red"];
-		$("#" + view.attrs.id).peity("donut", view.chart.options);
+	case "donut":
+		switch (view.figure.color) {
+	    case "A": break;
+	    case "H":
+	    	view.figure.options.fill = ["rgb(" + parseInt(255 - ((view.figure.cval * 255) / 100)) + "," + parseInt((view.figure.cval * 255) / 100) + ",0)", "#eee"];
+	    	break;
+	    case "U":
+	    	view.figure.options.fill = ["rgb(" + parseInt((view.figure.cval * 255) / 100) + "," + parseInt(255 - ((view.figure.cval * 255) / 100)) + ",0)", "#eee"];
+	    	break;
+	    default:
+	    	view.figure.options.fill = [view.figure.color, "#eee"];
+	    	break;
+	    }
+		$("#" + view.attrs.id).peity("donut", view.figure.options);
 		break;
 	};
-	
 };
 
 var ArborRenderer1 = function(canvas){
@@ -616,7 +695,9 @@ function UXArbor(view) {
 	var sys = arbor.ParticleSystem();
 	sys.screenSize(window.innerWidth);
 	sys.parameters({gravity:true, stiffness:300});
+	
 	sys.renderer = ArborRenderer1("#" + view.attrs.id);
+	
 	setTimeout(function() {
 		sys.graft(view.topo.datasets);
 	}, 0);

@@ -42,6 +42,9 @@ from . import views
 #===============================================================================
 url_sample = [
     url(r'^dimple/?', views.dimple, name=u'dimple'),
+    url(r'^peity/?', views.peity, name=u'peity'),
+    url(r'^arbor/?', views.arbor, name=u'arbor'),
+    url(r'^justgage/?', views.justgage, name=u'justgage'),
     url(r'^html/?', views.html, name=u'html'),
 ]
 

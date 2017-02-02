@@ -37,9 +37,11 @@
 import re
 import time
 
+import pygics
 import acidipy
 import archon
-import pygics
+
+from application import APPLICATION_CONFIGS
 
 from models import *
 
@@ -47,7 +49,7 @@ from models import *
 # Create your manager here.
 #===============================================================================
 
-APIC_MONSEC = 60
+ACI_MONSEC = APPLICATION_CONFIGS['aci_health_monitor_sec']
 
 class HealthMonitor(pygics.Task):
     
@@ -56,7 +58,6 @@ class HealthMonitor(pygics.Task):
         self.manager = manager
         self.count = mon_cnt
         self.health = {'_tstamp' : []}
-        init_time = time.time()
         for i in reversed(range(0, mon_cnt)):
             self.health['_tstamp'].append('00:00:00')
         
@@ -191,7 +192,7 @@ class EndpointTracker(acidipy.SubscribeHandler):
 
 class Manager(archon.ManagerAbstraction, acidipy.MultiDomain):
     
-    def __init__(self, mon_sec=APIC_MONSEC, mon_cnt=10, debug=False):
+    def __init__(self, mon_sec=ACI_MONSEC, mon_cnt=10, debug=False):
         acidipy.MultiDomain.__init__(self, conns=5, conn_max=10, debug=debug)
         self.scheduler = pygics.Scheduler(10)
         self.healthmon = HealthMonitor(self, mon_sec, mon_cnt)

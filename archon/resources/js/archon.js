@@ -99,7 +99,7 @@ $(document).ready(function() {
 					setTimeout(function() {
 						dashboard_page.html(ParseViewDom(dashboard_page.attr("id") + '-', data.page));
 						ParseViewData(data.page);
-						dashboard_page.css("height", "calc(100% - 100px)");
+						dashboard_page.css("height", "calc(100% - 50px)");
 						loading_page.collapse("hide");
 						dashboard_page.fadeIn(350);
 						dashboard_page.collapse("show");

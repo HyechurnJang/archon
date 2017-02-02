@@ -39,6 +39,5 @@ from deco import ROW, COL, Icon, StrWrap, KeyVal, Alert, Panel, CountPanel, Inde
 from action import Get, Post, Delete, DelClick, DelButton
 
 from table import DataTable, FooTable
-from chart import Chart, Line, Bar, Pie, Donut, HealthLine, HealthBar, SmallChart, SmallLine, SmallBar, SmallPie, SmallDonut, SmallHealthLine, SmallHealthBar, SmallHealthPie, SmallHealthDonut, Topo, Gauge
-
+from chart import Chart, Figure, Topo, Gauge
 

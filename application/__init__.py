@@ -39,8 +39,14 @@
 #===============================================================================
 APPLICATION_NAMES = [
     {'name' : 'aci', 'display' : u'ACI'},
+    {'name' : 'asa', 'display' : u'ASA'},
 #     {'name' : 'sample', 'display' : u'샘플'},
 ]
+
+APPLICATION_CONFIGS = {
+    'aci_health_monitor_sec' : 60,
+    'asa_health_monitor_sec' : 60,
+}
 
 #===============================================================================
 # Database Setting

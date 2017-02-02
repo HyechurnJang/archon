@@ -33,20 +33,3 @@
 #    under the License.                                                        #
 #                                                                              #
 ################################################################################
-
-from archon import *
-
-class Manager(ManagerAbstraction):
-    
-    def __init__(self):
-        pass
-
-@pageview(Manager)
-def dashboard(R, M, V):
-    
-    V.Page.html(
-        DIV(style='position:fixed;width:100%;text-align:center;top:40%;transform:translateY(-50%);').html(
-            IMG(src='/resources/images/logo.png'),
-            FlipClock()
-        )
-    )

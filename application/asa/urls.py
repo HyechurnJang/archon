@@ -34,19 +34,14 @@
 #                                                                              #
 ################################################################################
 
-from archon import *
+from django.conf.urls import url, include
+from . import views
 
-class Manager(ManagerAbstraction):
-    
-    def __init__(self):
-        pass
+#===============================================================================
+# Link your view here.
+#===============================================================================
 
-@pageview(Manager)
-def dashboard(R, M, V):
-    
-    V.Page.html(
-        DIV(style='position:fixed;width:100%;text-align:center;top:40%;transform:translateY(-50%);').html(
-            IMG(src='/resources/images/logo.png'),
-            FlipClock()
-        )
-    )
+urlpatterns = [
+    url(r'^overview/?', views.overview, name=u'개요'),
+    url(r'^conf/?', views.config, name=u'설정'),
+]

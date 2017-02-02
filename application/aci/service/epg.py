@@ -99,7 +99,7 @@ def epg_one(R, M, V):
     # Health
     hdata = M.getHealth()
     health = None
-    try: health = HealthLine(*hdata['_tstamp']).Data(dn, *hdata[domain_name + '/' + dn])
+    try: health = Chart.Line(*hdata['_tstamp'], **Chart.THEME_HEALTH).Data(dn, *hdata[domain_name + '/' + dn])
     except: pass
     
     # Details
