@@ -45,6 +45,7 @@ def overview(R, M, V):
     if not M: V.Page.html(Alert(V('Info'), V('Non-exist ASA Connection'), **{'class' : 'alert-info'})); return
     
     health = M.getHealth()
+    nats = M.NAT.Detail()
     pools = M.NAT.Pool()
     
     for domain_name in M:
@@ -64,6 +65,14 @@ def overview(R, M, V):
                 chart_hist.Data(domain_name + '/Disk', *health[dn])
                 disk_curr = health[dn][-1]
         chart_curr.Data(V('Current'), cpu_curr, mem_curr, disk_curr)
+        
+        
+        nat_table = DataTable(V('Config'), V('Mode'), V('From'), V('To'), V('Original'), V('Translate'), V('Trans-Hits'), V('Untrans-Hits'))
+        for nat in nats[domain_name]:
+            nat_table.Record(nat['config'], nat['mode'], nat['from'], nat['to'],
+                             STRONG().html(nat['originalAddress']),
+                             STRONG().html(nat['translatedAddress']),
+                             str(nat['translateHits']), str(nat['untranslateHits']))
         
         pool_list = ROW()
         pats = {}
@@ -128,6 +137,8 @@ def overview(R, M, V):
                         chart_curr
                     )
                 ),
+                HEAD(3, style='margin:0px;').html(V('NAT Status')),
+                nat_table,
                 HEAD(3, style='margin:0px;').html(V('PAT Status')),
                 pool_list
             )
