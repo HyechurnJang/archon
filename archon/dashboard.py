@@ -46,7 +46,6 @@ def dashboard(R, M, V):
     
     V.Page.html(
         DIV().html(
-            IMG('/resources/images/logo.png'),
             FLIPCLOCK()
         )
     )
