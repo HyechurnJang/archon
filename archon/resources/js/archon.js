@@ -267,17 +267,17 @@ function ParseViewDom(page, view) {
 	if (typeof view == "object") {
 		var html = "";
 		var attrs = view.attrs;
-		var elements = view.elements;
+		var elems = view.elems;
 		
-		html += "<" + view.type;
-		for ( var key in attrs) {
+		html += "<" + view.tag;
+		for (var key in attrs) {
 			html += ' ' + key + '="' + attrs[key] + '"';
 		}
 		html += ">";
-		for (var i = 0, element; element = elements[i]; i++) {
-			html += ParseViewDom(page, element);
+		for (var i = 0, elem; elem = elems[i]; i++) {
+			html += ParseViewDom(page, elem);
 		}
-		html += "</" + view.type + ">";
+		html += "</" + view.tag + ">";
 		return html;
 	}
 	return view;
@@ -285,9 +285,9 @@ function ParseViewDom(page, view) {
 
 function ParseViewData(view) {
 	if (typeof view == "object") {
-		var elements = view.elements;
-		for (var i = 0, element; element = elements[i]; i++) { ParseViewData(element); }
-		switch(view.type) {
+		var elems = view.elems;
+		for (var i = 0, elem; elem = elems[i]; i++) { ParseViewData(elem); }
+		switch(view.tag) {
 		case "TABLE": UXTable(view); break;
 		case "DIV":
 		case "CANVAS":
@@ -299,14 +299,15 @@ function ParseViewData(view) {
 };
 
 function UXTable(view) {
-	switch(view.attrs.lib) {
-	case "datatable": UXDataTable(view); break;
-	case "footable": UXFooTable(view); break;
+	switch(view.attrs.LIB) {
+	case "table_basic": UXDataTableBasic(view); break;
+	case "table_async": UXDataTableAsync(view); break;
+	case "table_flip": UXFooTable(view); break;
 	}
 };
 
 function UXChart(view) {
-	switch(view.attrs.lib) {
+	switch(view.attrs.LIB) {
 	case "dimple": UXDimple(view); break;
 	case "peity": UXPeity(view); break;
 	case "arbor": UXArbor(view); break;
@@ -314,4 +315,3 @@ function UXChart(view) {
 	case "flipclock": UXFlipClock(view); break;
 	}
 }; 
-

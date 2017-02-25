@@ -37,66 +37,66 @@
 from archon import *
 from ..models import FaultMessage
 
-def fault_all(R, M, V):
-    #===========================================================================
-    # Get Data
-    #===========================================================================
-    if len(R.Path) > 3: faults = M.Fault.list(severity=R.Path[3], detail=True, sort='created|desc')
-    else: faults = M.Fault.list(detail=True, sort='created|desc')
+@TABLE.ASYNC.pageview()
+def fault_async(R, M, V):
+    domain_name = R.Path[4]
+#     flt_cnt, faults = Burster(
+#     )(M[domain_name].Fault.count
+#     )(M[domain_name].Fault.list, page=(R.Page,R.Length), detail=True, sort='created|desc'
+#     ).run()
+    flt_cnt = M[domain_name].Fault.count()
+    faults = M[domain_name].Fault.list(page=(R.Page,R.Length), detail=True, sort='created|desc')
     
-    #===========================================================================
-    # Logic
-    #===========================================================================
-    table = DataTable(V('Domain'), V('Subjects'), V('Type'), V('Description'), V('Time Stamp'))
-    cri_cnt = 0
-    maj_cnt = 0
-    min_cnt = 0
-    war_cnt = 0
+    table = TABLE.ASYNCDATA(R.Draw, flt_cnt, flt_cnt)
+    for fault in faults:
+        table.Record(GET('/aci/show/fault/%s/%s' % (domain_name, fault['dn'])).html(fault['subject']),
+                     fault['severity'],
+                     STRWRAP(400).html(SMALL().html(fault['descr'])),
+                     SMALL().html(fault['created'][:-10]))
+    
+    return table
+
+def fault_all(R, M, V):
+    
+#     cri_cnt, maj_cnt, min_cnt, war_cnt = Burster(
+#     )(M.Fault.count, severity='critical'
+#     )(M.Fault.count, severity='major'
+#     )(M.Fault.count, severity='minor'
+#     )(M.Fault.count, severity='warning'
+#     ).run()
+    cri_cnt = M.Fault.count(severity='critical')
+    maj_cnt = M.Fault.count(severity='major')
+    min_cnt = M.Fault.count(severity='minor')
+    war_cnt = M.Fault.count(severity='warning')
+    
+    cri_num = 0
+    maj_num = 0
+    min_num = 0
+    war_num = 0
+    
+    nav = NAV()
     
     for domain_name in M:
-        for fault in faults[domain_name]:
-            severity = fault['severity']
-            if severity == 'critical':
-                cri_cnt += 1
-                attr = 'danger'
-            elif severity == 'major':
-                maj_cnt += 1
-                attr = 'danger'
-            elif severity == 'minor':
-                min_cnt += 1
-                attr = 'warning'
-            elif severity == 'warning':
-                war_cnt += 1
-                attr = 'warning'
-            elif severity == 'cleared':
-                attr = 'success'
-            else:
-                attr = ''
-            
-            descr = StrWrap(400).html('<small>' + fault['descr'] + '</small>')
-            tstamp = '<small>' + fault['created'][:-10] + '</small>'
-            
-            table.Record(domain_name,
-                         Get('/aci/show/fault/%s/%s' % (domain_name, fault['dn'])).html(fault['subject']),
-                         severity,
-                         descr,
-                         tstamp,
-                         **{'class' : attr})
-    
-    #===========================================================================
-    # View
-    #===========================================================================
-    if len(R.Path) < 4:
-        V.Page.html(
-            ROW().html(
-                COL(3).html(CountPanel(V('Critical'), 'bolt', cri_cnt, **(ATTR.click('/aci/show/fault/critical') + {'class' : 'panel-red'}))),
-                COL(3).html(CountPanel(V('Major'), 'exclamation-triangle', maj_cnt, **(ATTR.click('/aci/show/fault/major') + {'class' : 'panel-danger'}))),
-                COL(3).html(CountPanel(V('Minor'), 'exclamation-circle', min_cnt, **(ATTR.click('/aci/show/fault/minor') + {'class' : 'panel-yellow'}))),
-                COL(3).html(CountPanel(V('Warning'), 'exclamation', war_cnt, **(ATTR.click('/aci/show/fault/warning') + {'class' : 'panel-warning'})))
-            )
+        cri_num += cri_cnt[domain_name]
+        maj_num += maj_cnt[domain_name]
+        min_num += min_cnt[domain_name]
+        war_num += war_cnt[domain_name]
+        nav.Tab(
+            domain_name,
+            DIV(STYLE='padding-top:10px;').html(TABLE.ASYNC('aci/show/fault/fault_async/%s' % domain_name, V('Subjects'), V('Type'), V('Description'), V('Time Stamp')))
         )
-    V.Page.html(table)
-    V.Menu.html(BUTTON(**(ATTR.click('/'.join(R.Path)) + {'class' : 'btn-primary'})).html(V('Refresh')))
+    
+    V.Page.html(
+        ROW().html(
+            COL(3).html(COUNTER(V('Critical'), 'bolt', cri_num, CLASS='panel-red').click('/aci/show/fault/critical')),
+            COL(3).html(COUNTER(V('Major'), 'exclamation-triangle', maj_num, CLASS='panel-danger').click('/aci/show/fault/major')),
+            COL(3).html(COUNTER(V('Minor'), 'exclamation-circle', min_num, CLASS='panel-yellow').click('/aci/show/fault/minor')),
+            COL(3).html(COUNTER(V('Warning'), 'exclamation', war_num, CLASS='panel-warning').click('/aci/show/fault/warning'))
+        ),
+        nav
+    )
+    
+    V.Menu.html(BUTTON(CLASS='btn-primary').click('/'.join(R.Path)).html(V('Refresh')))
 
 def fault_one(R, M, V):
     #===========================================================================
@@ -109,7 +109,7 @@ def fault_one(R, M, V):
     #===========================================================================
     # Logic
     #===========================================================================
-    nav = Navigation()
+    nav = NAV()
     occur = V('From Instance') if fault.class_name == 'faultInst' else V('Delegated')
     title = '%s %s : %s' % (fault['type'].upper(), fault['severity'].upper(), fault['subject'])
     desc = fault['descr']
@@ -118,7 +118,7 @@ def fault_one(R, M, V):
     try: guide = FaultMessage.objects.get(code=fault['code'])
     except: pass
     else:
-        kv = KeyVal()
+        kv = KEYVAL()
         kv.Data('Title', guide.title)
         kv.Data('Code', guide.code)
         kv.Data('Syslog', guide.syslog)
@@ -130,7 +130,7 @@ def fault_one(R, M, V):
         nav.Tab(V('Guide'), kv)
     
     # Details
-    kv = KeyVal()
+    kv = KEYVAL()
     for key in fault.keys(): kv.Data(key, fault[key])
     nav.Tab(V('Details'), kv)
     
@@ -142,7 +142,7 @@ def fault_one(R, M, V):
         try: obj = M[domain_name](obj_dn, detail=True)
         except: pass
         else:
-            kv = KeyVal()
+            kv = KEYVAL()
             for key in obj.keys(): kv.Data(key, obj[key])
             nav.Tab(V('Object'), kv)
     
@@ -162,7 +162,7 @@ def fault_one(R, M, V):
         )
     V.Page.html(
         HEAD(3).html(V('Description')),
-        HEAD(4).html(desc)
+        HEAD(4).html(desc),
+        nav
     )
-    V.Page.html(nav)
-    V.Menu.html(BUTTON(**(ATTR.click('/'.join(R.Path)) + {'class' : 'btn-primary'})).html(V('Refresh')))
+    V.Menu.html(BUTTON(CLASS='btn-primary').click('/'.join(R.Path)).html(V('Refresh')))

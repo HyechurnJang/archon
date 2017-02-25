@@ -34,132 +34,212 @@
 #                                                                              #
 ################################################################################
 
+import re
 import uuid
 
-class VIEW(dict):
+class TAG(dict):
     
     @classmethod
-    def getUUID(cls): return 'A-' + str(uuid.uuid4())
+    def ATTR(cls, attrs, **sets):
+        for k in sets: attrs[k] = '%s %s' % (sets[k], attrs[k]) if k in attrs else sets[k]
+        return attrs
     
-    def __init__(self, _type, **attrs):
-        dict.__init__(self, type=_type, elements=[], attrs=attrs)
+    @classmethod
+    def UUID(cls):
+        return 'V-' + str(uuid.uuid4())
+    
+    def __init__(self, tag, **attrs):
+        dict.__init__(self, tag=tag, elems=[], attrs=attrs)
     
     def __len__(self, *args, **kwargs):
-        return self['elements'].__len__()
-        
-    def html(self, *elements):
-        for element in elements: self['elements'].append(element)
+        return self['elems'].__len__()
+    
+    def __str__(self):
+        return self.render()
+    
+    def click(self, url):
+        if 'CLASS' in self['attrs']: self['attrs']['CLASS'] += ' clickable'
+        else: self['attrs']['CLASS'] = 'clickable'
+        self['attrs']['onclick'] = "GetData('%s');" % url
         return self
     
-    def isEmpty(self):
-        return not self.__len__()
-
-class ATTR(dict):
-    
-    @classmethod
-    def merge(cls, a1, a2):
-        ret = ATTR(**a2)
-        for key in a1: ret[key] = ret[key] + ' ' + a1[key] if key in ret else a1[key]
-        return ret
-    
-    @classmethod
-    def click(cls, url):
-        return ATTR(**{'class' : 'clickable', 'onclick' : "GetData('%s');" % url})
-    
-    def __init__(self, **attrs):
-        dict.__init__(self, **attrs)
-        
-    def __add__(self, attr):
-        return ATTR(**dict(self.items() + attr.items()))
-    
-    def __lshift__(self, attr):
-        for key in attr: self[key] = self[key] + ' ' + attr[key] if key in self else attr[key]
+    def html(self, *elems):
+        for elem in elems: self['elems'].append(elem)
         return self
     
-class DIV(VIEW):
-    def __init__(self, **attrs):
-        VIEW.__init__(self, 'div', **attrs)
-
-class SPAN(VIEW):
-    def __init__(self, **attrs):
-        VIEW.__init__(self, 'span', **attrs)
-
-class HEAD(VIEW):
-    def __init__(self, level, **attrs):
-        VIEW.__init__(self, 'h' + str(level), **attrs)
-
-class PARA(VIEW):
-    def __init__(self, **attrs):
-        VIEW.__init__(self, 'p', **ATTR.merge(attrs, {'class' : 'para'}))
-
-class ANCH(VIEW):
-    def __init__(self, **attrs):
-        VIEW.__init__(self, 'a', **attrs)
-
-class LABEL(VIEW):
-    def __init__(self, **attrs):
-        VIEW.__init__(self, 'label', **attrs)
-
-class STRONG(VIEW):
-    def __init__(self, **attrs):
-        VIEW.__init__(self, 'strong', **attrs)
-
-class SMALL(VIEW):
-    def __init__(self, **attrs):
-        VIEW.__init__(self, 'small', **attrs)
+    def empty(self):
+        return not self['elems'].__len__()
+    
+    def render(self):
+        tag = self['tag']
+        attrs = self['attrs']
+        elems = self['elems']
         
-class IMG(VIEW):
-    def __init__(self, **attrs):
-        VIEW.__init__(self, 'img', **attrs)
-
-class TABLE(VIEW):
-    def __init__(self, **attrs):
-        VIEW.__init__(self, 'table', **attrs)
+        attr_str = ''; 
+        for k in attrs: attr_str += ' %s="%s"' % (k, attrs[k])
         
-class THEAD(VIEW):
-    def __init__(self, **attrs):
-        VIEW.__init__(self, 'thead', **attrs)
+        elem_str = ''
+        for elem in elems: elem_str += str(elem)
         
-class TBODY(VIEW):
-    def __init__(self, **attrs):
-        VIEW.__init__(self, 'tbody', **attrs)
+        return '<%s%s>%s</%s>' % (tag, attr_str, elem_str, tag)
+
+class DIV(TAG):
+    def __init__(self, **attrs): TAG.__init__(self, 'div', **attrs)
+
+class SPAN(TAG):
+    def __init__(self, **attrs): TAG.__init__(self, 'span', **attrs)
+
+class HEAD(TAG):
+    def __init__(self, level, **attrs): TAG.__init__(self, 'h' + str(level), **attrs)
+
+class PARA(TAG):
+    def __init__(self, **attrs): TAG.__init__(self, 'p', **TAG.ATTR(attrs, CLASS='para'))
+
+class ANCH(TAG):
+    def __init__(self, **attrs): TAG.__init__(self, 'a', **attrs)
+
+class LABEL(TAG):
+    def __init__(self, **attrs): TAG.__init__(self, 'label', **attrs)
+
+class STRONG(TAG):
+    def __init__(self, **attrs): TAG.__init__(self, 'strong', **attrs)
+
+class SMALL(TAG):
+    def __init__(self, **attrs): TAG.__init__(self, 'small', **attrs)
         
-class TH(VIEW):
-    def __init__(self, **attrs):
-        VIEW.__init__(self, 'th', **attrs)
+class IMG(TAG):
+    def __init__(self, src, **attrs): TAG.__init__(self, 'img', **TAG.ATTR(attrs, src=src))
+    
+class ICON(TAG):
+    def __init__(self, icon, **attrs): TAG.__init__(self, 'i', **TAG.ATTR(attrs, CLASS='fa fa-%s' % icon))
+
+class THEAD(TAG):
+    def __init__(self, **attrs): TAG.__init__(self, 'thead', **attrs)
         
-class TR(VIEW):
-    def __init__(self, **attrs):
-        VIEW.__init__(self, 'tr', **attrs)
-
-class TD(VIEW):
-    def __init__(self, **attrs):
-        VIEW.__init__(self, 'td', **attrs)
+class TBODY(TAG):
+    def __init__(self, **attrs): TAG.__init__(self, 'tbody', **attrs)
         
-class UL(VIEW):
-    def __init__(self, **attrs):
-        VIEW.__init__(self, 'ul', **attrs)
+class TH(TAG):
+    def __init__(self, **attrs): TAG.__init__(self, 'th', **attrs)
+        
+class TR(TAG):
+    def __init__(self, **attrs): TAG.__init__(self, 'tr', **attrs)
 
-class LI(VIEW):
-    def __init__(self, **attrs):
-        VIEW.__init__(self, 'li', **attrs)
+class TD(TAG):
+    def __init__(self, **attrs): TAG.__init__(self, 'td', **attrs)
 
-class FORM(VIEW):
-    def __init__(self, **attrs):
-        VIEW.__init__(self, 'form', **attrs)
+class TABLE(TAG):
+    
+    class BASIC(TAG):
+        
+        def __init__(self, *heads, **options):
+            TAG.__init__(self, 'TABLE', ID=TAG.UUID(), CLASS='table table-bordered table-hover', LIB='table_basic', **{'width':'100%'})
+            self.body = TBODY()
+            self['options'] = options
+            tr = TR()
+            order = [None for i in range(0, len(heads))]
+            for i in range(0, len(heads)):
+                head = heads[i]
+                kv = re.match('.+\<(?P<p>\d+)(?P<d>(\+|\-))\>$', head)
+                if kv:
+                    p = int(kv.group('p'))
+                    d = kv.group('d')
+                    if d == '+': order[p] = [i, 'asc']
+                    else: order[p] = [i, 'desc']
+                    head = head.replace('<%d%s>' % (p, d), '')
+                tr.html(TH().html(head))
+            order = filter(None, order)
+            if order: self['options']['order'] = order
+            else: self['options']['order'] = [[0, 'asc']]
+            self.html(THEAD().html(tr)).html(self.body)
+            
+        def Record(self, *cols, **attrs):
+            tr = TR(**attrs)
+            for col in cols: tr.html(TD().html(col))
+            self.body.html(tr)
+            return self
+        
+        def __len__(self, *args, **kwargs):
+            return self.body.__len__()
+    
+    class ASYNC(TAG):
+        
+        @classmethod
+        def pageview(cls):
+            
+            def wrapper(view):
+        
+                def decofunc(r, m, v):
+                    r.Draw = int(r.Query['draw'][0])
+                    r.Length = int(r.Query['length'][0])
+                    r.Start = int(r.Query['start'][0])
+                    r.Page = r.Start / r.Length
+                    r.OrderCol = int(r.Query['order[0][column]'][0])
+                    r.OrderDir = r.Query['order[0][dir]'][0]
+                    r.Search = r.Query['search[value]'][0]
+                    if r.Search == '': r.Search = None
+                    return view(r, m, v)
+                
+                return decofunc
+            
+            return wrapper
+        
+        def __init__(self, url, *heads, **attrs):
+            TAG.__init__(self, 'TABLE', **TAG.ATTR(attrs, ID=TAG.UUID(), CLASS='table table-bordered table-hover', LIB='table_async', **{'width':'100%', 'url':url}))
+            tr = TR()
+            for head in heads: tr.html(TH().html(head))
+            self.html(THEAD().html(tr))
+    
+    class ASYNCDATA(dict):
+        
+        def __init__(self, draw, total, count):
+            dict.__init__(self, draw=draw, recordsTotal=total, recordsFiltered=count)
+            self.data = []
+            self['data'] = self.data
+        
+        def Record(self, *cols, **attrs):
+            self.data.append([str(col) for col in cols])
+            return self
+        
+    class FLIP(TAG):
+        
+        def __init__(self, *heads, **attrs):
+            TAG.__init__(self, 'TABLE', **TAG.ATTR(attrs, ID=TAG.UUID(), CLASS='table', LIB='table_flip', **{'data-show-toggle':'true', 'data-paging':'true', 'width':'100%'}))
+            self.body = TBODY()
+            tr = TR()
+            for head in heads:
+                if '+' in head: tr.html(TH(**{'data-type':'html', 'data-breakpoints':'all', 'data-title':head.replace('+', '')}).html(head))
+                else: tr.html(TH(**{'data-type':'html'}).html(head))
+            self.html(THEAD().html(tr)).html(self.body)
+            
+        def Record(self, *cols, **attrs):
+            tr = TR(**attrs)
+            for col in cols: tr.html(TD(**{'data-type':'html'}).html(col))
+            self.body.html(tr)
+            return self
+        
+        def __len__(self, *args, **kwargs):
+            return self.body.__len__()
+    
+    def __init__(self, **attrs): TAG.__init__(self, 'table', **attrs)
+        
+class UL(TAG):
+    def __init__(self, **attrs): TAG.__init__(self, 'ul', **attrs)
 
-class INPUT(VIEW):
-        def __init__(self, **attrs):
-            VIEW.__init__(self, 'input', **attrs)
+class LI(TAG):
+    def __init__(self, **attrs): TAG.__init__(self, 'li', **attrs)
 
-class SELECT(VIEW):
-    def __init__(self, **attrs):
-        VIEW.__init__(self, 'select', **attrs)
+class FORM(TAG):
+    def __init__(self, **attrs): TAG.__init__(self, 'form', **attrs)
 
-class OPTION(VIEW):
-    def __init__(self, **attrs):
-        VIEW.__init__(self, 'option', **attrs)
+class INPUT(TAG):
+        def __init__(self, **attrs): TAG.__init__(self, 'input', **attrs)
 
-class BUTTON(VIEW):
-    def __init__(self, **attrs):
-        VIEW.__init__(self, 'button', **ATTR.merge(attrs, {'class' : 'btn', 'type' : 'button'}))
+class SELECT(TAG):
+    def __init__(self, **attrs): TAG.__init__(self, 'select', **attrs)
+
+class OPTION(TAG):
+    def __init__(self, **attrs): TAG.__init__(self, 'option', **attrs)
+
+class BUTTON(TAG):
+    def __init__(self, **attrs): TAG.__init__(self, 'button', **TAG.ATTR(attrs, CLASS='btn', TYPE='button'))

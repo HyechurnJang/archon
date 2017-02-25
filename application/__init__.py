@@ -40,13 +40,17 @@
 APPLICATION_NAMES = [
     {'name' : 'aci', 'display' : u'ACI'},
     {'name' : 'asa', 'display' : u'ASA'},
-#     {'name' : 'sample', 'display' : u'샘플'},
+    {'name' : 'sample', 'display' : u'Sample'},
 ]
 
 APPLICATION_CONFIGS = {
     'aci_health_monitor_sec' : 60,
     'asa_health_monitor_sec' : 60,
+    'asa_object_cache_sec' : 10,
+    'asa_nat_cache_sec' : 10,
 }
+
+APPLICATION_LANGUAGE = 'ko' # en
 
 #===============================================================================
 # Database Setting

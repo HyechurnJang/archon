@@ -45,8 +45,8 @@ class Manager(ManagerAbstraction):
 def dashboard(R, M, V):
     
     V.Page.html(
-        DIV(style='position:fixed;width:100%;text-align:center;top:40%;transform:translateY(-50%);').html(
-            IMG(src='/resources/images/logo.png'),
-            FlipClock()
+        DIV().html(
+            IMG('/resources/images/logo.png'),
+            FLIPCLOCK()
         )
     )

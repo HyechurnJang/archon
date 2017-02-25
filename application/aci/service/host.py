@@ -41,6 +41,10 @@ def host_all(R, M, V):
     #===========================================================================
     # Get Data
     #===========================================================================
+#     host_data, nic_data = Burster(
+#     )(M.Class('compHost').list, detail=True, sort=['type', 'dn']
+#     )(M.Class('compNic').list, detail=True
+#     ).run()
     host_data = M.Class('compHost').list(detail=True, sort=['type', 'dn'])
     nic_data = M.Class('compNic').list(detail=True)
 
@@ -52,14 +56,14 @@ def host_all(R, M, V):
         cnt_hv = 0
         cnt_vm = 0
         
-        ph_table = DataTable(V('OID'), V('Name'), V('IP'), V('MAC'), V('OS'), V('State'))
-        vm_table = DataTable(V('OID'), V('Name'), V('IP'), V('MAC'), V('OS'), V('State'))
-        hv_table = FooTable(V('OID'), V('Name'), V('OS'), V('State'), V('+Interfaces'))
+        ph_table = TABLE.BASIC(V('OID'), V('Name'), V('IP'), V('MAC'), V('OS'), V('State'))
+        vm_table = TABLE.BASIC(V('OID'), V('Name'), V('IP'), V('MAC'), V('OS'), V('State'))
+        hv_table = TABLE.FLIP(V('OID'), V('Name'), V('OS'), V('State'), V('+Interfaces'))
         
         for host in host_data[domain_name]:
             if host.class_name in ['compPhys', 'compVm']:
                 dn = host['dn']
-                oid = Get('/aci/show/host/%s/%s' % (domain_name, dn)).html(host['oid'])
+                oid = GET('/aci/show/host/%s/%s' % (domain_name, dn)).html(host['oid'])
                 ip_data = ' '
                 mac_data = ' '
                 dn2nic = dn + '/'
@@ -77,7 +81,7 @@ def host_all(R, M, V):
             elif host.class_name == 'compHv':
                 cnt_hv += 1
                 dn = host['dn']
-                oid = Get('/aci/show/host/%s/%s' % (domain_name, dn)).html(host['oid'])
+                oid = GET('/aci/show/host/%s/%s' % (domain_name, dn)).html(host['oid'])
                 ipmac = ' '
                 dn2nic = dn + '/'
                 os_name, _ = get_host_os(V, host['dn'])
@@ -92,12 +96,12 @@ def host_all(R, M, V):
     #===========================================================================
     # View
     #===========================================================================
-        V.Page.html(HEAD(1).html('%s %s' % (domain_name, V('Domain'))))
         V.Page.html(
+            HEAD(1).html('%s %s' % (domain_name, V('Domain'))),
             ROW().html(
-                COL(4).html(CountPanel(V('Physical Hosts'), 'server', cnt_phy, **{'class' : 'panel-dgrey'})),
-                COL(4).html(CountPanel(V('Virtual Hosts'), 'cube', cnt_vm, **{'class' : 'panel-dgrey'})),
-                COL(4).html(CountPanel(V('Hypervisor'), 'cubes', cnt_hv, **{'class' : 'panel-dgrey'}))
+                COL(4).html(COUNTER(V('Physical Hosts'), 'server', cnt_phy, CLASS='panel-dgrey')),
+                COL(4).html(COUNTER(V('Virtual Hosts'), 'cube', cnt_vm, CLASS='panel-dgrey')),
+                COL(4).html(COUNTER(V('Hypervisor'), 'cubes', cnt_hv, CLASS='panel-dgrey'))
             )
         )
         if ph_table:
@@ -116,7 +120,7 @@ def host_all(R, M, V):
                 hv_table
             )
     
-    V.Menu.html(BUTTON(**(ATTR.click('/'.join(R.Path)) + {'class' : 'btn-primary'})).html(V('Refresh')))
+    V.Menu.html(BUTTON(CLASS='btn-primary').click('/'.join(R.Path)).html(V('Refresh')))
         
 def host_one(R, M, V):
     #===========================================================================
@@ -130,21 +134,21 @@ def host_one(R, M, V):
     #===========================================================================
     # Logic
     #===========================================================================
-    nav = Navigation()
+    nav = NAV()
     
     name = '[%s] %s <small>%s</small>' % (host_data['oid'].upper(), host_data['name'], get_host_type(V, host_data['type']))
     desc = host_data['descr']
     pw_stat, pw_img = get_power_stat(V, host_data['state'])
     
     # Detail
-    kv = KeyVal()
+    kv = KEYVAL()
     for key in host_data.keys(): kv.Data(key, host_data[key])
     nav.Tab(V('Details'), kv)
     
     # Topology
-    topo = Topo()
+    topo = TOPO()
     set_topo(topo, dn, color='red', path_color='green', dot=True)
-    nav.Tab(V('Topology'), DIV(style='text-align:center;padding-top:10px;').html(topo))
+    nav.Tab(V('Topology'), DIV(STYLE='text-align:center;padding-top:10px;').html(topo))
     
     nics = []
     
@@ -152,7 +156,7 @@ def host_one(R, M, V):
         os_name, os_img = get_host_os(V, host_data['os'])
         
         key = M[domain_name].Class('compPpNic').keys()
-        table = FooTable(*['+' + k if k != 'name' else V('NIC Name') for k in key])
+        table = TABLE.FLIP(*['+' + k if k != 'name' else V('NIC Name') for k in key])
         for child in children:
             if child.class_name == 'compPpNic':
                 table.Record(*[child[k] for k in key])
@@ -173,7 +177,7 @@ def host_one(R, M, V):
         os_name, os_img = get_host_os(V, host_data['os'], host_data['cfgdOs'])
         hv_name, hv_img = get_host_os(V, host_data['dn'])
         key = M[domain_name].Class('compVNic').keys()
-        table = FooTable(*['+' + k if k != 'name' else V('NIC Name') for k in key])
+        table = TABLE.FLIP(*['+' + k if k != 'name' else V('NIC Name') for k in key])
         for child in children:
             if child.class_name == 'compVNic':
                 table.Record(*[child[k] for k in key])
@@ -193,9 +197,9 @@ def host_one(R, M, V):
     elif host_data.class_name == 'compHv':
         os_name, os_img = get_host_os(V, host_data['dn'])
         h_key = M[domain_name].Class('compHpNic').keys()
-        h_table = FooTable(*['+' + k if k != 'name' else V('NIC Name') for k in h_key])
+        h_table = TABLE.FLIP(*['+' + k if k != 'name' else V('NIC Name') for k in h_key])
         m_key = M[domain_name].Class('compMgmtNic').keys()
-        m_table = FooTable(*['+' + k if k != 'name' else V('NIC Name') for k in m_key])
+        m_table = TABLE.FLIP(*['+' + k if k != 'name' else V('NIC Name') for k in m_key])
         for child in children:
             if child.class_name == 'compHpNic':
                 h_table.Record(*[child[k] for k in h_key])
@@ -238,37 +242,37 @@ def host_one(R, M, V):
     if host_data.class_name == 'compVm':
         V.Page.html(
             ROW().html(
-                COL(4, 'sm', style='text-align:center;').html(HEAD(3).html(V('OS'))).html(HEAD(4).html(os_name)).html(IMG(src=os_img, width='100px')),
-                COL(4, 'sm', style='text-align:center;').html(HEAD(3).html(V('Hypervisor'))).html(HEAD(4).html(hv_name)).html(IMG(src=hv_img, width='100px')),
-                COL(4, 'sm', style='text-align:center;').html(HEAD(3).html(V('Power State'))).html(HEAD(4).html(pw_stat)).html(IMG(src=pw_img, width='100px'))
+                COL(4, 'sm', STYLE='text-align:center;').html(HEAD(3).html(V('OS'))).html(HEAD(4).html(os_name)).html(IMG(os_img, width='100px')),
+                COL(4, 'sm', STYLE='text-align:center;').html(HEAD(3).html(V('Hypervisor'))).html(HEAD(4).html(hv_name)).html(IMG(hv_img, width='100px')),
+                COL(4, 'sm', STYLE='text-align:center;').html(HEAD(3).html(V('Power State'))).html(HEAD(4).html(pw_stat)).html(IMG(pw_img, width='100px'))
             )
         )
     else:
         V.Page.html(
             ROW().html(
-                COL(6, 'sm', style='text-align:center;').html(HEAD(3).html(V('OS'))).html(HEAD(4).html(os_name)).html(IMG(src=os_img, width='128px')),
-                COL(6, 'sm', style='text-align:center;').html(HEAD(3).html(V('Power State'))).html(HEAD(4).html(pw_stat)).html(IMG(src=pw_img, width='128px'))
+                COL(6, 'sm', STYLE='text-align:center;').html(HEAD(3).html(V('OS'))).html(HEAD(4).html(os_name)).html(IMG(os_img, width='128px')),
+                COL(6, 'sm', STYLE='text-align:center;').html(HEAD(3).html(V('Power State'))).html(HEAD(4).html(pw_stat)).html(IMG(pw_img, width='128px'))
             )
         )
     if nics:
         nics = sorted(nics, key=lambda nic: nic[0])
-        nic_table = TABLE(style='margin:auto;')
+        nic_table = TABLE(STYLE='margin:auto;')
         for nic in nics:
             nic_table.html(
                 TR().html(
-                    TD(style='padding:0px 5px 0px 5px;').html(IMG(src='/resources/images/tool/nic.png', width='36px')),
-                    TD(style='padding:0px 5px 0px 5px;').html(HEAD(4).html(nic[0])),
-                    TD(style='padding:0px 5px 0px 5px;').html(HEAD(4).html(nic[1])),
-                    TD(style='padding:0px 5px 0px 5px;').html(HEAD(4).html(nic[2]))
+                    TD(STYLE='padding:0px 5px 0px 5px;').html(IMG('/resources/images/tool/nic.png', width='36px')),
+                    TD(STYLE='padding:0px 5px 0px 5px;').html(HEAD(4).html(nic[0])),
+                    TD(STYLE='padding:0px 5px 0px 5px;').html(HEAD(4).html(nic[1])),
+                    TD(STYLE='padding:0px 5px 0px 5px;').html(HEAD(4).html(nic[2]))
                 )
             )
         V.Page.html(
             ROW().html(
-                COL(12, style='text-align:center;').html(
+                COL(12, STYLE='text-align:center;').html(
                     HEAD(3).html(V('Network Interfaces')),
                     nic_table
                 )
             )
         )
     V.Page.html(nav)
-    V.Menu.html(BUTTON(**(ATTR.click('/'.join(R.Path)) + {'class' : 'btn-primary'})).html(V('Refresh')))
+    V.Menu.html(BUTTON(CLASS='btn-primary').click('/'.join(R.Path)).html(V('Refresh')))

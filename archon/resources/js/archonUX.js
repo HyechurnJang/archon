@@ -1,7 +1,7 @@
-function UXDataTable(view) {
-	$("#" + view.attrs.id).DataTable({
+function UXDataTableBasic(view) {
+	var options = {
 		scrollX: false,
-    	dom: 'Bfrtip',
+		dom: 'Bfrtip',
         lengthMenu: [
             [ 10, 25, 50, -1 ],
             [ '10 rows', '25 rows', '50 rows', 'Show all' ]
@@ -14,22 +14,45 @@ function UXDataTable(view) {
             {extend:'print', text:'<i class="fa fa-print"></i>', titleAttr:'Print'}
         ],
         search: { "regex": false },
+        order: view.options.order,
+        destroy: true
+	};
+	$("#" + view.attrs.ID).DataTable(options);
+};
+
+function UXDataTableAsync(view) {
+	$("#" + view.attrs.ID).DataTable({
+		ajax: view.attrs.url,
+		searchDelay: 1000,
+		processing: true,
+		serverSide: true,
+		scrollX: false,
+    	dom: 'Bfrtip',
+        lengthMenu: [
+            [ 10, 25, 50, -1 ],
+            [ '10 rows', '25 rows', '50 rows', 'Show all' ]
+        ],
+        buttons: [
+        	{extend:'pageLength', text:'<i class="fa fa-align-justify"></i>', titleAttr:'Rows'},
+            {extend:'colvis', text:'<i class="fa fa-th-list"></i>', titleAttr:'Cols'},
+        ],
+        search: { "regex": false },
         destroy: true
     });
 };
 
 function UXFooTable(view) {
-	$("#" + view.attrs.id).footable();
+	$("#" + view.attrs.ID).footable();
 };
 
 function UXFlipClock(view) {
-	$("#" + view.attrs.id).FlipClock({clockFace: 'TwentyFourHourClock'});
+	$("#" + view.attrs.ID).FlipClock({clockFace: 'TwentyFourHourClock'});
 }
 
 function UXJustgage(view) {
 	setTimeout(function() {
 		var g = new JustGage({
-			id: view.attrs.id,
+			id: view.attrs.ID,
 			title: view.chart.title,
 		    value: view.chart.value,
 		    min: view.chart.min,
@@ -56,7 +79,7 @@ function UXDimple(view) {
     var margin = view.chart.options.margin;
     if (width == null) { width = "100%"; }
     if (height == null) { height = "100%"; }
-    var svg = dimple.newSvg("#" + view.attrs.id, width, height);
+    var svg = dimple.newSvg("#" + view.attrs.ID, width, height);
     var chart = new dimple.chart(svg);
     chart.setMargins(margin[0], margin[1], margin[2], margin[3]);//"30px", "20px", "20px", "20px");
     
@@ -217,7 +240,7 @@ function UXPeity(view) {
 	    	view.figure.options.stroke = view.figure.color;
 	    	break;
 	    }
-		$("#" + view.attrs.id).peity("line", view.figure.options);
+		$("#" + view.attrs.ID).peity("line", view.figure.options);
 		break;
 	case "bar":
 		switch (view.figure.color) {
@@ -232,7 +255,7 @@ function UXPeity(view) {
 	    	view.figure.options.fill = view.figure.color;
 	    	break;
 	    }
-		$("#" + view.attrs.id).peity("bar", view.figure.options);
+		$("#" + view.attrs.ID).peity("bar", view.figure.options);
 		break;
 	case "pie":
 		switch (view.figure.color) {
@@ -247,7 +270,7 @@ function UXPeity(view) {
 	    	view.figure.options.fill = [view.figure.color, "#eee"];
 	    	break;
 	    }
-		$("#" + view.attrs.id).peity("pie", view.figure.options);
+		$("#" + view.attrs.ID).peity("pie", view.figure.options);
 		break;
 	case "donut":
 		switch (view.figure.color) {
@@ -262,7 +285,7 @@ function UXPeity(view) {
 	    	view.figure.options.fill = [view.figure.color, "#eee"];
 	    	break;
 	    }
-		$("#" + view.attrs.id).peity("donut", view.figure.options);
+		$("#" + view.attrs.ID).peity("donut", view.figure.options);
 		break;
 	};
 };
@@ -704,7 +727,7 @@ var ArborRenderer3 = function(elt){
 
 
 function UXArbor(view) {
-	var canvas = $("#" + view.attrs.id);
+	var canvas = $("#" + view.attrs.ID);
 	if (view.topo.options.width == 0) { canvas.attr("width", window.innerWidth - 50); }
 	else { canvas.attr("width", view.topo.options.width); }
 	if (view.topo.options.height == 0) { canvas.attr("height", window.innerHeight - 200); }
@@ -713,7 +736,7 @@ function UXArbor(view) {
 	sys.screenSize(window.innerWidth);
 	sys.parameters({gravity:true, stiffness:300});
 	
-	sys.renderer = ArborRenderer1("#" + view.attrs.id);
+	sys.renderer = ArborRenderer1("#" + view.attrs.ID);
 	
 	setTimeout(function() {
 		sys.graft(view.topo.datasets);

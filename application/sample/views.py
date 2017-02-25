@@ -40,6 +40,82 @@ from manager import Manager
 #===============================================================================
 # Create your views here.
 #===============================================================================
+
+@pageview(Manager)
+def core(R, M, V):
+    
+    pass
+
+@pageview(Manager)
+def deco(R, M, V):
+    
+    pass
+
+@pageview(Manager)
+def action(R, M, V):
+    
+    pass
+
+table_data1 = [
+    ["Airi","Satou","Accountant","Tokyo","28th Nov 08","$162,700"],
+    ["Angelica","Ramos","Chief Executive Officer (CEO)","London","9th Oct 09","$1,200,000"],
+    ["Ashton","Cox","Junior Technical Author","San Francisco","12th Jan 09","$86,000"],
+    ["Bradley","Greer","Software Engineer","London","13th Oct 12","$132,000"],
+    ["Brenden","Wagner","Software Engineer","San Francisco","7th Jun 11","$206,850"],
+    ["Brielle","Williamson","Integration Specialist","New York","2nd Dec 12","$372,000"],
+    ["Bruno","Nash","Software Engineer","London","3rd May 11","$163,500"],
+    ["Caesar","Vance","Pre-Sales Support","New York","12th Dec 11","$106,450"],
+    ["Cara","Stevens","Sales Assistant","New York","6th Dec 11","$145,600"],
+    ["Cedric","Kelly","Senior Javascript Developer","Edinburgh","29th Mar 12","$433,060"]
+]
+
+table_data2 = [
+    [STRONG().html("airi"),"satou","Accountant","Tokyo","28th Nov 08","$162,700"],
+    [PARA().html(SMALL().html("angelica"), STRONG().html('!!!')),"ramos","Chief Executive Officer (CEO)","London","9th Oct 09","$1,200,000"],
+    [GET('/sample/samples/table').html("ashton"),"cox","Junior Technical Author","San Francisco","12th Jan 09","$86,000"],
+    ["bradley","greer","Software Engineer","London","13th Oct 12","$132,000"],
+    ["brenden","wagner","Software Engineer","San Francisco","7th Jun 11","$206,850"],
+    ["brielle","williamson","Integration Specialist","New York","2nd Dec 12","$372,000"],
+    ["bruno","nash","Software Engineer","London","3rd May 11","$163,500"],
+    ["caesar","vance","Pre-Sales Support","New York","12th Dec 11","$106,450"],
+    ["cara","stevens","Sales Assistant","New York","6th Dec 11","$145,600"],
+    ["cedric","kelly","Senior Javascript Developer","Edinburgh","29th Mar 12","$433,060"]
+]
+
+@TABLE.ASYNC.pageview()
+def sub_table(R, M, V):
+    print 'Draw   :', R.Draw
+    print 'Leng   :', R.Length
+    print 'Start  :', R.Start
+    print 'Search :', R.Search
+    print 'OrderC :', R.OrderCol
+    print 'OrderD :', R.OrderDir
+    
+    total = 57
+    count = 47
+    
+    ret = TABLE.ASYNCDATA(R.Draw, total, count)
+    if R.Start == 0:
+        for td in table_data1: ret.Record(*td)
+    else:
+        for td in table_data2: ret.Record(*td) 
+    
+    return ret
+
+@pageview(Manager, sub_table=sub_table)
+def table(R, M, V):
+    
+    basic = TABLE.BASIC('First Name', 'Last Name', 'Position', 'Office', 'Start Data', 'Salary')
+    for record in table_data1: basic.Record(*record)
+    V.Page.html(basic)
+    
+    asyn = TABLE.ASYNC('sample/samples/table/sub_table', 'First Name', 'Last Name', 'Position', 'Office', 'Start Data', 'Salary')
+    V.Page.html(asyn)
+     
+    flip = TABLE.FLIP('First Name', 'Last Name', '+Position', '+Office', '+Start Data', 'Salary')
+    for record in table_data1: flip.Record(*record)
+    V.Page.html(flip)
+
 @pageview(Manager)
 def dimple(R, M, V):
     
@@ -60,15 +136,15 @@ def dimple(R, M, V):
         'legend' : True,
     }
     
-    chart = Chart.Line
+    chart = CHART.LINE
     
     V.Page.html(chart(*labels).Data('Line1', *data3))
     
     V.Page.html(chart(*labels, **options1).Data('Line1', *data3))
     V.Page.html(chart(*labels, **options2).Data('Line1', *data3))
     
-    V.Page.html(chart(*labels, **Chart.THEME_HEALTH).Data('Line1', *data3))
-    V.Page.html(chart(*labels, **Chart.THEME_UTIL).Data('Line1', *data3))
+    V.Page.html(chart(*labels, **CHART.THEME_HEALTH).Data('Line1', *data3))
+    V.Page.html(chart(*labels, **CHART.THEME_UTIL).Data('Line1', *data3))
     
     V.Page.html(chart(*labels).Data('Line1', *data1).Data('Line2', *data2).Data('Line3', *data3))
     
@@ -80,46 +156,46 @@ def peity(R, M, V):
     
     V.Page.html(
         DIV().html(
-            Figure.Line(*[100, 4, 20, 50, 70, 10, 30], height=100, width=200),
-            Figure.Bar(*[100, 4, 20, 50, 70, 10, 30], height=100, width=200),
-            Figure.Pie(1,5, height=100, width=100),
-            Figure.Donut(1,5, height=100, width=100)
+            FIGURE.LINE(*[100, 4, 20, 50, 70, 10, 30], height=100, width=200),
+            FIGURE.BAR(*[100, 4, 20, 50, 70, 10, 30], height=100, width=200),
+            FIGURE.PIE(1,5, height=100, width=100),
+            FIGURE.DONUT(1,5, height=100, width=100)
         )
     )
     
     V.Page.html(
         DIV().html(
-            Figure.Line(*[100, 4, 20, 50, 70, 10, 30], height=100, width=200, **Figure.THEME_HEALTH),
-            Figure.Bar(*[100, 4, 20, 50, 70, 10, 30], height=100, width=200, **Figure.THEME_UTIL),
-            Figure.Pie(20, 80, height=100, width=100, color=Figure.COLOR_HEALTH),
-            Figure.Donut(20, 80, height=100, width=100, color=Figure.COLOR_UTIL)
+            FIGURE.LINE(*[100, 4, 20, 50, 70, 10, 30], height=100, width=200, **FIGURE.THEME_HEALTH),
+            FIGURE.BAR(*[100, 4, 20, 50, 70, 10, 30], height=100, width=200, **FIGURE.THEME_UTIL),
+            FIGURE.PIE(20, 80, height=100, width=100, color=FIGURE.COLOR_HEALTH),
+            FIGURE.DONUT(20, 80, height=100, width=100, color=FIGURE.COLOR_UTIL)
         )
     )
     
     V.Page.html(
         DIV().html(
-            Figure.Pie(0, 100, height=100, width=100, **Figure.THEME_HEALTH),
-            Figure.Pie(25, 75, height=100, width=100, **Figure.THEME_HEALTH),
-            Figure.Pie(50, 50, height=100, width=100, **Figure.THEME_HEALTH),
-            Figure.Pie(75, 25, height=100, width=100, **Figure.THEME_HEALTH),
-            Figure.Pie(100, 0, height=100, width=100, **Figure.THEME_HEALTH),
+            FIGURE.PIE(0, 100, height=100, width=100, **FIGURE.THEME_HEALTH),
+            FIGURE.PIE(25, 75, height=100, width=100, **FIGURE.THEME_HEALTH),
+            FIGURE.PIE(50, 50, height=100, width=100, **FIGURE.THEME_HEALTH),
+            FIGURE.PIE(75, 25, height=100, width=100, **FIGURE.THEME_HEALTH),
+            FIGURE.PIE(100, 0, height=100, width=100, **FIGURE.THEME_HEALTH),
         )
     )
     
     V.Page.html(
         DIV().html(
-            Figure.Donut(0, 100, height=100, width=100, hole=10, **Figure.THEME_UTIL),
-            Figure.Donut(25, 75, height=100, width=100, hole=20, **Figure.THEME_UTIL),
-            Figure.Donut(50, 50, height=100, width=100, **Figure.THEME_UTIL),
-            Figure.Donut(75, 25, height=100, width=100, **Figure.THEME_UTIL),
-            Figure.Donut(100, 0, height=100, width=100, **Figure.THEME_UTIL),
+            FIGURE.DONUT(0, 100, height=100, width=100, hole=10, **FIGURE.THEME_UTIL),
+            FIGURE.DONUT(25, 75, height=100, width=100, hole=20, **FIGURE.THEME_UTIL),
+            FIGURE.DONUT(50, 50, height=100, width=100, **FIGURE.THEME_UTIL),
+            FIGURE.DONUT(75, 25, height=100, width=100, **FIGURE.THEME_UTIL),
+            FIGURE.DONUT(100, 0, height=100, width=100, **FIGURE.THEME_UTIL),
         )
     )
 
 @pageview(Manager)
 def arbor(R, M, V):
     
-    topo = Topo(height=0)
+    topo = TOPO(height=0)
     
     topo.Node('Test1', 'Test1OK')
     topo.Node('Test2', 'Test2')
@@ -129,41 +205,10 @@ def arbor(R, M, V):
 
 @pageview(Manager)
 def justgage(R, M, V):
-    
-    V.Page.html(
-'''
-<div>
-<div id="test-justgage">
-</div>
-</div>
-<script language="javascript" type="text/javascript">
-setTimeout(function() {
-    var g = new JustGage({
-        id: "test-justgage",
-        title: "Test JustGage,
-        value: getRandomInt(0, 100),
-        min: 0,
-        max: 100,
-        pointer: true,
-        pointerOptions: {
-            toplength: -15,
-            bottomlength: 10,
-            bottomwidth: 12,
-            color: '#8e8e93',
-            stroke: '#ffffff',
-            stroke_width: 3,
-            stroke_linecap: 'round'
-        }
-    });
-}, 250);
-</script>
-'''
-    )
-    
-    gauge = Gauge('Test1', 40)
+    gauge = GAUGE('Test1', 40)
     V.Page.html(gauge)
 
 @pageview(Manager)
-def html(request, manager, view):
-    
+def html(R, M, V):
+
     pass

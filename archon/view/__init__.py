@@ -34,10 +34,8 @@
 #                                                                              #
 ################################################################################
 
-from core import VIEW, ATTR, DIV, SPAN, HEAD, PARA, ANCH, LABEL, STRONG, SMALL, IMG, TABLE, THEAD, TBODY, TH, TR, TD, UL, LI, FORM, INPUT, SELECT, OPTION, BUTTON
-from deco import ROW, COL, Icon, StrWrap, KeyVal, Alert, Panel, CountPanel, Indent, Section, ListGroup, Navigation, Modal, JumboTron, FlipClock
-from action import Get, Post, Delete, DelClick, DelButton
-
-from table import DataTable, FooTable
-from chart import Chart, Figure, Topo, Gauge
+from core import TAG, DIV, SPAN, HEAD, PARA, ANCH, LABEL, STRONG, SMALL, IMG, ICON, THEAD, TBODY, TH, TR, TD, TABLE, UL, LI, FORM, INPUT, SELECT, OPTION, BUTTON
+from deco import ROW, COL, STRWRAP, KEYVAL, ALERT, PANEL, COUNTER, INDENT, SECTOR, LISTGROUP, NAV, MODAL, JUMBO, FLIPCLOCK, OVERLAP
+from action import GET, POST, DELETE
+from chart import CHART, FIGURE, TOPO, GAUGE
 

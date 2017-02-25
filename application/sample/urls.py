@@ -41,6 +41,10 @@ from . import views
 # Link your view here.
 #===============================================================================
 url_sample = [
+    url(r'^core/?', views.core, name=u'core'),
+    url(r'^deco/?', views.deco, name=u'deco'),
+    url(r'^action/?', views.action, name=u'action'),
+    url(r'^table/?', views.table, name=u'table'),
     url(r'^dimple/?', views.dimple, name=u'dimple'),
     url(r'^peity/?', views.peity, name=u'peity'),
     url(r'^arbor/?', views.arbor, name=u'arbor'),

@@ -46,7 +46,7 @@ def epg_all(R, M, V):
     #===========================================================================
     # Logic
     #===========================================================================
-    table = DataTable(V('Domain'), V('Name'), V('Bridge Domain'), V('Provided Contracts'), V('Consumed Contracts'), V('Binding Path'))
+    table = TABLE.BASIC(V('Domain'), V('Name'), V('Bridge Domain'), V('Provided Contracts'), V('Consumed Contracts'), V('Binding Path'))
     epg_cnt = 0
     for domain_name in M:
         for epg in epgs[domain_name]:
@@ -54,7 +54,7 @@ def epg_all(R, M, V):
             raw = re.sub('(uni/|tn-|ap-|epg-)', '', epg['dn']).split('/')
             path_raw = '/'.join(raw[:2])
             name_raw = raw[2]
-            name = PARA().html(SMALL().html(path_raw + '/')).html(Get('/aci/show/epgroup/%s/%s' % (domain_name, epg['dn'])).html(name_raw))
+            name = PARA().html(SMALL().html(path_raw + '/'), GET('/aci/show/epgroup/%s/%s' % (domain_name, epg['dn'])).html(name_raw))
             bd_data = ' '
             prov_data = ' '
             cons_data = ' '
@@ -76,11 +76,11 @@ def epg_all(R, M, V):
     #===========================================================================
     V.Page.html(
         ROW().html(
-            COL(12).html(CountPanel(V('EPG'), 'object-group', epg_cnt, **{'class' : 'panel-dgrey'}))
+            COL(12).html(COUNTER(V('EPG'), 'object-group', epg_cnt, CLASS='panel-dgrey'))
         ),
         table
     )
-    V.Menu.html(BUTTON(**(ATTR.click('/'.join(R.Path)) + {'class' : 'btn-primary'})).html(V('Refresh')))
+    V.Menu.html(BUTTON(CLASS='btn-primary').click('/'.join(R.Path)).html(V('Refresh')))
 
 def epg_one(R, M, V):
     #===========================================================================
@@ -93,31 +93,31 @@ def epg_one(R, M, V):
     #===========================================================================
     # Logic
     #===========================================================================
-    nav = Navigation()
+    nav = NAV()
     active_ep = None
     
     # Health
     hdata = M.getHealth()
     health = None
-    try: health = Chart.Line(*hdata['_tstamp'], **Chart.THEME_HEALTH).Data(dn, *hdata[domain_name + '/' + dn])
+    try: health = CHART.LINE(*hdata['_tstamp'], **CHART.THEME_HEALTH).Data(dn, *hdata[domain_name + '/' + dn])
     except: pass
     
     # Details
-    kv = KeyVal()
+    kv = KEYVAL()
     for key in epg.keys(): kv.Data(key, epg[key])
     nav.Tab(V('Details'), kv)
     
     # Topology
-    topo = Topo()
+    topo = TOPO()
     set_topo(topo, dn, color='red', path_color='orange', dot=True)
-    nav.Tab(V('Topology'), DIV(style='text-align:center;padding-top:10px;').html(topo))
+    nav.Tab(V('Topology'), DIV(STYLE='text-align:center;padding-top:10px;').html(topo))
     
     # BD Relation
     act = epg.Class('fvRsBd')
     datas = act.list(detail=True)
     if datas:
         data = datas[0]
-        kv = KeyVal()
+        kv = KEYVAL()
         for key in data.keys(): kv.Data(key, data[key])
         set_topo(topo, data['tDn'], color='orange')
         topo.Edge(dn, data['tDn'])
@@ -135,7 +135,7 @@ def epg_one(R, M, V):
             if k == 'tDn' : col.append(V('Name'))
             elif k == 'encap' : col.append(V('Encap'))
             else: col.append('+' + k)
-        table = FooTable(*col)
+        table = TABLE.FLIP(*col)
         nav.Tab(V('Path Attachments'), table)
         for data in datas:
             val = []
@@ -151,7 +151,7 @@ def epg_one(R, M, V):
     datas = act.list(detail=True)
     if datas:
         key = act.keys()
-        table = FooTable(*['+' + k if k != 'tnVzBrCPName' else V('Name') for k in key])
+        table = TABLE.FLIP(*['+' + k if k != 'tnVzBrCPName' else V('Name') for k in key])
         nav.Tab(V('Provided Contracts'), table)
         for data in datas: table.Record(*[data[k] for k in key])
     
@@ -160,14 +160,14 @@ def epg_one(R, M, V):
     datas = act.list(detail=True)
     if datas:
         key = act.keys()
-        table = FooTable(*['+' + k if k != 'tnVzBrCPName' else V('Name') for k in key])
+        table = TABLE.FLIP(*['+' + k if k != 'tnVzBrCPName' else V('Name') for k in key])
         nav.Tab(V('Consumed Contracts'), table)
         for data in datas: table.Record(*[data[k] for k in key])
 
     # Endpoint
     datas = epg.Endpoint.list(detail=True)
     if datas:
-        active_ep = ROW(style='margin-bottom:20px;')
+        active_ep = ROW(STYLE='margin-bottom:20px;')
         key = epg.Endpoint.keys()
         col = []
         for k in key:
@@ -175,19 +175,19 @@ def epg_one(R, M, V):
             elif k == 'ip' : col.append(V('IP'))
             elif k == 'encap' : col.append(V('Encap'))
             else: col.append('+' + k)
-        table = FooTable(*col)
+        table = TABLE.FLIP(*col)
         nav.Tab(V('Endpoint'), table)
         for data in datas:
             val = []
             for k in key:
-                if k == 'name': val.append(Get('/aci/show/endpoint/%s/%s' % (domain_name, data['dn'])).html(data[k]))
+                if k == 'name': val.append(GET('/aci/show/endpoint/%s/%s' % (domain_name, data['dn'])).html(data[k]))
                 else: val.append(data[k])
             table.Record(*val)
             set_topo(topo, data['dn'], color='black')
             active_ep.html(
-                COL(2, style='padding:0px 5px 0px 5px').html(
-                    DIV(style='float:left;').html(IMG(src='/resources/images/tool/nic.png', width='20px')),
-                    DIV(style='padding-left:22px;').html(data['name'])
+                COL(2, STYLE='padding:0px 5px 0px 5px').html(
+                    DIV(STYLE='float:left;').html(IMG('/resources/images/tool/nic.png', width='20px')),
+                    DIV(STYLE='padding-left:22px;').html(data['name'])
                 )
             )
 
@@ -202,4 +202,4 @@ def epg_one(R, M, V):
             active_ep
         )
     V.Page.html(nav)
-    V.Menu.html(BUTTON(**(ATTR.click('/'.join(R.Path)) + {'class' : 'btn-primary'})).html(V('Refresh')))
+    V.Menu.html(BUTTON(CLASS='btn-primary').click('/'.join(R.Path)).html(V('Refresh')))

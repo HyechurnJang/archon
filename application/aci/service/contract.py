@@ -41,6 +41,12 @@ def contract_all(R, M, V):
     #===========================================================================
     # Get Data
     #===========================================================================
+#     ctrts, subjs, provs, conss = Burster(
+#     )(M.Contract.list, detail=True, sort='dn'
+#     )(M.Subject.list, sort='dn'
+#     )(M.Class('vzRtProv').list, sort='dn'
+#     )(M.Class('vzRtCons').list, sort='dn'
+#     ).run()
     ctrts = M.Contract.list(detail=True, sort='dn')
     subjs = M.Subject.list(sort='dn')
     provs = M.Class('vzRtProv').list(sort='dn')
@@ -49,7 +55,7 @@ def contract_all(R, M, V):
     #===========================================================================
     # Logic
     #===========================================================================
-    table = DataTable(V('Domain'), V('Name'), V('Scope'), V('Subject'), V('Provider'), V('Consumer'))
+    table = TABLE.BASIC(V('Domain'), V('Name'), V('Scope'), V('Subject'), V('Provider'), V('Consumer'))
     ctrt_cnt = 0
     prov_cnt = 0
     cons_cnt = 0
@@ -57,10 +63,9 @@ def contract_all(R, M, V):
         for ctrt in ctrts[domain_name]:
             ctrt_cnt += 1
             dn = ctrt['dn']
-            path, kn, rn = ctrt.rn()
-            krn = kn + '-' + rn
+            path, _, rn = ctrt.rn()
             path = re.sub('(uni/|tn-)', '', path)
-            name = PARA().html(SMALL().html(path + '/')).html(Get('/aci/show/contract/%s/%s' % (domain_name, dn)).html(rn))
+            name = PARA().html(SMALL().html(path + '/'), GET('/aci/show/contract/%s/%s' % (domain_name, dn)).html(rn))
             ctrt_subj = ' '
             ctrt_prov = ' '
             ctrt_cons = ' '
@@ -81,12 +86,12 @@ def contract_all(R, M, V):
     #===========================================================================
     V.Page.html(
         ROW().html(
-            COL(4).html(CountPanel(V('Contracts'), 'ticket', ctrt_cnt, **{'class' : 'panel-dgrey'})),
-            COL(4).html(CountPanel(V('Provider'), 'truck', prov_cnt, **{'class' : 'panel-dgrey'})),
-            COL(4).html(CountPanel(V('Consumer'), 'shopping-cart', cons_cnt, **{'class' : 'panel-dgrey'}))
+            COL(4).html(COUNTER(V('Contracts'), 'ticket', ctrt_cnt, CLASS='panel-dgrey')),
+            COL(4).html(COUNTER(V('Provider'), 'truck', prov_cnt, CLASS='panel-dgrey')),
+            COL(4).html(COUNTER(V('Consumer'), 'shopping-cart', cons_cnt, CLASS='panel-dgrey'))
         )
     ).html(table)
-    V.Menu.html(BUTTON(**(ATTR.click('/'.join(R.Path)) + {'class' : 'btn-primary'})).html(V('Refresh')))
+    V.Menu.html(BUTTON(CLASS='btn-primary').click('/'.join(R.Path)).html(V('Refresh')))
 
 def contract_one(R, M, V):
     #===========================================================================
@@ -95,30 +100,28 @@ def contract_one(R, M, V):
     domain_name = R.Path[3]
     dn = '/'.join(R.Path[4:])
     ctrt = M[domain_name](dn, detail=True)
-    path, kn, rn = ctrt.rn()
-    krn = kn + '-' + rn
     name = ctrt['name']
     
     #===========================================================================
     # Logic
     #===========================================================================
-    nav = Navigation()
+    nav = NAV()
     
     # Details
-    kv = KeyVal()
+    kv = KEYVAL()
     for key in ctrt.keys(): kv.Data(key, ctrt[key])
     nav.Tab(V('Details'), kv)
     
     # Topology
-    topo = Topo()
+    topo = TOPO()
     set_topo(topo, dn, color='red', path_color='orange', dot=True)
-    nav.Tab(V('Topology'), DIV(style='text-align:center;padding-top:10px;').html(topo))
+    nav.Tab(V('Topology'), DIV(STYLE='text-align:center;padding-top:10px;').html(topo))
     
     # Subject
     datas = ctrt.Subject.list(detail=True, sort='dn')
     if datas:
         key = ctrt.Subject.keys()
-        table = FooTable(*['+' + k if k != 'name' else V('Name') for k in key])
+        table = TABLE.FLIP(*['+' + k if k != 'name' else V('Name') for k in key])
         for data in datas:
             table.Record(*[data[k] for k in key])
             set_topo(topo, data['dn'], color='orange')
@@ -130,12 +133,12 @@ def contract_one(R, M, V):
     
     
     epg_key = M[domain_name].EPG.keys()
-    epg_prov_table = FooTable(*['+' + k if k != 'name' else V('Name') for k in epg_key])
-    epg_cons_table = FooTable(*['+' + k if k != 'name' else V('Name') for k in epg_key])
+    epg_prov_table = TABLE.FLIP(*['+' + k if k != 'name' else V('Name') for k in epg_key])
+    epg_cons_table = TABLE.FLIP(*['+' + k if k != 'name' else V('Name') for k in epg_key])
     
     ext_key = M[domain_name].Class('l3extInstP').keys()
-    ext_prov_table = FooTable(*['+' + k if k != 'name' else V('Name') for k in ext_key])
-    ext_cons_table = FooTable(*['+' + k if k != 'name' else V('Name') for k in ext_key])
+    ext_prov_table = TABLE.FLIP(*['+' + k if k != 'name' else V('Name') for k in ext_key])
+    ext_cons_table = TABLE.FLIP(*['+' + k if k != 'name' else V('Name') for k in ext_key])
     
     # Provided
     act = ctrt.Class('vzRtProv')
@@ -177,7 +180,8 @@ def contract_one(R, M, V):
     #===========================================================================
     # View
     #===========================================================================
-    V.Page.html(HEAD(1).html(name))
-    V.Page.html(nav)
-    V.Menu.html(BUTTON(**(ATTR.click('/'.join(R.Path)) + {'class' : 'btn-primary'})).html(V('Refresh')))
-    pass
+    V.Page.html(
+        HEAD(1).html(name),
+        nav
+    )
+    V.Menu.html(BUTTON(CLASS='btn-primary').click('/'.join(R.Path)).html(V('Refresh')))

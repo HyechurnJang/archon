@@ -41,6 +41,13 @@ def external_all(R, M, V):
     #===========================================================================
     # Get Data
     #===========================================================================
+#     extns, ctxts, subns, provs, conss = Burster(
+#     )(M.L3Profile.list, detail=True, sort='dn'
+#     )(M.Context.list, detail=True, sort='dn'
+#     )(M.Class('l3extSubnet').list, detail=True, sort='dn'
+#     )(M.Class('fvRsProv').list, detail=True, sort='dn'
+#     )(M.Class('fvRsCons').list, detail=True, sort='dn'
+#     ).run()
     extns = M.L3Profile.list(detail=True, sort='dn')
     ctxts = M.Context.list(detail=True, sort='dn')
     subns = M.Class('l3extSubnet').list(detail=True, sort='dn')
@@ -50,17 +57,16 @@ def external_all(R, M, V):
     #===========================================================================
     # Logic
     #===========================================================================
-    table = DataTable(V('Domain'), V('Name'), V('Contexts'), V('Subnets'), V('Provided Contracts'), V('Consumed Contracts'))
+    table = TABLE.BASIC(V('Domain'), V('Name'), V('Contexts'), V('Subnets'), V('Provided Contracts'), V('Consumed Contracts'))
     extn_cnt = 0
     
     for domain_name in M:
         for extn in extns[domain_name]:
             extn_cnt += 1
             dn = extn['dn']
-            path, kn, rn = extn.rn()
-            krn = kn + '-' + rn
+            path, _, rn = extn.rn()
             path = re.sub('(uni/|tn-|out-)', '', path)
-            name = PARA().html(SMALL().html(path + '/')).html(Get('/aci/show/external/%s/%s' % (domain_name, dn)).html(rn))
+            name = PARA().html(SMALL().html(path + '/')).html(GET('/aci/show/external/%s/%s' % (domain_name, dn)).html(rn))
             scope = extn['scope']
             
             extn_ctxt = ' '
@@ -82,11 +88,11 @@ def external_all(R, M, V):
     #===========================================================================
     V.Page.html(
         ROW().html(
-            COL(12).html(CountPanel(V('External Networks'), 'cloud', extn_cnt, **{'class' : 'panel-dgrey'}))
+            COL(12).html(COUNTER(V('External Networks'), 'cloud', extn_cnt, CLASS='panel-dgrey'))
         ),
         table
     )
-    V.Menu.html(BUTTON(**(ATTR.click('/'.join(R.Path)) + {'class' : 'btn-primary'})).html(V('Refresh')))
+    V.Menu.html(BUTTON(CLASS='btn-primary').click('/'.join(R.Path)).html(V('Refresh')))
 
 def external_one(R, M, V):
     #===========================================================================
@@ -100,46 +106,50 @@ def external_one(R, M, V):
     #===========================================================================
     # Logic
     #===========================================================================
-    nav = Navigation()
+    nav = NAV()
     
     # Detail
-    kv = KeyVal()
+    kv = KEYVAL()
     for key in extn.keys(): kv.Data(key, extn[key])
     nav.Tab(V('Details'), kv)
     
     # Topology
-    topo = Topo()
+    topo = TOPO()
     set_topo(topo, dn, color='red', path_color='orange', dot=True)
     set_topo(topo, outn['dn'])
-    nav.Tab(V('Topology'), DIV(style='text-align:center;padding-top:10px;').html(topo))
+    nav.Tab(V('Topology'), DIV(STYLE='text-align:center;padding-top:10px;').html(topo))
     
     # Out Network
-    kv = KeyVal()
+    kv = KEYVAL()
     for key in outn.keys(): kv.Data(key, outn[key])
     nav.Tab(V('Outside Network'), kv)
     
-    
     fold = None
+    fold_key = None
     prov = None
+    prov_key = None
     cons = None
-    
-    fold_key = M[domain_name].Class('vnsFolderInst').keys()
-    prov_key = M[domain_name].Class('fvRsProv').keys()
-    cons_key = M[domain_name].Class('fvRsCons').keys()
+    cons_key = None
     
     children = extn.children(detail=True)
     for child in children:
         if child.class_name == 'vnsFolderInst':
-            if fold == None: fold = FooTable(*['+' + k if k != 'name' else V('Name') for k in fold_key])
+            if fold == None:
+                fold_key = M[domain_name].Class('vnsFolderInst').keys()
+                fold = TABLE.FLIP(*['+' + k if k != 'name' else V('Name') for k in fold_key])
             fold.Record(*[child[k] for k in fold_key])
             set_topo(topo, child['dn'])
         elif child.class_name == 'fvRsProv':
-            if prov == None: prov = FooTable(*['+' + k if k != 'tRn' else V('Name') for k in prov_key])
+            if prov == None:
+                prov_key = M[domain_name].Class('fvRsProv').keys()
+                prov = TABLE.FLIP(*['+' + k if k != 'tRn' else V('Name') for k in prov_key])
             prov.Record(*[child[k] for k in prov_key])
             set_topo(topo, child['tDn'], color='pink')
             topo.Edge(dn, child['tDn'])
         elif child.class_name == 'fvRsCons':
-            if cons == None: cons = FooTable(*['+' + k if k != 'tRn' else V('Name') for k in cons_key])
+            if cons == None:
+                cons_key = M[domain_name].Class('fvRsCons').keys()
+                cons = TABLE.FLIP(*['+' + k if k != 'tRn' else V('Name') for k in cons_key])
             cons.Record(*[child[k] for k in cons_key])
             set_topo(topo, child['tDn'], color='cyan')
             topo.Edge(dn, child['tDn'])
@@ -150,6 +160,8 @@ def external_one(R, M, V):
     if fold != None: nav.Tab(V('Folders'), fold)
     if prov != None: nav.Tab(V('Provided Contracts'), prov)
     if cons != None: nav.Tab(V('Consumed Contracts'), cons)
-    V.Page.html(HEAD(1).html(extn['name']))
-    V.Page.html(nav)
-    V.Menu.html(BUTTON(**(ATTR.click('/'.join(R.Path)) + {'class' : 'btn-primary'})).html(V('Refresh')))
+    V.Page.html(
+        HEAD(1).html(extn['name']),
+        nav
+    )
+    V.Menu.html(BUTTON(CLASS='btn-primary').click('/'.join(R.Path)).html(V('Refresh')))

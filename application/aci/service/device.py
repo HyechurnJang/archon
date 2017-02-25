@@ -50,7 +50,7 @@ def device_all(R, M, V):
     # Logic
     #===========================================================================
     for domain_name in M:
-        table = DataTable(V('ID'), V('Type'), V('Name'), V('Model'), V('Serial'), V('Version'), V('Management IP'), V('State'), V('Fabric State'), V('Uptime'))
+        table = TABLE.BASIC(V('ID'), V('Type'), V('Name'), V('Model'), V('Serial'), V('Version'), V('Management IP'), V('State'), V('Fabric State'), V('Uptime'))
         
         cnt_ctrl = 0
         cnt_spne = 0
@@ -85,7 +85,7 @@ def device_all(R, M, V):
             
             table.Record(id,
                          role,
-                         Get('/aci/show/device/%s/%s' % (domain_name, node['dn'])).html(node['name']),
+                         GET('/aci/show/device/%s/%s' % (domain_name, node['dn'])).html(node['name']),
                          node['model'],
                          node['serial'],
                          version,
@@ -102,19 +102,19 @@ def device_all(R, M, V):
             V.Page.html(
                 ROW().html(
                     COL(4).html(
-                        CountPanel(V('Controller'), 'map-signs', cnt_ctrl, **(ATTR.click('/aci/show/device/controller') + {'class' : 'panel-dgrey'}))
+                        COUNTER(V('Controller'), 'map-signs', cnt_ctrl, CLASS='panel-dgrey').click('/aci/show/device/controller')
                     ),
                     COL(4).html(
-                        CountPanel(V('Spine'), 'tree', cnt_spne, **(ATTR.click('/aci/show/device/spine') + {'class' : 'panel-dgrey'}))
+                        COUNTER(V('Spine'), 'tree', cnt_spne, CLASS='panel-dgrey').click('/aci/show/device/spine')
                     ),
                     COL(4).html(
-                        CountPanel(V('Leaf'), 'leaf', cnt_leaf, **(ATTR.click('/aci/show/device/leaf') + {'class' : 'panel-dgrey'}))
+                        COUNTER(V('Leaf'), 'leaf', cnt_leaf, CLASS='panel-dgrey').click('/aci/show/device/leaf')
                     )
                 )
             )
         V.Page.html(table)
     
-    V.Menu.html(BUTTON(**(ATTR.click('/'.join(R.Path)) + {'class' : 'btn-primary'})).html(V('Refresh')))
+    V.Menu.html(BUTTON(CLASS='btn-primary').click('/'.join(R.Path)).html(V('Refresh')))
 
 def device_one(R, M, V):
     #===========================================================================
@@ -127,35 +127,35 @@ def device_one(R, M, V):
     #===========================================================================
     # Logic
     #===========================================================================
-    nav = Navigation()
+    nav = NAV()
     health = None
     active_intf = None
     
     # Detail
-    kv = KeyVal()
+    kv = KEYVAL()
     for key in node_data.keys(): kv.Data(key, node_data[key])
     nav.Tab(V('Details'), kv)
     
     # Topology
-    topo = Topo()
+    topo = TOPO()
     set_topo(topo, dn, color='red', dot=True)
-    nav.Tab(V('Topology'), DIV(style='text-align:center;padding-top:10px;').html(topo))
+    nav.Tab(V('Topology'), DIV(STYLE='text-align:center;padding-top:10px;').html(topo))
     
     if hasattr(node_data, 'System'):
         if node_data['role'] != 'controller':
             data = M.getHealth()
-            try: health = Chart.Line(*data['_tstamp'], **Chart.THEME_HEALTH).Data(dn, *data[domain_name + '/' + dn])
+            try: health = CHART.LINE(*data['_tstamp'], **CHART.THEME_HEALTH).Data(dn, *data[domain_name + '/' + dn])
             except: pass
-        kv = KeyVal()
+        kv = KEYVAL()
         for key in node_data.System.keys(): kv.Data(key, node_data.System[key])
         nav.Tab(V('System'), kv)
         physif = node_data.System.PhysIf.list(detail=True, sort='id')
         if physif:
             phys_health = node_data.System.PhysIf.health()
-            active_intf = ROW(style='margin-bottom:20px;')
+            active_intf = ROW(STYLE='margin-bottom:20px;')
             sort_phys_health = {}
             key = node_data.System.PhysIf.keys()
-            table = FooTable(*['+' + k if k != 'id' else V('ID') for k in key])
+            table = TABLE.FLIP(*['+' + k if k != 'id' else V('ID') for k in key])
             for pi in physif:
                 table.Record(*[pi[k] for k in key])
                 sort_phys_health[pi['id']] = None
@@ -166,23 +166,23 @@ def device_one(R, M, V):
                 if ph_val != None:
                     if ph_val > 50:
                         active_intf.html(
-                            COL(2, style='padding:0px 5px 0px 5px').html(
-                                DIV(style='float:left;').html(Figure.Donut(ph_val, 100 - ph_val, height=20, **Figure.THEME_HEALTH)),
-                                DIV(style='padding-left:22px;').html(ph_name)
+                            COL(2, STYLE='padding:0px 5px 0px 5px').html(
+                                DIV(STYLE='float:left;').html(FIGURE.DONUT(ph_val, 100 - ph_val, height=20, **FIGURE.THEME_HEALTH)),
+                                DIV(STYLE='padding-left:22px;').html(ph_name)
                             )
                         )
                     else:
                         active_intf.html(
-                            COL(2, style='padding:0px 5px 0px 5px').html(
-                                DIV(style='float:left;').html(Figure.Donut(100 - ph_val, ph_val, height=20, **Figure.THEME_UTIL)),
-                                DIV(style='padding-left:22px;').html(ph_name)
+                            COL(2, STYLE='padding:0px 5px 0px 5px').html(
+                                DIV(STYLE='float:left;').html(FIGURE.DONUT(100 - ph_val, ph_val, height=20, **FIGURE.THEME_UTIL)),
+                                DIV(STYLE='padding-left:22px;').html(ph_name)
                             )
                         )
                 else:
                     active_intf.html(
-                        COL(2, style='padding:0px 5px 0px 5px').html(
-                            DIV(style='float:left;').html(Figure.Donut(0, 100, height=20, **Figure.THEME_HEALTH)),
-                            DIV(style='padding-left:22px;').html(ph_name)
+                        COL(2, STYLE='padding:0px 5px 0px 5px').html(
+                            DIV(STYLE='float:left;').html(FIGURE.DONUT(0, 100, height=20, **FIGURE.THEME_HEALTH)),
+                            DIV(STYLE='padding-left:22px;').html(ph_name)
                         )
                     )
     
@@ -202,4 +202,4 @@ def device_one(R, M, V):
             active_intf
         )
     V.Page.html(nav)
-    V.Menu.html(BUTTON(**(ATTR.click('/'.join(R.Path)) + {'class' : 'btn-primary'})).html(V('Refresh')))
+    V.Menu.html(BUTTON(CLASS='btn-primary').click('/'.join(R.Path)).html(V('Refresh')))

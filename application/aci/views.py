@@ -45,10 +45,26 @@ from platform import node
 #===============================================================================
 @pageview(Manager)
 def overview(R, M, V):
-    if not M: V.Page.html(Alert(V('Info'), V('Non-exist APIC Connection'), **{'class' : 'alert-info'})); return
+    if not M: V.Page.html(ALERT(V('Info'), V('Non-exist APIC Connection'), CLASS='alert-info')); return
     #===========================================================================
     # Count Chart
     #===========================================================================
+    
+#     cnt_nd, cnt_tt, cnt_bd, cnt_epg, cnt_ep, cnt_ft, cnt_ct, cnt_47d, cnt_47g, cnt_fc, cnt_fj, cnt_fn, cnt_fw = Burster(
+#     )(M.Node.count
+#     )(M.Tenant.count
+#     )(M.BridgeDomain.count
+#     )(M.EPG.count
+#     )(M.Endpoint.count
+#     )(M.Filter.count
+#     )(M.Contract.count
+#     )(M.Class('vnsCDev').count
+#     )(M.Class('vnsGraphInst').count
+#     )(M.Fault.list, severity='critical'
+#     )(M.Fault.list, severity='major'
+#     )(M.Fault.list, severity='minor'
+#     )(M.Fault.list, severity='warning'
+#     ).run()
     cnt_nd = M.Node.count()
     cnt_tt = M.Tenant.count()
     cnt_bd = M.BridgeDomain.count()
@@ -69,24 +85,24 @@ def overview(R, M, V):
     
     for domain_name in M:
         V.Page.html(
-            Panel(**{'class' : 'panel-dgrey'}).Head('<strong>%s %s</strong>' % (domain_name, V('Domain'))).Body(
+            PANEL(CLASS='panel-dgrey').Head(STRONG().html('%s %s' % (domain_name, V('Domain')))).Body(
                 ROW().html(
-                    COL(1, 'md').html(Gauge('Node', *resolution(cnt_nd[domain_name], 100), style='height:100px;')),
-                    COL(1, 'md').html(Gauge('Tenant', *resolution(cnt_tt[domain_name], 100), style='height:100px;')),
-                    COL(1, 'md').html(Gauge('BD', *resolution(cnt_bd[domain_name], 100), style='height:100px;')),
-                    COL(1, 'md').html(Gauge('EPG', *resolution(cnt_epg[domain_name], 100), style='height:100px;')),
-                    COL(1, 'md').html(Gauge('EP', *resolution(cnt_ep[domain_name], 100), style='height:100px;')),
-                    COL(1, 'md').html(Gauge('Filter', *resolution(cnt_ft[domain_name], 100), style='height:100px;')),
-                    COL(1, 'md').html(Gauge('Contract', *resolution(cnt_ct[domain_name], 100), style='height:100px;')),
-                    COL(1, 'md').html(Gauge('L4/7Devices', *resolution(cnt_47d[domain_name], 100), style='height:100px;')),
-                    COL(1, 'md').html(Gauge('L4/7Graphs', *resolution(cnt_47g[domain_name], 100), style='height:100px;')),
+                    COL(1, 'md').html(GAUGE('Node', *resolution(cnt_nd[domain_name], 100), STYLE='height:100px;')),
+                    COL(1, 'md').html(GAUGE('Tenant', *resolution(cnt_tt[domain_name], 100), STYLE='height:100px;')),
+                    COL(1, 'md').html(GAUGE('BD', *resolution(cnt_bd[domain_name], 100), STYLE='height:100px;')),
+                    COL(1, 'md').html(GAUGE('EPG', *resolution(cnt_epg[domain_name], 100), STYLE='height:100px;')),
+                    COL(1, 'md').html(GAUGE('EP', *resolution(cnt_ep[domain_name], 100), STYLE='height:100px;')),
+                    COL(1, 'md').html(GAUGE('Filter', *resolution(cnt_ft[domain_name], 100), STYLE='height:100px;')),
+                    COL(1, 'md').html(GAUGE('Contract', *resolution(cnt_ct[domain_name], 100), STYLE='height:100px;')),
+                    COL(1, 'md').html(GAUGE('L4/7Devices', *resolution(cnt_47d[domain_name], 100), STYLE='height:100px;')),
+                    COL(1, 'md').html(GAUGE('L4/7Graphs', *resolution(cnt_47g[domain_name], 100), STYLE='height:100px;')),
                     COL(3, 'md').html(
-                        DIV(style='text-align:center;font-size:10px;font-weight:bold;color:#999;margin:0px;padding-top:6px;').html('Faults'),
+                        DIV(STYLE='text-align:center;font-size:10px;font-weight:bold;color:#999;margin:0px;padding-top:6px;').html('Faults'),
                         ROW().html(
-                            COL(3, style='padding-top:0px;').html(Gauge('critical', *resolution(len(cnt_fc[domain_name]), 100), style='height:70px;')),
-                            COL(3, style='padding-top:0px;').html(Gauge('major', *resolution(len(cnt_fj[domain_name]), 100), style='height:70px;')),
-                            COL(3, style='padding-top:0px;').html(Gauge('minor', *resolution(len(cnt_fn[domain_name]), 100), style='height:70px;')),
-                            COL(3, style='padding-top:0px;').html(Gauge('warning', *resolution(len(cnt_fw[domain_name]), 100), style='height:70px;'))
+                            COL(3, STYLE='padding-top:0px;').html(GAUGE('critical', *resolution(len(cnt_fc[domain_name]), 100), STYLE='height:70px;')),
+                            COL(3, STYLE='padding-top:0px;').html(GAUGE('major', *resolution(len(cnt_fj[domain_name]), 100), STYLE='height:70px;')),
+                            COL(3, STYLE='padding-top:0px;').html(GAUGE('minor', *resolution(len(cnt_fn[domain_name]), 100), STYLE='height:70px;')),
+                            COL(3, STYLE='padding-top:0px;').html(GAUGE('warning', *resolution(len(cnt_fw[domain_name]), 100), STYLE='height:70px;'))
                         )
                     )
                 )
@@ -98,9 +114,9 @@ def overview(R, M, V):
     #===========================================================================
     health = M.getHealth()
     dns = sorted(health)
-    topo_hist = Chart.Line(height=295, min=0, max=100, *health['_tstamp'])
-    node_hist = Chart.Line(height=145, min=0, max=100, *health['_tstamp'])
-    epgs_hist = Chart.Line(height=200, min=0, max=100, *health['_tstamp'])
+    topo_hist = CHART.LINE(height=295, min=0, max=100, *health['_tstamp'])
+    node_hist = CHART.LINE(height=145, min=0, max=100, *health['_tstamp'])
+    epgs_hist = CHART.LINE(height=200, min=0, max=100, *health['_tstamp'])
     node_cur = []
     epgs_cur = []
     
@@ -125,30 +141,31 @@ def overview(R, M, V):
     epgs_cur = sorted(epgs_cur, key=lambda node: node[1])
     for nc in node_cur: node_cols.append(nc[0]); node_vals.append(nc[1])
     for ec in epgs_cur: epgs_cols.append(ec[0]); epgs_vals.append(ec[1])
-    node_now = Chart.Bar(height=145, xaxis=False, order=Chart.ORDER_ASC, *node_cols, **Chart.THEME_HEALTH).Data(V('Current Health'), *node_vals)
-    epgs_now = Chart.Bar(height=200, xaxis=False, order=Chart.ORDER_ASC, *epgs_cols, **Chart.THEME_HEALTH).Data(V('Current Health'), *epgs_vals)
+    node_now = CHART.BAR(height=145, xaxis=False, order=CHART.ORDER_ASC, *node_cols, **CHART.THEME_HEALTH).Data(V('Current Health'), *node_vals)
+    epgs_now = CHART.BAR(height=200, xaxis=False, order=CHART.ORDER_ASC, *epgs_cols, **CHART.THEME_HEALTH).Data(V('Current Health'), *epgs_vals)
     
     V.Page.html(
         ROW().html(
             COL(6).html(
-                Panel(**{'class' : 'panel-dgrey'}).Head(STRONG().html(V('Total Health'))).Body(topo_hist)
+                PANEL(CLASS='panel-dgrey').Head(STRONG().html(V('Total Health'))).Body(topo_hist)
             ),
             COL(6).html(
-                Panel(**{'class' : 'panel-dgrey'}).Head(STRONG().html(V('Node Health'))).Body(node_hist, node_now)
+                PANEL(CLASS='panel-dgrey').Head(STRONG().html(V('Node Health'))).Body(node_hist, node_now)
             )
         ),
-        Panel(**{'class' : 'panel-dgrey'}).Head(STRONG().html(V('EPG Health'))).Body(
+        PANEL(CLASS='panel-dgrey').Head(STRONG().html(V('EPG Health'))).Body(
             ROW().html(
                 COL(6).html(epgs_hist),
                 COL(6).html(epgs_now)
             )
         )
     )
-    V.Menu.html(BUTTON(**(ATTR.click('/'.join(R.Path)) + {'class' : 'btn-primary'})).html(V('Refresh')))
+    
+    V.Menu.html(BUTTON(CLASS='btn-primary').click('/'.join(R.Path)).html(V('Refresh')))
 
 @pageview(Manager)
 def healthview(R, M, V):
-    if not M: V.Page.html(Alert(V('Info'), V('Non-exist APIC Connection'), **{'class' : 'alert-info'})); return
+    if not M: V.Page.html(ALERT(V('Info'), V('Non-exist APIC Connection'), CLASS='alert-info')); return
     health = M.getHealth()
     dns = sorted(health)
     node_list = ROW()
@@ -166,42 +183,49 @@ def healthview(R, M, V):
             name = re.sub('(uni/|tn-|ap-|epg-)', '', dn)
             val = health[dn][-1]
             epgs_list.html(
-                COL(6, style='padding:0px 5px 0px 5px').html(
-                    DIV(style='text-align:center;font-size:14px;font-weight:bold;color:#fff;background-color:%s;width:50px;height:20px;float:left;border-right:1px solid #fff;border-radius:3px;' % hcolor(val)).html(val),
-                    DIV(style='float:left;').html(Figure.Line(*health[dn], width=80, height=20, **Figure.THEME_HEALTH)),
-                    DIV(style='padding-left:135px;font-weight:bold;', **ATTR.click('/aci/show/epgroup/%s' % dn)).html(SMALL().html(name))
+                COL(6, STYLE='padding:0px 5px 0px 5px;').html(
+                    DIV(STYLE='text-align:center;font-size:14px;font-weight:bold;color:#fff;background-color:%s;width:50px;height:20px;float:left;border-right:1px solid #fff;border-radius:3px;' % hcolor(val)).html(str(val)),
+                    DIV(STYLE='float:left;').html(FIGURE.LINE(*health[dn], width=80, height=20, **FIGURE.THEME_HEALTH)),
+                    DIV(STYLE='padding-left:135px;font-weight:bold;').click('/aci/show/epgroup/%s' % dn).html(SMALL().html(name))
                 )
             )
         elif '/node-' in dn:
             name = re.sub('(topology/|pod-|node-)', '', dn)
             val = health[dn][-1]
             node_list.html(
-                COL(3, style='padding:0px 5px 0px 5px').html(
-                    DIV(style='text-align:center;font-size:14px;font-weight:bold;color:#fff;background-color:%s;width:50px;height:20px;float:left;border-right:1px solid #fff;border-radius:3px;' % hcolor(val)).html(val),
-                    DIV(style='float:left;').html(Figure.Line(*health[dn], width=80, height=20, **Figure.THEME_HEALTH)),
-                    DIV(style='padding-left:135px;font-weight:bold;', **ATTR.click('/aci/show/device/%s' % dn)).html(SMALL().html(name))
+                COL(3, STYLE='padding:0px 5px 0px 5px').html(
+                    DIV(STYLE='text-align:center;font-size:14px;font-weight:bold;color:#fff;background-color:%s;width:50px;height:20px;float:left;border-right:1px solid #fff;border-radius:3px;' % hcolor(val)).html(str(val)),
+                    DIV(STYLE='float:left;').html(FIGURE.LINE(*health[dn], width=80, height=20, **FIGURE.THEME_HEALTH)),
+                    DIV(STYLE='padding-left:135px;font-weight:bold;').click('/aci/show/device/%s' % dn).html(SMALL().html(name))
                 )
             )
     
     V.Page.html(
-        Panel(**{'class' : 'panel-dgrey'}).Head(STRONG().html(V('Node Health'))).Body(node_list),
-        Panel(**{'class' : 'panel-dgrey'}).Head(STRONG().html(V('EPG Health'))).Body(epgs_list),
+        PANEL(CLASS='panel-dgrey').Head(STRONG().html(V('Node Health'))).Body(node_list),
+        PANEL(CLASS='panel-dgrey').Head(STRONG().html(V('EPG Health'))).Body(epgs_list),
     )
-    
-    V.Menu.html(BUTTON(**(ATTR.click('/'.join(R.Path)) + {'class' : 'btn-primary'})).html(V('Refresh')))
+    V.Menu.html(BUTTON(CLASS='btn-primary').click('/'.join(R.Path)).html(V('Refresh')))
 
 @pageview(Manager)
 def topoview(R, M, V):
-    if not M: V.Page.html(Alert(V('Info'), V('Non-exist APIC Connection'), **{'class' : 'alert-info'})); return
+    if not M: V.Page.html(ALERT(V('Info'), V('Non-exist APIC Connection'), CLASS='alert-info')); return
+    
+#     tns, aps, epgs, pods, nodes = Burster(
+#     )(M.Tenant.list
+#     )(M.AppProfile.list
+#     )(M.EPG.list
+#     )(M.Pod.list
+#     )(M.Node.list
+#     ).run()
     tns = M.Tenant.list()
     aps = M.AppProfile.list()
     epgs = M.EPG.list()
     pods = M.Pod.list()
     nodes = M.Node.list()
     
-    nav = Navigation()
+    nav = NAV()
     for domain_name in M:
-        topo = Topo(height=0)
+        topo = TOPO(height=0)
         for tn in tns[domain_name]: set_topo(topo, tn['dn'], color='navy', path_color='black')
         for ap in aps[domain_name]: set_topo(topo, ap['dn'], color='blue')
         for pod in pods[domain_name]: set_topo(topo, pod['dn'], color='maroon', path_color='black')
@@ -213,21 +237,21 @@ def topoview(R, M, V):
                 set_topo(topo, path['tDn'], color='indigo', path_color='orangered')
                 topo.Edge(epg['dn'], path['tDn'])
         
-        nav.Tab(domain_name, DIV(style='text-align:center;padding-top:10px;').html(topo))
+        nav.Tab(domain_name, DIV(STYLE='text-align:center;padding-top:10px;').html(topo))
     
     V.Page.html(nav)
-    V.Menu.html(BUTTON(**(ATTR.click('/'.join(R.Path)) + {'class' : 'btn-primary'})).html(V('Refresh')))
+    V.Menu.html(BUTTON(CLASS='btn-primary').click('/'.join(R.Path)).html(V('Refresh')))
 
 @pageview(Manager)
 def host(R, M, V):
-    if not M: V.Page.html(Alert(V('Info'), V('Non-exist APIC Connection'), **{'class' : 'alert-info'})); return
+    if not M: V.Page.html(ALERT(V('Info'), V('Non-exist APIC Connection'), CLASS='alert-info')); return
     if R.Method == 'GET':
         if len(R.Path) > 3: host_one(R, M, V)
         else: host_all(R, M, V)
 
 @pageview(Manager)
 def device(R, M, V):
-    if not M: V.Page.html(Alert(V('Info'), V('Non-exist APIC Connection'), **{'class' : 'alert-info'})); return
+    if not M: V.Page.html(ALERT(V('Info'), V('Non-exist APIC Connection'), CLASS='alert-info')); return
     if R.Method == 'GET':
         plen = len(R.Path)
         if plen > 4: device_one(R, M, V)
@@ -236,51 +260,51 @@ def device(R, M, V):
      
 @pageview(Manager)
 def tenant(R, M, V):
-    if not M: V.Page.html(Alert(V('Info'), V('Non-exist APIC Connection'), **{'class' : 'alert-info'})); return
+    if not M: V.Page.html(ALERT(V('Info'), V('Non-exist APIC Connection'), CLASS='alert-info')); return
     if R.Method == 'GET':
         if len(R.Path) > 3: tenant_one(R, M, V)
         else: tenant_all(R, M, V)
 
 @pageview(Manager)
 def epg(R, M, V):
-    if not M: V.Page.html(Alert(V('Info'), V('Non-exist APIC Connection'), **{'class' : 'alert-info'})); return
+    if not M: V.Page.html(ALERT(V('Info'), V('Non-exist APIC Connection'), CLASS='alert-info')); return
     if R.Method == 'GET':
         if len(R.Path) > 3: epg_one(R, M, V)
         else: epg_all(R, M, V)
     
 @pageview(Manager)
 def endpoint(R, M, V):
-    if not M: V.Page.html(Alert(V('Info'), V('Non-exist APIC Connection'), **{'class' : 'alert-info'})); return
+    if not M: V.Page.html(ALERT(V('Info'), V('Non-exist APIC Connection'), CLASS='alert-info')); return
     if R.Method == 'GET':
         if len(R.Path) > 3: ep_one(R, M, V)
         else: ep_all(R, M, V)
 
 @pageview(Manager)
 def contract(R, M, V):
-    if not M: V.Page.html(Alert(V('Info'), V('Non-exist APIC Connection'), **{'class' : 'alert-info'})); return
+    if not M: V.Page.html(ALERT(V('Info'), V('Non-exist APIC Connection'), CLASS='alert-info')); return
     if R.Method == 'GET':
         if len(R.Path) > 3: contract_one(R, M, V)
         else: contract_all(R, M, V)
 
 @pageview(Manager)
 def external(R, M, V):
-    if not M: V.Page.html(Alert(V('Info'), V('Non-exist APIC Connection'), **{'class' : 'alert-info'})); return
+    if not M: V.Page.html(ALERT(V('Info'), V('Non-exist APIC Connection'), CLASS='alert-info')); return
     if R.Method == 'GET':
         if len(R.Path) > 3: external_one(R, M, V)
         else: external_all(R, M, V)
 
-@pageview(Manager)
+@pageview(Manager, fault_async=fault_async)
 def fault(R, M, V):
-    if not M: V.Page.html(Alert(V('Info'), V('Non-exist APIC Connection'), **{'class' : 'alert-info'})); return
+    if not M: V.Page.html(ALERT(V('Info'), V('Non-exist APIC Connection'), CLASS='alert-info')); return
     if R.Method == 'GET':
         plen = len(R.Path)
         if plen > 4: fault_one(R, M, V)
-        elif plen > 3: fault_all(R, M, V)
+#         elif plen > 3: fault_all(R, M, V)
         else: fault_all(R, M, V)
 
 @pageview(Manager)
 def epg_util(R, M, V):
-    if not M: V.Page.html(Alert(V('Info'), V('Non-exist APIC Connection'), **{'class' : 'alert-info'})); return
+    if not M: V.Page.html(ALERT(V('Info'), V('Non-exist APIC Connection'), CLASS='alert-info')); return
     domain_name = None
     if len(R.Path) > 3: domain_name = R.Path[3]
     elif len(M) == 1: domain_name = M.keys()[0]
@@ -290,6 +314,10 @@ def epg_util(R, M, V):
     # Get Data
     #===========================================================================
         ctrl = M[domain_name]
+#         bytes, pkts = Burster(
+#         )(ctrl.Class('l2IngrBytesAg15min').list, detail=True
+#         )(ctrl.Class('l2IngrPktsAg15min').list, detail=True
+#         ).run()
         bytes = ctrl.Class('l2IngrBytesAg15min').list(detail=True)
         pkts = ctrl.Class('l2IngrPktsAg15min').list(detail=True)
 
@@ -297,7 +325,7 @@ def epg_util(R, M, V):
     # Logic
     #===========================================================================
         if bytes:
-            table = DataTable(V('Name'), V('Unicast'), V('Multicast'))
+            table = TABLE.BASIC(V('Name'), V('Unicast'), V('Multicast'))
             start = bytes[0]['repIntvStart'][11:-13]
             end = bytes[0]['repIntvEnd'][11:-13]
             tub = 0.00
@@ -309,7 +337,7 @@ def epg_util(R, M, V):
                 raw = re.sub('(uni/|tn-|ap-|epg-)', '', dn).split('/')
                 path_raw = '/'.join(raw[:2])
                 name_raw = raw[2]
-                name = PARA().html(SMALL().html(path_raw + '/')).html(Get('/aci/show/epgroup/%s/%s' % (domain_name, dn)).html(name_raw))
+                name = PARA().html(SMALL().html(path_raw + '/'), GET('/aci/show/epgroup/%s/%s' % (domain_name, dn)).html(name_raw))
                 ub = round(float(data['unicastRate']), 2)
                 mb = round(float(data['multicastRate']), 2)
                 tub += ub
@@ -326,30 +354,30 @@ def epg_util(R, M, V):
     #===========================================================================
     # View
     #===========================================================================
-            V.Page.html(HEAD(1).html('%s %s' % (domain_name, V('Domain'))))
             V.Page.html(
+                HEAD(1).html('%s %s' % (domain_name, V('Domain'))),
                 ROW().html(
-                    COL(6).html(CountPanel(V('Start'), 'hourglass-start', start, **{'class' : 'panel-dgrey'})),
-                    COL(6).html(CountPanel(V('End'), 'hourglass-end', end, **{'class' : 'panel-dgrey'}))
+                    COL(6).html(COUNTER(V('Start'), 'hourglass-start', start, CLASS='panel-dgrey')),
+                    COL(6).html(COUNTER(V('End'), 'hourglass-end', end, CLASS='panel-dgrey'))
                 ),
                 ROW().html(
-                    COL(12).html(CountPanel(V('Total Unicast Bytes'), 'arrow-circle-o-right', tub, **{'class' : 'panel-dgrey'}))
+                    COL(12).html(COUNTER(V('Total Unicast Bytes'), 'arrow-circle-o-right', tub, CLASS='panel-dgrey'))
                 ),
                 ROW().html(
-                    COL(12).html(CountPanel(V('Total Multicast Bytes'), 'share-alt', tmb, **{'class' : 'panel-dgrey'}))
-                )
+                    COL(12).html(COUNTER(V('Total Multicast Bytes'), 'share-alt', tmb, CLASS='panel-dgrey'))
+                ),
+                table
             )
-            V.Page.html(table)
     else:
-        lg = ListGroup()
-        for domain_name in M: lg.html(HEAD(3, **ATTR.click('/aci/stat/epgstat/%s' % domain_name)).html(domain_name))
+        lg = LISTGROUP()
+        for domain_name in M: lg.html(HEAD(3).click('/aci/stat/epgstat/%s' % domain_name).html(domain_name))
         V.Page.html(lg)
     
-    V.Menu.html(BUTTON(**(ATTR.click('/'.join(R.Path)) + {'class' : 'btn-primary'})).html(V('Refresh')))
+    V.Menu.html(BUTTON(CLASS='btn-primary').click('/'.join(R.Path)).html(V('Refresh')))
 
 @pageview(Manager)
 def intf_util(R, M, V):
-    if not M: V.Page.html(Alert(V('Info'), V('Non-exist APIC Connection'), **{'class' : 'alert-info'})); return
+    if not M: V.Page.html(ALERT(V('Info'), V('Non-exist APIC Connection'), CLASS='alert-info')); return
     domain_name = None
     node_dn = None
     if len(R.Path) > 3:
@@ -365,7 +393,7 @@ def intf_util(R, M, V):
         tib = 0.00
         teb = 0.00
         if intfs:
-            table = DataTable(V('Name'), V('Ingress'), V('Egress'))
+            table = TABLE.BASIC(V('Name'), V('Ingress'), V('Egress'))
             for intf in intfs:
                 intf_dn = intf['dn']
                 try:
@@ -377,8 +405,8 @@ def intf_util(R, M, V):
                     end = igr['repIntvEnd'][11:-13]
                 ibavg = round(float(igr['bytesRateAvg']), 2)
                 iuavg = round(float(igr['utilAvg']), 2)
-                ebavg = round(float(igr['bytesRateAvg']), 2)
-                euavg = round(float(igr['utilAvg']), 2)
+                ebavg = round(float(egr['bytesRateAvg']), 2)
+                euavg = round(float(egr['utilAvg']), 2)
                 tib += ibavg
                 teb += ebavg
                 
@@ -387,48 +415,52 @@ def intf_util(R, M, V):
                 
                 table.Record(intf['id'], igr_val, egr_val)
             
-            V.Page.html(HEAD(1).html(name))
             V.Page.html(
+                HEAD(1).html(name),
                 ROW().html(
-                    COL(6).html(CountPanel(V('Start'), 'hourglass-start', start, **{'class' : 'panel-dgrey'})),
-                    COL(6).html(CountPanel(V('End'), 'hourglass-end', end, **{'class' : 'panel-dgrey'}))
+                    COL(6).html(COUNTER(V('Start'), 'hourglass-start', start, CLASS='panel-dgrey')),
+                    COL(6).html(COUNTER(V('End'), 'hourglass-end', end, CLASS='panel-dgrey'))
                 ),
                 ROW().html(
-                    COL(12).html(CountPanel(V('Total Ingress Bytes'), 'download', tib, **{'class' : 'panel-dgrey'}))
+                    COL(12).html(COUNTER(V('Total Ingress Bytes'), 'download', tib, CLASS='panel-dgrey'))
                 ),
                 ROW().html(
-                    COL(12).html(CountPanel(V('Total Egress Bytes'), 'upload', teb, **{'class' : 'panel-dgrey'}))
-                )
+                    COL(12).html(COUNTER(V('Total Egress Bytes'), 'upload', teb, CLASS='panel-dgrey'))
+                ),
+                table
             )
-            V.Page.html(table)
     
     else:
-        lg = ListGroup()
+        lg = LISTGROUP()
+#         leafs, spines = Burster(
+#         )(M.Node.list, role='leaf', sort='dn', detail=True
+#         )(M.Node.list, role='spine', sort='dn', detail=True
+#         ).run()
+        leafs = M.Node.list(role='leaf', sort='dn', detail=True)
+        spines = M.Node.list(role='spine', sort='dn', detail=True)
         for domain_name in M:
-            nodes = M.Node.list(role='leaf', sort='dn', detail=True)
-            for node in nodes[domain_name]:
+            for node in leafs[domain_name]:
                 if node['fabricSt'] == 'active':
                     name = domain_name + re.sub('(topology|pod-|node-)', '', node['dn'])
-                    lg.html(HEAD(3, **ATTR.click('/aci/stat/intfstat/%s/%s' % (domain_name, node['dn']))).html(name))
-            nodes = M.Node.list(role='spine', sort='dn', detail=True)
-            for node in nodes[domain_name]:
+                    lg.html(HEAD(3).click('/aci/stat/intfstat/%s/%s' % (domain_name, node['dn'])).html(name))
+            for node in spines[domain_name]:
                 if node['fabricSt'] == 'active':
                     name = domain_name + re.sub('(topology|pod-|node-)', '', node['dn'])
-                    lg.html(HEAD(3, **ATTR.click('/aci/stat/intfstat/%s/%s' % (domain_name, node['dn']))).html(name))
+                    lg.html(HEAD(3).click('/aci/stat/intfstat/%s/%s' % (domain_name, node['dn'])).html(name))
         V.Page.html(lg)
     
-    V.Menu.html(BUTTON(**(ATTR.click('/'.join(R.Path)) + {'class' : 'btn-primary'})).html(V('Refresh')))
+    V.Menu.html(BUTTON(CLASS='btn-primary').click('/'.join(R.Path)).html(V('Refresh')))
 
 @pageview(Manager)
 def acl_permit(R, M, V):
-    if not M: V.Page.html(Alert(V('Info'), V('Non-exist APIC Connection'), **{'class' : 'alert-info'})); return
+    if not M: V.Page.html(ALERT(V('Info'), V('Non-exist APIC Connection'), CLASS='alert-info')); return
     domain_name = None
     if len(R.Path) > 3: domain_name = R.Path[3]
     elif len(M) == 1: domain_name = M.keys()[0]
     if domain_name != None:
         cnt_dict = {}
-        cnt_table = DataTable(V('Source'), V('Destination'), V('Protocol'), V('Count'))
-        ts_table = DataTable(V('Time Stamp'), V('Source'), V('Destination'), V('Protocol'), V('Path'), V('Length'))
+        cnt_table = TABLE.BASIC(V('Source'), V('Destination'), V('Protocol'), V('Count'))
+        ts_table = TABLE.BASIC(V('Time Stamp'), V('Source'), V('Destination'), V('Protocol'), V('Path'), V('Length'))
         pkts = M[domain_name].Class('acllogPermitL3Pkt').list(detail=True)
         for pkt in pkts:
             if pkt['protocol'] in ['udp', 'tcp']:
@@ -457,22 +489,22 @@ def acl_permit(R, M, V):
             ts_table
         )
     else:
-        lg = ListGroup()
-        for domain_name in M: lg.html(HEAD(3, **ATTR.click('/aci/stat/acl_permit/%s' % domain_name)).html(domain_name))
+        lg = LISTGROUP()
+        for domain_name in M: lg.html(HEAD(3).click('/aci/stat/acl_permit/%s' % domain_name).html(domain_name))
         V.Page.html(lg)
     
-    V.Menu.html(BUTTON(**(ATTR.click('/'.join(R.Path)) + {'class' : 'btn-primary'})).html(V('Refresh')))
+    V.Menu.html(BUTTON(CLASS='btn-primary').click('/'.join(R.Path)).html(V('Refresh')))
 
 @pageview(Manager)
 def acl_deny(R, M, V):
-    if not M: V.Page.html(Alert(V('Info'), V('Non-exist APIC Connection'), **{'class' : 'alert-info'})); return
+    if not M: V.Page.html(ALERT(V('Info'), V('Non-exist APIC Connection'), CLASS='alert-info')); return
     domain_name = None
     if len(R.Path) > 3: domain_name = R.Path[3]
     elif len(M) == 1: domain_name = M.keys()[0]
     if domain_name != None:
         cnt_dict = {}
-        cnt_table = DataTable(V('Source'), V('Destination'), V('Protocol'), V('Count'))
-        ts_table = DataTable(V('Time Stamp'), V('Source'), V('Destination'), V('Protocol'), V('Path'), V('Length'))
+        cnt_table = TABLE.BASIC(V('Source'), V('Destination'), V('Protocol'), V('Count'))
+        ts_table = TABLE.BASIC(V('Time Stamp'), V('Source'), V('Destination'), V('Protocol'), V('Path'), V('Length'))
         pkts = M[domain_name].Class('acllogDropL3Pkt').list(detail=True)
         for pkt in pkts:
             if pkt['protocol'] in ['udp', 'tcp']:
@@ -501,24 +533,24 @@ def acl_deny(R, M, V):
             ts_table
         )
     else:
-        lg = ListGroup()
-        for domain_name in M: lg.html(HEAD(3, **ATTR.click('/aci/stat/acl_deny/%s' % domain_name)).html(domain_name))
+        lg = LISTGROUP()
+        for domain_name in M: lg.html(HEAD(3).click('/aci/stat/acl_deny/%s' % domain_name).html(domain_name))
         V.Page.html(lg)
     
-    V.Menu.html(BUTTON(**(ATTR.click('/'.join(R.Path)) + {'class' : 'btn-primary'})).html(V('Refresh')))
+    V.Menu.html(BUTTON(CLASS='btn-primary').click('/'.join(R.Path)).html(V('Refresh')))
 
 @pageview(Manager)
 def eptracker(R, M, V):
-    if not M: V.Page.html(Alert(V('Info'), V('Non-exist APIC Connection'), **{'class' : 'alert-info'})); return
+    if not M: V.Page.html(ALERT(V('Info'), V('Non-exist APIC Connection'), CLASS='alert-info')); return
     if R.Method == 'GET' and len(R.Path) > 3 and R.Path[3] == 'init': M.initEndpoint()
-    table = DataTable(V('Domain'), V('MAC'), V('IP'), V('EPG'), V('Interface'), V('Start'), V('Stop'))
+    table = TABLE.BASIC(V('Domain'), V('MAC'), V('IP'), V('EPG'), V('Interface'), V('Start'), V('Stop'))
     eps = EPTracker.objects.all()
     for ep in eps:
         epg = ep.tenant + '/' + ep.app + '/' + ep.epg
         intf = ' '
         for iname in ep.intf.split(','): intf += '<p><small>' + iname + ',&nbsp;</small></p>'
         table.Record(ep.domain,
-                     Get('/aci/show/endpoint/%s/%s' % (ep.domain, ep.dn)).html(ep.mac),
+                     GET('/aci/show/endpoint/%s/%s' % (ep.domain, ep.dn)).html(ep.mac),
                      ep.ip,
                      '<small>' + epg + '</small>',
                      intf,
@@ -528,13 +560,13 @@ def eptracker(R, M, V):
         
     V.Page.html(table)
     V.Menu.html(
-        BUTTON(**(ATTR.click('/aci/tool/eptracker') + {'class' : 'btn-primary'})).html(V('Refresh')),
-        BUTTON(**(ATTR.click('/aci/tool/eptracker/init') + {'class' : 'btn-success'})).html(V('Reload'))
+        BUTTON(CLASS='btn-primary').click('/aci/tool/eptracker').html(V('Refresh')),
+        BUTTON(CLASS='btn-success').click('/aci/tool/eptracker/init').html(V('Reload'))
     )
 
 @pageview(Manager)
 def ofinder(R, M, V):
-    if not M: V.Page.html(Alert(V('Info'), V('Non-exist APIC Connection'), **{'class' : 'alert-info'})); return
+    if not M: V.Page.html(ALERT(V('Info'), V('Non-exist APIC Connection'), CLASS='alert-info')); return
     if R.Method == 'GET' and len(R.Path) > 3:
         domain_name = R.Path[3]
         obj_name = '/'.join(R.Path[4:])
@@ -546,32 +578,32 @@ def ofinder(R, M, V):
         obj_name = None
         
     V.Page.html(
-        Post('/aci/tool/ofinder', V('Search'), **{'class' : 'btn-primary', 'style' : 'float:right;'}
-        ).Select('domain_name', Post.TopLabel(V('APIC Domain Name')), *M.keys()
-        ).Text('obj_name', Post.TopLabel(V('Object Name')), placeholder=V('DN or Class Name'))
+        POST('/aci/tool/ofinder', V('Search'), CLASS='btn-primary', STYLE='float:right;'
+        ).Select('domain_name', POST.LABEL_TOP(V('APIC Domain Name')), *M.keys()
+        ).Text('obj_name', POST.LABEL_TOP(V('Object Name')), placeholder=V('DN or Class Name'))
     )
     
     if domain_name != None and obj_name != None:
         if '/' in obj_name:
-            nav = Navigation()
+            nav = NAV()
             obj = M[domain_name](obj_name, detail=True)
-            kv = KeyVal()
+            kv = KEYVAL()
             for key in obj.keys(): kv.Data(key, obj[key])
             nav.Tab(V('Details'), kv)
             
             try: parent = obj.parent(detail=True)
             except: pass
             else:
-                kv = KeyVal()
-                for key in parent.keys(): kv.Data(key, parent[key] if key != 'dn' else Get('/aci/tool/ofinder/%s/%s' % (domain_name, parent[key])).html(parent[key]))
+                kv = KEYVAL()
+                for key in parent.keys(): kv.Data(key, parent[key] if key != 'dn' else GET('/aci/tool/ofinder/%s/%s' % (domain_name, parent[key])).html(parent[key]))
                 nav.Tab(V('Parent Details'), kv)
             
             citems = {}
             children = obj.children(detail=True, sort='dn')
             for child in children:
                 key = child.keys()
-                if child.class_name not in citems: citems[child.class_name] = FooTable(*['+' + k if k != 'dn' else V('DN') for k in key])
-                citems[child.class_name].Record(*[child[k] if k != 'dn' else Get('/aci/tool/ofinder/%s/%s' % (domain_name, child[k])).html(child[k]) for k in key])
+                if child.class_name not in citems: citems[child.class_name] = TABLE.FLIP(*['+' + k if k != 'dn' else V('DN') for k in key])
+                citems[child.class_name].Record(*[child[k] if k != 'dn' else GET('/aci/tool/ofinder/%s/%s' % (domain_name, child[k])).html(child[k]) for k in key])
             
             cdiv = DIV()
             for class_name in citems: cdiv.html(citems[class_name])
@@ -587,8 +619,8 @@ def ofinder(R, M, V):
             
             for obj in objs:
                 key = obj.keys()
-                if obj.class_name not in items: items[obj.class_name] = FooTable(*['+' + k if k != 'dn' else V('DN') for k in key])
-                items[obj.class_name].Record(*[obj[k] if k != 'dn' else Get('/aci/tool/ofinder/%s/%s' % (domain_name, obj[k])).html(obj[k]) for k in key])
+                if obj.class_name not in items: items[obj.class_name] = TABLE.FLIP(*['+' + k if k != 'dn' else V('DN') for k in key])
+                items[obj.class_name].Record(*[obj[k] if k != 'dn' else GET('/aci/tool/ofinder/%s/%s' % (domain_name, obj[k])).html(obj[k]) for k in key])
             
             div = DIV()
             for class_name in items: div.html(items[class_name])
@@ -597,42 +629,34 @@ def ofinder(R, M, V):
                 div
             )
     
-    V.Menu.html(BUTTON(**(ATTR.click('/'.join(R.Path)) + {'class' : 'btn-primary'})).html(V('Refresh')))
+    V.Menu.html(BUTTON(CLASS='btn-primary').click('/'.join(R.Path)).html(V('Refresh')))
 
 @pageview(Manager)
 def config(R, M, V):
     alert = None
     if R.Method == 'POST':
         if M.addDomain(R.Data['domain_name'], R.Data['ip'], R.Data['user'], R.Data['password']):
-            alert = Alert(V('Connection Success'),
-                          V('Setting %s with %s') % (R.Data['ip'], R.Data['domain_name']),
-                          **{'class' : 'alert-success'})
+            alert = ALERT(V('Connection Success'), V('Setting %s with %s') % (R.Data['ip'], R.Data['domain_name']), CLASS='alert-success')
         else:
-            alert = Alert(V('Connection Failed'),
-                          V('Incorrect Setting %s') % R.Data['domain_name'],
-                          **{'class' : 'alert-danger'})
+            alert = ALERT(V('Connection Failed'), V('Incorrect Setting %s') % R.Data['domain_name'], CLASS='alert-danger')
         
     elif R.Method == 'DELETE':
         if M.delDomain(R.Path[2]):
-            alert = Alert(V('Disconnection Success'),
-                          V('Erasing %s') % R.Path[2],
-                          **{'class' : 'alert-success'})
+            alert = ALERT(V('Disconnection Success'), V('Erasing %s') % R.Path[2], CLASS='alert-success')
         else:
-            alert = Alert(V('Disconnection Failed'),
-                          V('Incorrect Erasing %s') % R.Path[2],
-                          **{'class' : 'alert-danger'})
+            alert = ALERT(V('Disconnection Failed'), V('Incorrect Erasing %s') % R.Path[2], CLASS='alert-danger')
     
     V.Menu.html(
-        Modal(V('Register APIC Domain'), BUTTON(**{'class' : 'btn-primary', 'style' : 'float:right;'}).html(V('Connect APIC'))).html(
-            Post('/aci/conf', V('Register'), **{'class' : 'btn-primary', 'style' : 'float:right;'}
-            ).Text('domain_name', Post.TopLabel(V('APIC Domain Name')), placeholder=V('Unique Name Required')
-            ).Text('ip', Post.TopLabel(V('APIC Address')), placeholder='XXX.XXX.XXX.XXX'
-            ).Text('user', Post.TopLabel(V('Admin ID')), placeholder='admin'
-            ).Password(label=Post.TopLabel(V('Password')))
+        MODAL(V('Register APIC Domain'), BUTTON(CLASS='btn-primary', STYLE='float:right;').html(V('Connect APIC'))).html(
+            POST('/aci/conf', V('Register'), CLASS='btn-primary', STYLE='float:right;'
+            ).Text('domain_name', POST.LABEL_TOP(V('APIC Domain Name')), placeholder=V('Unique Name Required')
+            ).Text('ip', POST.LABEL_TOP(V('APIC Address')), placeholder='XXX.XXX.XXX.XXX'
+            ).Text('user', POST.LABEL_TOP(V('Admin ID')), placeholder='admin'
+            ).Password(label=POST.LABEL_TOP(V('Password')))
         )
     )
     
-    table = FooTable(V('Domain Name'), V('+APIC IP'), V('+Administrator ID'), V('+Start Connections'), V('+Max Connections'), '')
+    table = TABLE.FLIP(V('Domain Name'), V('+APIC IP'), V('+Administrator ID'), V('+Start Connections'), V('+Max Connections'), '')
     
     for domain_name in M:
         table.Record(domain_name,
@@ -640,7 +664,7 @@ def config(R, M, V):
                      M[domain_name]['user'],
                      M[domain_name]['conns'],
                      M[domain_name]['conn_max'],
-                     DelButton('/aci/conf/' + domain_name, V('Delete'), tail=True, **{'class' : 'btn-xs'}))
+                     DELETE.BUTTON('/aci/conf/%s' % domain_name, V('Delete'), tail=True, CLASS='btn-xs'))
     
     if alert != None: V.Page.html(alert)
     V.Page.html(table)

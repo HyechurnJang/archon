@@ -46,7 +46,7 @@ def ep_all(R, M, V):
     #===========================================================================
     # Logic
     #===========================================================================
-    table = DataTable(V('Domain'), V('Name'), V('EPG'), V('Path'), V('Encap'), V('IP'), V('NIC Type'))
+    table = TABLE.BASIC(V('Domain'), V('Name'), V('EPG'), V('Path'), V('Encap'), V('IP'), V('NIC Type'))
     ep_cnt = 0
     dcv_cnt = 0
     mng_cnt = 0
@@ -96,7 +96,7 @@ def ep_all(R, M, V):
                     intf = re.sub('(topology/|pod-|protpaths-|paths-|pathep-|\[|\])', '', intf)
             
             table.Record(domain_name,
-                         Get('/aci/show/endpoint/%s/%s' % (domain_name, dn)).html(mac),
+                         GET('/aci/show/endpoint/%s/%s' % (domain_name, dn)).html(mac),
                          epg_name, intf, encap, ip, nic_type)
     
     #===========================================================================
@@ -104,15 +104,15 @@ def ep_all(R, M, V):
     #===========================================================================
     V.Page.html(
         ROW().html(
-            COL(2).html(CountPanel(V('Endpoints'), 'plug', ep_cnt, **{'class' : 'panel-dgrey'})),
-            COL(2).html(CountPanel(V('Discovered'), 'flag-checkered', dcv_cnt, **{'class' : 'panel-dgrey'})),
-            COL(2).html(CountPanel(V('Management'), 'cog', mng_cnt, **{'class' : 'panel-dgrey'})),
-            COL(2).html(CountPanel(V('Physical'), 'server', phy_cnt, **{'class' : 'panel-dgrey'})),
-            COL(2).html(CountPanel(V('Hypervisor'), 'cubes', hyp_cnt, **{'class' : 'panel-dgrey'})),
-            COL(2).html(CountPanel(V('Virtual'), 'cube', vir_cnt, **{'class' : 'panel-dgrey'}))
+            COL(2).html(COUNTER(V('Endpoints'), 'plug', ep_cnt, CLASS='panel-dgrey')),
+            COL(2).html(COUNTER(V('Discovered'), 'flag-checkered', dcv_cnt, CLASS='panel-dgrey')),
+            COL(2).html(COUNTER(V('Management'), 'cog', mng_cnt, CLASS='panel-dgrey')),
+            COL(2).html(COUNTER(V('Physical'), 'server', phy_cnt, CLASS='panel-dgrey')),
+            COL(2).html(COUNTER(V('Hypervisor'), 'cubes', hyp_cnt, CLASS='panel-dgrey')),
+            COL(2).html(COUNTER(V('Virtual'), 'cube', vir_cnt, CLASS='panel-dgrey'))
         )
     ).html(table)
-    V.Menu.html(BUTTON(**(ATTR.click('/'.join(R.Path)) + {'class' : 'btn-primary'})).html(V('Refresh')))
+    V.Menu.html(BUTTON(CLASS='btn-primary').click('/'.join(R.Path)).html(V('Refresh')))
 
 def ep_one(R, M, V):
     #===========================================================================
@@ -120,27 +120,28 @@ def ep_one(R, M, V):
     #===========================================================================
     domain_name = R.Path[3]
     dn = '/'.join(R.Path[4:])
-    ep = M[domain_name](dn, detail=True)
+    try: ep = M[domain_name](dn, detail=True)
+    except: V.Page.html(ALERT(V('Non-Exist Resource'), V('Endpoint %s') % dn, CLASS='alert-danger')); return
     
     #===========================================================================
     # Logic    
     #===========================================================================
-    nav = Navigation()
+    nav = NAV()
     
     # Details
-    kv = KeyVal()
+    kv = KEYVAL()
     for key in ep.keys(): kv.Data(key, ep[key])
     nav.Tab(V('Details'), kv)
     
     # Topology
-    topo = Topo()
+    topo = TOPO()
     set_topo(topo, dn, color='red', path_color='orange', dot=True)
-    nav.Tab(V('Topology'), DIV(style='text-align:center;padding-top:10px;').html(topo))
+    nav.Tab(V('Topology'), DIV(STYLE='text-align:center;padding-top:10px;').html(topo))
     
     # EPG
     epg = ep.parent(detail=True)
     if epg and epg.class_name == 'fvAEPg':
-        kv = KeyVal()
+        kv = KEYVAL()
         for key in epg.keys(): kv.Data(key, epg[key])
         nav.Tab(V('EPG'), kv)
         
@@ -148,7 +149,7 @@ def ep_one(R, M, V):
     children = ep.children(detail=True)
     for child in children:
         if child.class_name == 'fvRsCEpToPathEp':
-            kv = KeyVal()
+            kv = KEYVAL()
             for key in child.keys(): kv.Data(key, child[key])
             nav.Tab(V('Path'), kv)
             set_topo(topo, child['tDn'])
@@ -177,44 +178,44 @@ def ep_one(R, M, V):
             key = nic.keys()
             host = nic.parent(detail=True)
             if nic.class_name == 'compPpNic':
-                if phy_nic == None: phy_nic = FooTable(*['+' + k if k != 'name' else V('Physical NIC') for k in key])
+                if phy_nic == None: phy_nic = TABLE.FLIP(*['+' + k if k != 'name' else V('Physical NIC') for k in key])
                 phy_nic.Record(*[nic[k] for k in key])
                 set_topo(topo, nic['dn'], color='green', path_color='green')
                 topo.Edge(dn, nic['dn'])
                 if host and host['dn'] not in hosts:
                     hosts.append(host['dn'])
                     key = host.keys()
-                    if phy_host == None: phy_host = FooTable(*['+' + k if k != 'name' else V('Physical Hosts') for k in key])
+                    if phy_host == None: phy_host = TABLE.FLIP(*['+' + k if k != 'name' else V('Physical Hosts') for k in key])
                     phy_host.Record(*[host[k] for k in key])
             elif nic.class_name == 'compVNic':
-                if vm_nic == None: vm_nic = FooTable(*['+' + k if k != 'name' else V('Virtual NIC') for k in key])
+                if vm_nic == None: vm_nic = TABLE.FLIP(*['+' + k if k != 'name' else V('Virtual NIC') for k in key])
                 vm_nic.Record(*[nic[k] for k in key])
                 set_topo(topo, nic['dn'], color='green', path_color='green')
                 topo.Edge(dn, nic['dn'])
                 if host and host['dn'] not in hosts:
                     hosts.append(host['dn'])
                     key = host.keys()
-                    if vm_host == None: vm_host = FooTable(*['+' + k if k != 'name' else V('Virtual Hosts') for k in key])
+                    if vm_host == None: vm_host = TABLE.FLIP(*['+' + k if k != 'name' else V('Virtual Hosts') for k in key])
                     vm_host.Record(*[host[k] for k in key])
             elif nic.class_name == 'compHpNic':
-                if hv_nic == None: hv_nic = FooTable(*['+' + k if k != 'name' else V('Hypervisor NIC') for k in key])
+                if hv_nic == None: hv_nic = TABLE.FLIP(*['+' + k if k != 'name' else V('Hypervisor NIC') for k in key])
                 hv_nic.Record(*[nic[k] for k in key])
                 set_topo(topo, nic['dn'], color='green', path_color='green')
                 topo.Edge(dn, nic['dn'])
                 if host and host['dn'] not in hosts:
                     hosts.append(host['dn'])
                     key = host.keys()
-                    if hv_host == None: hv_host = FooTable(*['+' + k if k != 'name' else V('Hypervisor Hosts') for k in key])
+                    if hv_host == None: hv_host = TABLE.FLIP(*['+' + k if k != 'name' else V('Hypervisor Hosts') for k in key])
                     hv_host.Record(*[host[k] for k in key])
             elif nic.class_name == 'compMgmtNic':
-                if mg_nic == None: mg_nic = FooTable(*['+' + k if k != 'name' else V('Management NIC') for k in key])
+                if mg_nic == None: mg_nic = TABLE.FLIP(*['+' + k if k != 'name' else V('Management NIC') for k in key])
                 mg_nic.Record(*[nic[k] for k in key])
                 set_topo(topo, nic['dn'], color='green', path_color='green')
                 topo.Edge(dn, nic['dn'])
                 if host and host['dn'] not in hosts:
                     hosts.append(host['dn'])
                     key = host.keys()
-                    if hv_host == None: hv_host = FooTable(*['+' + k if k != 'name' else V('Hypervisor Hosts') for k in key])
+                    if hv_host == None: hv_host = TABLE.FLIP(*['+' + k if k != 'name' else V('Hypervisor Hosts') for k in key])
                     hv_host.Record(*[host[k] for k in key])
         
     #===========================================================================
@@ -236,4 +237,4 @@ def ep_one(R, M, V):
         HEAD(4).html(ep['ip'])
     )
     V.Page.html(nav)
-    V.Menu.html(BUTTON(**(ATTR.click('/'.join(R.Path)) + {'class' : 'btn-primary'})).html(V('Refresh')))
+    V.Menu.html(BUTTON(CLASS='btn-primary').click('/'.join(R.Path)).html(V('Refresh')))

@@ -49,16 +49,20 @@ from models import *
 # Create your manager here.
 #===============================================================================
 
-ASA_MONSEC = APPLICATION_CONFIGS['asa_health_monitor_sec']
+ASA_HEALTH_MONITOR_SEC = APPLICATION_CONFIGS['asa_health_monitor_sec']
+ASA_HEALTH_MONITOR_CNT = 10
+
+ASA_OBJECT_CACHE_SEC = APPLICATION_CONFIGS['asa_object_cache_sec']
+ASA_NAT_CACHE_SEC = APPLICATION_CONFIGS['asa_nat_cache_sec']
 
 class HealthMonitor(pygics.Task):
     
-    def __init__(self, manager, mon_sec, mon_cnt):
-        pygics.Task.__init__(self, tick=mon_sec)
+    def __init__(self, manager):
+        pygics.Task.__init__(self, tick=ASA_HEALTH_MONITOR_SEC)
         self.manager = manager
-        self.count = mon_cnt
+        self.count = ASA_HEALTH_MONITOR_CNT
         self.health = {'_tstamp' : []}
-        for i in reversed(range(0, mon_cnt)):
+        for i in reversed(range(0, ASA_HEALTH_MONITOR_CNT)):
             self.health['_tstamp'].append('00:00:00')
         
     def task(self):
@@ -97,17 +101,47 @@ class HealthMonitor(pygics.Task):
     def getHealth(self):
         return self.health
 
+class ObjectCache(pygics.Task):
+    
+    def __init__(self, manager):
+        pygics.Task.__init__(self, tick=ASA_OBJECT_CACHE_SEC)
+        self.manager = manager
+        self.object = {}
+        self.object_group = {}
+        
+    def task(self):
+        o = self.manager.Object()
+        og = self.manager.ObjectGroup()
+        self.object = o
+        self.object_group = og
+
+class NATCache(pygics.Task):
+    
+    def __init__(self, manager):
+        pygics.Task.__init__(self, tick=ASA_OBJECT_CACHE_SEC)
+        self.manager = manager
+        self.nat = self.manager.NAT.list()
+        
+    def task(self):
+        self.nat = self.manager.NAT.list()
+
 class Manager(archon.ManagerAbstraction, asadipy.MultiDomain):
     
-    def __init__(self, mon_sec=ASA_MONSEC, mon_cnt=10, debug=False):
+    def __init__(self, debug=False):
         asadipy.MultiDomain.__init__(self, conns=5, conn_max=10, debug=debug)
         self.scheduler = pygics.Scheduler(10)
-        self.healthmon = HealthMonitor(self, mon_sec, mon_cnt)
-        self.scheduler.register(self.healthmon)
+        self.healthmon = HealthMonitor(self)
+        self.objectcache = ObjectCache(self)
+        self.natcache = NATCache(self)
+        self.scheduler.register(self.healthmon, self.objectcache, self.natcache)
         self.scheduler.start()
         domains = Domain.objects.all()
         for domain in domains:
             asadipy.MultiDomain.addDomain(self, domain.name, domain.ip, domain.user, domain.password)
+        self.ipusers = {}
+        ipusers = IpUser.objects.all()
+        for ipuser in ipusers:
+            self.ipusers['%s-%s' % (ipuser.domain, ipuser.ip)] = {'user': ipuser.user, 'domain' : ipuser.domain, 'ip' : ipuser.ip}
     
     def addDomain(self, domain_name, ip, user, pwd):
         try: Domain.objects.get(name=domain_name)
@@ -123,10 +157,38 @@ class Manager(archon.ManagerAbstraction, asadipy.MultiDomain):
         asadipy.MultiDomain.delDomain(self, domain_name)
         domain.delete()
         return True
+    
+    def addIpUser(self, domain, ip, user):
+        key = '%s-%s' % (domain, ip)
+        if key in self.ipusers: return False
+        self.ipusers['%s-%s' % (domain, ip)] = {'user': user, 'domain' : domain, 'ip' : ip}
+        IpUser.objects.create(domain=domain, ip=ip, user=user)
+        return True
+    
+    def getIpUser(self, domain, ip):
+        key = '%s-%s' % (domain, ip)
+        if key in self.ipusers: return self.ipusers['%s-%s' % (domain, ip)]['user']
+        return 'N/A' 
+    
+    def delIpUser(self, domain, ip):
+        key = '%s-%s' % (domain, ip)
+        if key in self.ipusers:
+            self.ipusers.pop('%s-%s' % (domain, ip))
+            IpUser.objects.filter(domain=domain, ip=ip).delete()
+            return True
+        return False
 
     def getHealth(self):
         return self.healthmon.getHealth()
     
+    def getObject(self):
+        return self.objectcache.object
+    
+    def getObjectGroup(self):
+        return self.objectcache.object_group
+    
+    def getNAT(self):
+        return self.natcache.nat
 
 
 

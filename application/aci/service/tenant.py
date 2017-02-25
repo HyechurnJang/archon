@@ -38,36 +38,17 @@ from archon import *
 from common import *
 
 def tenant_all(R, M, V):
-#     #===========================================================================
-#     # Method Work
-#     #===========================================================================
-#     alert = None
-#     if R.Method == 'POST':
-#         try: M[R.Data['domain_name']].Tenant.create(name=R.Data['tenant_name'])
-#         except:
-#             alert = Alert(V('Create Failed'),
-#                           V('Incorrect Config Data'),
-#                           **{'class' : 'alert-danger'})
-#         else:
-#             alert = Alert(V('Create Success'),
-#                           V('Tenant %s/%s Created') % (R.Data['domain_name'], R.Data['tenant_name']),
-#                           **{'class' : 'alert-success'})
-#     if R.Method == 'DELETE':
-#         domain_name = R.Path[3]
-#         dn = '/'.join(R.Path[4:])
-#         try: M[domain_name](dn).delete()
-#         except:
-#             alert = Alert(V('Delete Failed'),
-#                           V('Incorrect Domain or Tenant Name'),
-#                           **{'class' : 'alert-danger'})
-#         else:
-#             alert = Alert(V('Delete Success'),
-#                           V('Tenant %s/%s Deleted') % (domain_name, dn),
-#                           **{'class' : 'alert-success'})
-            
     #===========================================================================
     # Get Data
     #===========================================================================
+#     tns, epgs, bds, ctxs, ctrs, flts = Burster(
+#     )(M.Tenant.list, sort='name'
+#     )(M.EPG.list, sort='name'
+#     )(M.BridgeDomain.list, sort='name'
+#     )(M.Context.list, sort='name'
+#     )(M.Contract.list, sort='name'
+#     )(M.Filter.list, sort='name'
+#     ).run()
     tns = M.Tenant.list(sort='name')
     epgs = M.EPG.list(sort='name')
     bds = M.BridgeDomain.list(sort='name')
@@ -78,12 +59,12 @@ def tenant_all(R, M, V):
     #===========================================================================
     # Logic
     #===========================================================================
-    table = DataTable(V('Domain'), V('Name'), V('EPG'), V('Bridge Domain'), V('Context'), V('Contract'), V('Filter'))
+    table = TABLE.BASIC(V('Domain'), V('Name'), V('EPG'), V('Bridge Domain'), V('Context'), V('Contract'), V('Filter'))
     tn_cnt = 0
     for domain_name in M:
         for tn in tns[domain_name]:
             tn_cnt += 1
-            name = Get('/aci/show/tenant/%s/%s' % (domain_name, tn['dn'])).html(tn['name'])
+            name = GET('/aci/show/tenant/%s/%s' % (domain_name, tn['dn'])).html(tn['name'])
             epg_data = ' '
             bd_data = ' '
             ctx_data = ' '
@@ -107,19 +88,12 @@ def tenant_all(R, M, V):
 #     if alert != None: V.Page.html(alert)
     V.Page.html(
         ROW().html(
-            COL(12).html(CountPanel(V('Tenants'), 'users', tn_cnt, **{'class' : 'panel-dgrey'}))
+            COL(12).html(COUNTER(V('Tenants'), 'users', tn_cnt, CLASS='panel-dgrey'))
         ),
         table
     )
 
-    V.Menu.html(
-        BUTTON(**(ATTR.click('/'.join(R.Path)) + {'class' : 'btn-primary'})).html(V('Refresh')),
-#         Modal(V('Create New Tenant'), BUTTON(**{'class' : 'btn-primary'}).html(V('Create'))).html(
-#             Post('/aci/show/tenant', V('Register'), **{'class' : 'btn-primary', 'style' : 'float:right;'}
-#             ).Text('domain_name', Post.TopLabel(V('Domain Name')), placeholder=V('Unique Name Required')
-#             ).Text('tenant_name', Post.TopLabel(V('Tenant Name')), placeholder=V('Unique Name Required'))
-#         )
-    )
+    V.Menu.html(BUTTON(CLASS='btn-primary').click('/'.join(R.Path)).html(V('Refresh')))
 
 def tenant_one(R, M, V):
     #===========================================================================
@@ -132,23 +106,23 @@ def tenant_one(R, M, V):
     #===========================================================================
     # Logic
     #===========================================================================
-    nav = Navigation()
+    nav = NAV()
     
     # Health
     hdata = M.getHealth()
     health = None
-    try: health = Chart.Line(*hdata['_tstamp'], **Chart.THEME_HEALTH).Data(dn, *hdata[domain_name + '/' + dn])
+    try: health = CHART.LINE(*hdata['_tstamp'], **CHART.THEME_HEALTH).Data(dn, *hdata[domain_name + '/' + dn])
     except: pass
     
     # Details
-    kv = KeyVal()
+    kv = KEYVAL()
     for key in tenant.keys(): kv.Data(key, tenant[key])
     nav.Tab(V('Details'), kv)
     
     # Topology
-    topo = Topo()
+    topo = TOPO()
     set_topo(topo, dn, color='red', path_color='orange', dot=True)
-    nav.Tab(V('Topology'), DIV(style='text-align:center;padding-top:10px;').html(topo))
+    nav.Tab(V('Topology'), DIV(STYLE='text-align:center;padding-top:10px;').html(topo))
 
     # App Profile
     datas = tenant.AppProfile.list(detail=True, sort='name')
@@ -156,14 +130,14 @@ def tenant_one(R, M, V):
         key = tenant.AppProfile.keys()
         col = ['+' + k if k != 'name' else V('Name') for k in key]
         col.append(V('+EPG'))
-        table = FooTable(*col)
+        table = TABLE.FLIP(*col)
         nav.Tab(V('Application Profiles'), table)
         for data in datas:
             val = [data[k] for k in key]
             sub_val = DIV()
             sub_datas = data.EPG.list(sort='name')
             if sub_datas:
-                for sub_data in sub_datas: sub_val.html(PARA().html(Get('/aci/show/epgroup/%s/%s' % (domain_name, sub_data['dn'])).html(sub_data['name'])))
+                for sub_data in sub_datas: sub_val.html(PARA().html(GET('/aci/show/epgroup/%s/%s' % (domain_name, sub_data['dn'])).html(sub_data['name'])))
             val.append(sub_val)
             table.Record(*val)
             set_topo(topo, data['dn'], color='orange', path_color='orange')
@@ -174,7 +148,7 @@ def tenant_one(R, M, V):
         key = tenant.BridgeDomain.keys()
         col = ['+' + k if k != 'name' else V('Name') for k in key]
         col.append(V('+Subnet'))
-        table = FooTable(*col)
+        table = TABLE.FLIP(*col)
         nav.Tab(V('Bridge Domains'), table)
         for data in datas:
             val = [data[k] for k in key]
@@ -190,7 +164,7 @@ def tenant_one(R, M, V):
     datas = tenant.Context.list(detail=True, sort='name')
     if datas:
         key = tenant.Context.keys()
-        table = FooTable(*['+' + k if k != 'name' else V('Name') for k in key])
+        table = TABLE.FLIP(*['+' + k if k != 'name' else V('Name') for k in key])
         nav.Tab(V('Contexts'), table)
         for data in datas: table.Record(*[data[k] for k in key])
         set_topo(topo, data['dn'], color='orange', path_color='orange')
@@ -199,7 +173,7 @@ def tenant_one(R, M, V):
     datas = tenant.L3Out.list(detail=True, sort='name')
     if datas:
         key = tenant.L3Out.keys()
-        table = FooTable(*['+' + k if k != 'name' else V('Name') for k in key])
+        table = TABLE.FLIP(*['+' + k if k != 'name' else V('Name') for k in key])
         nav.Tab(V('L3 Externals'), table)
         for data in datas: table.Record(*[data[k] for k in key])
         set_topo(topo, data['dn'], color='orange', path_color='orange')
@@ -210,7 +184,7 @@ def tenant_one(R, M, V):
         key = tenant.Contract.keys()
         col = ['+' + k if k != 'name' else V('Name') for k in key]
         col.append(V('+Subject'))
-        table = FooTable(*col)
+        table = TABLE.FLIP(*col)
         nav.Tab(V('Contracts'), table)
         for data in datas:
             val = [data[k] for k in key]
@@ -228,7 +202,7 @@ def tenant_one(R, M, V):
         key = tenant.Filter.keys()
         col = ['+' + k if k != 'name' else V('Name') for k in key]
         col.append(V('+Filter Entry'))
-        table = FooTable(*col)
+        table = TABLE.FLIP(*col)
         nav.Tab(V('Filters'), table)
         for data in datas:
             val = [data[k] for k in key]
@@ -246,9 +220,4 @@ def tenant_one(R, M, V):
     V.Page.html(HEAD(1).html(tenant['name']))
     if health != None: V.Page.html(ROW().html(health))
     V.Page.html(nav)
-    V.Menu.html(
-        BUTTON(**(ATTR.click('/'.join(R.Path)) + {'class' : 'btn-primary'})).html(V('Refresh')),
-#         Modal(V('Delete Tenant'), BUTTON(**{'class' : 'btn-danger'}).html(V('Delete'))).html(
-#             HEAD(3).html(V('Is Right ?'), DelButton('/aci/show/tenant/%s/%s' % (domain_name, dn), tail=True))
-#         )
-    )
+    V.Menu.html(BUTTON(CLASS='btn-primary').click('/'.join(R.Path)).html(V('Refresh')))

@@ -49,5 +49,10 @@ class Domain(models.Model):
     user = models.CharField(max_length=32)
     password = models.CharField(max_length=32)
     created_date = models.DateTimeField(default=timezone.now)
-
 modelview(Domain)
+
+class IpUser(models.Model):
+    ip = models.CharField(max_length=32)
+    domain = models.CharField(max_length=64)
+    user = models.CharField(max_length=64)
+modelview(IpUser)

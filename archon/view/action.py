@@ -36,73 +36,74 @@
 
 from core import *
 
-class Get(STRONG):
+class GET(STRONG):
     
     def __init__(self, url, **attrs):
-        STRONG.__init__(self, **ATTR.merge(attrs, {'class' : 'data-action', 'onclick' : "GetData('%s');" % url}))
+        STRONG.__init__(self, **TAG.ATTR(attrs, CLASS='data-action', **{'onclick':"GetData('%s');" % url}))
 
-class Post(DIV):
+class POST(DIV):
     
-    class TopLabel(LABEL):
+    class LABEL_TOP(LABEL):
         def __init__(self, label, **attrs):
             LABEL.__init__(self, **attrs)
             self.html(label)
             
-    class InLabel(SPAN):
+    class LABEL_INLINE(SPAN):
         def __init__(self, label, **attrs):
-            SPAN.__init__(self, **ATTR.merge(attrs, {'class' : 'input-group-addon'}))
+            SPAN.__init__(self, **TAG.ATTR(attrs, CLASS='input-group-addon'))
             self.html(label)
      
     def __init__(self, url, label='Submit', **attrs):
         DIV.__init__(self)
-        self.uuid = VIEW.getUUID()
+        self.uuid = TAG.UUID()
         self.html(
-            DIV(**{'class' : 'input-group'}).html(
-                BUTTON(**ATTR.merge(attrs, {'onclick' : "PostData('." + self.uuid + "','%s');" % url})).html(label)
+            DIV(CLASS='input-group').html(
+                BUTTON(**TAG.ATTR(attrs, **{'onclick':"PostData('." + self.uuid + "','%s');" % url})).html(label)
             )
         )
          
     def Text(self, name, label, **attrs):
-        self['elements'].insert(-1,
-            DIV(**{'class' : 'input-group'}).html(label).html(
-                INPUT(**ATTR.merge(attrs, {'type' : 'text', 'name' : name, 'class' : 'form-control ' + self.uuid}))
+        self['elems'].insert(-1,
+            DIV(CLASS='input-group').html(
+                label,
+                INPUT(**TAG.ATTR(attrs, TYPE='text', NAME=name, CLASS='form-control ' + self.uuid))
             )
         )
         return self
     
     def Password(self, name='password', label='Password', **attrs):
-        self['elements'].insert(-1,
-            DIV(**{'class' : 'input-group'}).html(label).html(
-                INPUT(**ATTR.merge(attrs, {'type' : 'password', 'name' : name, 'class' : 'form-control ' + self.uuid}))
+        self['elems'].insert(-1,
+            DIV(CLASS='input-group').html(
+                label,
+                INPUT(**TAG.ATTR(attrs, TYPE='password', NAME=name, CLASS='form-control ' + self.uuid))
             )
         )
         return self
     
-    def Select(self, name, label='select', *elements, **attrs):
-        
-        select = SELECT(**ATTR.merge(attrs, {'name' : name, 'class' : 'form-control ' + self.uuid}))
-        for element in elements: select.html(OPTION().html(element))
-        self['elements'].insert(-1,
-            DIV(**{'class' : 'input-group'}).html(label).html(select)
+    def Select(self, name, label='select', *elems, **attrs):
+        select = SELECT(**TAG.ATTR(attrs, NAME=name, CLASS='form-control ' + self.uuid))
+        for elem in elems: select.html(OPTION().html(elem))
+        self['elems'].insert(-1,
+            DIV(CLASS='input-group').html(label).html(select)
         )
         return self
     
-class Delete(ANCH):
-    
-    def __init__(self, element, url, **attrs):
-        ANCH.__init__(self, **ATTR.merge(attrs, {'class' : 'data-action', 'onclick' : "DeleteData('%s');" % url}))
-        self.html(element)
+class DELETE(ANCH):
 
-class DelClick(VIEW):
+    class CLICK(TAG):
     
-    def __init__(self, url, tail=False, **attrs):
-        if tail: VIEW.__init__(self, 'button', **ATTR.merge(attrs, {'class' : 'close', 'onclick' : "DeleteData('%s');" % url}))
-        else: VIEW.__init__(self, 'button', **ATTR.merge(attrs, {'class' : 'close', 'onclick' : "DeleteData('%s');" % url, 'style' : 'float:none;'}))
-        self.html('&times;')
-
-class DelButton(BUTTON):
+        def __init__(self, url, tail=False, **attrs):
+            if tail: TAG.__init__(self, 'button', **TAG.ATTR(attrs, CLASS='close', **{'onclick':"DeleteData('%s');" % url}))
+            else: TAG.__init__(self, 'button', **TAG.ATTR(attrs, CLASS='close', STYLE='float:none;', **{'onclick':"DeleteData('%s');" % url}))
+            self.html('&times;')
     
-    def __init__(self, url, text='Delete', tail=False, **attrs):
-        if tail: BUTTON.__init__(self, **ATTR.merge(attrs, {'class' : 'btn-danger', 'onclick' : "DeleteData('%s');" % url, 'style' : 'float:right;'}))
-        else: BUTTON.__init__(self, **ATTR.merge(attrs, {'class' : 'btn-danger', 'onclick' : "DeleteData('%s');" % url}))
-        self.html(text)
+    class BUTTON(BUTTON):
+        
+        def __init__(self, url, text='Delete', tail=False, **attrs):
+            if tail: BUTTON.__init__(self, **TAG.ATTR(attrs, CLASS='btn-danger', STYLE='float:right;', **{'onclick' : "DeleteData('%s');" % url}))
+            else: BUTTON.__init__(self, **TAG.ATTR(attrs, CLASS='btn-danger', **{'onclick' : "DeleteData('%s');" % url}))
+            self.html(text)
+    
+    def __init__(self, elem, url, **attrs):
+        ANCH.__init__(self, **TAG.ATTR(attrs, CLASS='data-action', **{'onclick':"DeleteData('%s');" % url}))
+        self.html(elem)

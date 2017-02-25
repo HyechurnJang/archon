@@ -37,29 +37,18 @@
 from core import *
 
 class ROW(DIV):
-    
-    def __init__(self, **attrs):
-        DIV.__init__(self, **ATTR.merge(attrs, {'class' : 'row'}))
+    def __init__(self, **attrs): DIV.__init__(self, **TAG.ATTR(attrs, CLASS='row'))
 
 class COL(DIV):
-    
-    def __init__(self, size, scr='xs', **attrs):
-        DIV.__init__(self, **ATTR.merge(attrs, {'class' : 'col-%s-%d colwrapper' % (scr, size)}))
+    def __init__(self, size, scr='sm', **attrs): DIV.__init__(self, **TAG.ATTR(attrs, CLASS='col-%s-%d colwrapper' % (scr, size)))
 
-class Icon(VIEW):
-    
-    def __init__(self, icon, **attrs):
-        VIEW.__init__(self, 'i', **ATTR.merge(attrs, {'class' : 'fa fa-%s' % icon}))
+class STRWRAP(DIV):
+    def __init__(self, width=100, **attrs): DIV.__init__(self, **TAG.ATTR(attrs, CLASS='strwrap', STYLE='width:%dpx;' % width))
 
-class StrWrap(DIV):
-    
-    def __init__(self, width=100, **attrs):
-        DIV.__init__(self, **ATTR.merge(attrs, {'class' : 'strwrap', 'style' : 'width:%dpx;' % width}))
-
-class KeyVal(DIV):
+class KEYVAL(DIV):
     
     def __init__(self, **attrs):
-        DIV.__init__(self, **ATTR.merge(attrs, {'class' : 'keyval'}))
+        DIV.__init__(self, **TAG.ATTR(attrs, CLASS='keyval'))
         self.table = TABLE()
         self.html(self.table)
         self.first = False
@@ -67,160 +56,179 @@ class KeyVal(DIV):
     def Data(self, key, val):
         if self.first: self.table.html(TR().html(TH().html(key)).html(TD().html(val)))
         else:
-            self.table.html(TR().html(TH(**{'class' : 'keyval-first'}).html(key)).html(TD(**{'class' : 'keyval-first'}).html(val)))
+            self.table.html(TR().html(TH(CLASS='keyval-first').html(key)).html(TD(CLASS='keyval-first').html(val)))
             self.first = True
+        return self
     
     def __len__(self, *args, **kwargs):
         return self.table.__len__()
 
-class Alert(DIV):
+class ALERT(DIV):
     
     def __init__(self, title, msg, **attrs):
-        DIV.__init__(self, **ATTR.merge(attrs, {'class' : 'alert alert-dismissible', 'role' : 'alert'}))
+        DIV.__init__(self, **TAG.ATTR(attrs, CLASS='alert alert-dismissible', **{'role':'alert'}))
         self.html(
-            VIEW('button', **{'type' : 'button', 'class' : 'close', 'data-dismiss' : 'alert', 'aria-label' : 'Close'}).html(
-                SPAN(**{'aria-hidden' : 'true'}).html('&times;')
-            )
-        ).html(STRONG().html(title)).html(msg)
+            TAG('button', TYPE='button', CLASS='close', **{'data-dismiss':'alert', 'aria-label':'Close'}).html(
+                SPAN(**{'aria-hidden':'true'}).html('&times;')
+            ),
+            STRONG().html(title),
+            msg
+        )
 
-class Panel(DIV):
+class PANEL(DIV):
     
     def __init__(self, **attrs):
-        DIV.__init__(self, **ATTR.merge(attrs, {'class' : 'panel'}))
-        self.head = DIV(**{'class' : 'panel-heading'})
-        self.body = DIV(**{'class' : 'panel-body'})
-        self.foot = DIV(**{'class' : 'panel-footer'})
+        DIV.__init__(self, **TAG.ATTR(attrs, CLASS='panel'))
+        self.head = DIV(CLASS='panel-heading')
+        self.body = DIV(CLASS='panel-body')
+        self.foot = DIV(CLASS='panel-footer')
     
-    def Head(self, *elements):
-        self.head.html(*elements)
-        if self.head not in self['elements']: self['elements'].insert(0, self.head)
+    def Head(self, *elems):
+        self.head.html(*elems)
+        if self.head not in self['elems']: self['elems'].insert(0, self.head)
         return self
     
-    def Body(self, *elements):
-        self.body.html(*elements)
-        if self.body not in self['elements']: self['elements'].append(self.body)
+    def Body(self, *elems):
+        self.body.html(*elems)
+        if self.body not in self['elems']: self['elems'].append(self.body)
         return self
     
-    def Foot(self, *elements):
-        self.foot.html(*elements)
-        if self.foot not in self['elements']: self['elements'].append(self.foot)
+    def Foot(self, *elems):
+        self.foot.html(*elems)
+        if self.foot not in self['elems']: self['elems'].append(self.foot)
         return self
 
-class CountPanel(DIV):
+class COUNTER(DIV):
     
     def __init__(self, title, icon, count, **attrs):
-        DIV.__init__(self, **ATTR.merge(attrs, {'class' : 'panel'}))
+        DIV.__init__(self, **TAG.ATTR(attrs, CLASS='panel'))
         self.html(
-            DIV(**{'class' : 'panel-heading'}).html(
+            DIV(CLASS='panel-heading').html(
                 ROW().html(
-                    COL(4).html(
-                        Icon(icon, **{'class' : 'fa-5x'})
-                    )
-                ).html(
-                    COL(8, **{'class' : 'text-right'}).html(
-                        DIV(**{'class' : 'huge-font'}).html(str(count))
-                    ).html(
+                    COL(4).html(ICON(icon, CLASS='fa-5x')),
+                    COL(8, CLASS='text-right').html(
+                        DIV(CLASS='huge-font').html(str(count)),
                         DIV().html(STRONG().html(title))
                     )
                 )
             )
         )
     
-class Indent(DIV):
+class INDENT(DIV):
     
-    def __init__(self, **attrs):
-        DIV.__init__(self, **ATTR.merge(attrs, {'class' : 'indent'}))
+    def __init__(self, **attrs): DIV.__init__(self, **TAG.ATTR(attrs, CLASS='indent'))
 
-class Section(DIV):
+class SECTOR(DIV):
     
     def __init__(self, title, **attrs):
         DIV.__init__(self)
-        self.body = Indent(**attrs)
-        self['elements'].append(HEAD(3).html(title))
-        self['elements'].append(self.body)
+        self.body = INDENT(**attrs)
+        self['elems'].append(HEAD(3).html(title))
+        self['elems'].append(self.body)
         
-    def html(self, *elements):
-        for element in elements: self.body.html(element)
+    def html(self, *elems):
+        self.body.html(*elems)
         return self
 
-class ListGroup(UL):
+class LISTGROUP(UL):
     
     def __init__(self, **attrs):
-        UL.__init__(self, **ATTR.merge(attrs, {'class' : 'list-group'}))
+        UL.__init__(self, **TAG.ATTR(attrs, CLASS='list-group'))
     
-    def html(self, *elements):
-        for element in elements: self['elements'].append(LI(**{'class' : 'list-group-item'}).html(element))
+    def html(self, *elems):
+        for elem in elems: self['elems'].append(LI(CLASS='list-group-item').html(elem))
         return self
 
-class Navigation(DIV):
+class NAV(DIV):
      
     def __init__(self, **attrs):
         DIV.__init__(self, **attrs)
-        self.uuid = VIEW.getUUID()
+        self.uuid = TAG.UUID()
         self.tab_cnt = 0
         self.tab_first = True
-        self.tab = UL(**{'class' : 'nav nav-tabs', 'role' : 'tablist'})
-        self.content = DIV(**{'class' : 'tab-content'})
+        self.tab = UL(CLASS='nav nav-tabs', **{'role':'tablist'})
+        self.content = DIV(CLASS='tab-content')
         self.html(self.tab).html(self.content)
         
-    def Tab(self, label, element):
+    def Tab(self, label, elem):
         tid = '%s-%d' % (self.uuid, self.tab_cnt)
         self.tab_cnt += 1
         if self.tab_first:
-            lattr = {'role' : 'presentation', 'class' : 'active'}
-            dattr = {'role' : 'tabpanel', 'class' : 'tab-pane fade in active', 'id' : tid}
+            lattr = {'CLASS':'active', 'role':'presentation'}
+            dattr = {'ID':tid, 'CLASS':'tab-pane fade in active', 'role':'tabpanel'}
             self.tab_first = False
         else:
-            lattr = {'role' : 'presentation'}
-            dattr = {'role' : 'tabpanel', 'class' : 'tab-pane fade', 'id' : tid}
+            lattr = {'role':'presentation'}
+            dattr = {'ID':tid, 'CLASS':'tab-pane fade', 'role':'tabpanel'}
         self.tab.html(
             LI(**lattr).html(
-                ANCH(**{'href' : '#%s' % tid, 'aria-controls' : tid, 'role' : 'tab', 'data-toggle' : 'tab'}).html(label)
+                ANCH(**{'href':'#%s' % tid, 'aria-controls':tid, 'role':'tab', 'data-toggle':'tab'}).html(label)
             )
         )
-        self.content.html(DIV(**dattr).html(element))
+        self.content.html(DIV(**dattr).html(elem))
+        return self
 
-class Modal(DIV):
+class MODAL(DIV):
     
-    class Close(BUTTON):
+    class CLOSE(BUTTON):
         def __init__(self, text='Close', **attrs):
-            BUTTON.__init__(self, **ATTR.merge(attrs, {'data-dismiss' : 'modal'}))
+            BUTTON.__init__(self, **TAG.ATTR(attrs, **{'data-dismiss':'modal'}))
             self.html(text)
     
     def __init__(self, modal_title, click_element, **attrs):
         DIV.__init__(self)
-        uuid = VIEW.getUUID()
+        uuid = TAG.UUID()
         label_id = uuid + '-label'
         click_element['attrs']['data-toggle'] = 'modal'
         click_element['attrs']['data-target'] = '#%s' % uuid
-        self['elements'].append(click_element)
-        self.body = DIV(**ATTR.merge(attrs, {'class' : 'modal-body'}))
-        self['elements'].append(DIV(**{'class' : 'modal fade', 'id' : uuid, 'tabindex' : '-1', 'role' : 'dialog', 'aria-labelledby' : label_id}).html(
-                DIV(**{'class' : 'modal-dialog', 'role' : 'document'}).html(
-                    DIV(**{'class' : 'modal-content'}).html(
-                        DIV(**{'class' : 'modal-header'}).html(
-                            VIEW('button', **{'class' : 'close', 'data-dismiss' : 'modal', 'aria-label' : 'Close'}).html(SPAN(**{'aria-hidden' : 'true'}).html('&times;'))
-                        ).html(
-                            HEAD(4, **{'class' : 'modal-title', 'id' : label_id}).html(modal_title)
-                        )
-                    ).html(
+        self['elems'].append(click_element)
+        self.body = DIV(**TAG.ATTR(attrs, CLASS='modal-body'))
+        self['elems'].append(
+            DIV(CLASS='modal fade', ID=uuid, **{'tabindex':'-1', 'role':'dialog', 'aria-labelledby':label_id}).html(
+                DIV(CLASS='modal-dialog', **{'role':'document'}).html(
+                    DIV(CLASS='modal-content').html(
+                        DIV(CLASS='modal-header').html(
+                            TAG('button', CLASS='close', **{'data-dismiss':'modal', 'aria-label':'Close'}).html(
+                                SPAN(**{'aria-hidden':'true'}).html('&times;')
+                            ),
+                            HEAD(4, CLASS='modal-title', ID=label_id).html(modal_title)
+                        ),
                         self.body
                     )
                 )
             )
         )
 
-    def html(self, *elements):
-        for element in elements: self.body.html(element)
+    def html(self, *elems):
+        self.body.html(*elems)
         return self
 
-class JumboTron(DIV):
+class JUMBO(DIV):
     
     def __init__(self, **attrs):
-        DIV.__init__(self, **ATTR.merge(attrs, {'class' : 'jumbotron'}))
+        DIV.__init__(self, **TAG.ATTR(attrs, CLASS='jumbotron'))
 
-class FlipClock(VIEW):
+class FLIPCLOCK(TAG):
     
     def __init__(self, **attrs):
-        VIEW.__init__(self, 'DIV', **ATTR.merge(attrs, {'id' : VIEW.getUUID(), 'lib' : 'flipclock'}))
+        TAG.__init__(self, 'DIV', **TAG.ATTR(attrs, ID=TAG.UUID(), LIB='flipclock'))
+
+class OVERLAP(DIV):
+    
+    def __init__(self, width, height=None, **attrs):
+        style = 'width:%dpx;' % width
+        if height != None: style += 'height:%dpx;' %  height
+        DIV.__init__(self, **TAG.ATTR(attrs, STYLE=style))
+        self.over = DIV(STYLE='position:absolute;' + style)
+        self.under = DIV(STYLE=style)
+        self.html(self.over, self.under)
+    
+    def Under(self, *elems):
+        self.under.html(*elems)
+        return self
+    
+    def Over(self, *elems):
+        self.over.html(*elems)
+        return self
+    
     

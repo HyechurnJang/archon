@@ -37,6 +37,11 @@
 import re
 import json
 
+import gevent.monkey
+gevent.monkey.patch_socket()
+gevent.monkey.patch_ssl()
+import gevent
+
 from django.contrib import admin
 from django.contrib.auth.decorators import login_required
 from django.http import JsonResponse
@@ -44,7 +49,7 @@ from django.http import JsonResponse
 from archon.settings import SESSION_COOKIE_AGE
 from archon.view import *
 
-ARCHON_DEBUG = False
+ARCHON_DEBUG = True
 
 class ManagerAbstraction:
     
@@ -55,12 +60,52 @@ class ManagerAbstraction:
         if cls.__MANAGER__ == None: cls.__MANAGER__ = cls(*argv, **kargs)
         return cls.__MANAGER__
 
+class Burster:
+    
+    def __init__(self):
+        self.methods = []
+        self.args = []
+        self.kargs = []
+        self.length = 0
+        
+    def __call__(self, method, *argv, **kargs):
+        self.methods.append(method)
+        self.args.append(argv)
+        self.kargs.append(kargs)
+        self.length += 1
+        return self
+    
+    def run(self):
+        ret = [None for i in range(0, self.length)]
+        fetches = []
+        
+        def fetch(__method__, __ret__, __index__, *argv, **kargs):
+            try: __ret__[__index__] = __method__(*argv, **kargs)
+            except Exception as e: print str(e)
+        
+        for i in range(0, self.length):
+            fetches.append(gevent.spawn(fetch, self.methods[i], ret, i, *self.args[i], **self.kargs[i]))
+        try: gevent.joinall(fetches, raise_error=True)
+        except Exception as e:
+            print 'Burster', str(e)
+            for r in ret: print r
+        return ret
+
+class ArchonReq:
+    
+    def __init__(self, request, method, path, query, data):
+        self.Request = request
+        self.Method = method
+        self.Path = path
+        self.Query = query
+        self.Data = data
+
 class ArchonView:
     
-    class PageContent(VIEW):
+    class PageContent(TAG):
         
         def __init__(self):
-            VIEW.__init__(self, 'div', **{'class' : 'pagecontent'})
+            TAG.__init__(self, 'div', CLASS='pagecontent')
         
     def __init__(self, app, lang):
         self.Menu = DIV()
@@ -87,19 +132,10 @@ class ArchonView:
     
     @classmethod
     def __error__(cls, title, msg):
-        return {'menu' : DIV(), 'page' : Alert(title, msg, **{'class' : 'alert-danger'})}
+        return {'menu' : DIV(), 'page' : ALERT(title, msg, CLASS='alert-danger')}
 
-def pageview(manager_class):
+def pageview(manager_class, **async_path):
     
-    class Req:
-    
-        def __init__(self, request, method, path, query, data):
-            self.Request = request
-            self.Method = method
-            self.Path = path
-            self.Query = query
-            self.Data = data
-        
     def wrapper(view):
         
         @login_required
@@ -111,7 +147,11 @@ def pageview(manager_class):
             lang = filter(None, re.split(';|,|q=0.\d', request.META['HTTP_ACCEPT_LANGUAGE']))
             app = view.__module__.split('.')[1]
             
+            print method, path
+            
             v = ArchonView(app, lang)
+            try: m = manager_class.instance()
+            except Exception as e: return JsonResponse(ArchonView.__error__(v('manager allocation error'), str(e)))
             
             try:
                 if method == 'GET': query = request.GET; data = {}
@@ -120,11 +160,15 @@ def pageview(manager_class):
                 elif method == 'DELETE': query = {}; data = {}
                 else: query = {}; data = {}
             except Exception as e: return JsonResponse(ArchonView.__error__(v('request error'), str(e)))
+            r = ArchonReq(request, method, path, query, data)
             
-            try: m = manager_class.instance()
-            except Exception as e: return JsonResponse(ArchonView.__error__(v('manager allocation error'), str(e)))
-
-            r = Req(request, method, path, query, data)
+            async_path_names = async_path.keys()
+            for async_path_name in async_path_names:
+                if async_path_name in path:
+                    print 'Match Async Path', async_path_name
+                    try: return JsonResponse(async_path[async_path_name](r, m, v))
+                    except Exception as e: return JsonResponse(ArchonView.__error__(v('application error'), str(e)))
+            
             try: view(r, m, v)
             except Exception as e: return JsonResponse(ArchonView.__error__(v('application error'), str(e)))
             return JsonResponse(v.__render__())
@@ -135,20 +179,21 @@ def pageview(manager_class):
             lang = filter(None, re.split(';|,|q=0.\d', request.META['HTTP_ACCEPT_LANGUAGE']))
             app = view.__module__.split('.')[1]
             
-            print method
-            print path
-            
             v = ArchonView(app, lang)
+            m = manager_class.instance()
             
-            if method == 'GET': query = request.GET; data = {}
-            elif method == 'POST': query = request.POST; data = json.loads(request.body)
-            elif method == 'PUT': query = request.PUT; data = json.loads(request.body)
+            if method == 'GET': query = dict(request.GET); data = {}
+            elif method == 'POST': query = dict(request.POST); data = json.loads(request.body)
+            elif method == 'PUT': query = dict(request.PUT); data = json.loads(request.body)
             elif method == 'DELETE': query = {}; data = {}
             else: query = {}; data = {}
+            r = ArchonReq(request, method, path, query, data)
             
-            m = manager_class.instance()
-
-            r = Req(request, method, path, query, data)
+            async_path_names = async_path.keys()
+            for async_path_name in async_path_names:
+                if async_path_name in path:
+                    return JsonResponse(async_path[async_path_name](r, m, v))
+                    
             view(r, m, v)
             return JsonResponse(v.__render__())
         
@@ -159,3 +204,4 @@ def pageview(manager_class):
 
 def modelview(model):
     admin.site.register(model, admin.ModelAdmin)
+    

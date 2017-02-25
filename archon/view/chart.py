@@ -36,7 +36,7 @@
 
 from core import *
 
-class Chart:
+class CHART:
     
     ORDER_NON = 0
     ORDER_ASC = 1
@@ -49,10 +49,10 @@ class Chart:
     THEME_HEALTH = {'min' : 0, 'max' : 100, 'color' : COLOR_HEALTH}
     THEME_UTIL = {'min' : 0, 'max' : 100, 'color' : COLOR_UTIL}
     
-    class __Chart__(VIEW):
+    class __Chart__(TAG):
         
         def __init__(self, chart_type, *labels, **options):
-            VIEW.__init__(self, 'DIV', **{'id' : VIEW.getUUID(), 'lib' : 'dimple'})
+            TAG.__init__(self, 'DIV', ID=TAG.UUID(), LIB='dimple')
             if 'width' not in options: options['width'] = None              # None : auto, else : fixed
             if 'height' not in options: options['height'] = None            # None : auto, else : fixed
             if 'margin' not in options: options['margin'] = ['30px', '20px', '20px', '20px']
@@ -62,8 +62,8 @@ class Chart:
             if 'ykey' not in options: options['ykey'] = 'Y'                 # default : Y
             if 'xaxis' not in options: options['xaxis'] = True              # True : displayed, False : transparent
             if 'yaxis' not in options: options['yaxis'] = True              # True : displayed, False : transparent
-            if 'order' not in options: options['order'] = Chart.ORDER_NON   # ORDER_NON, ORDER_ASC, ORDER_DSC 
-            if 'color' not in options: options['color'] = Chart.COLOR_AUTO  # COLOR_AUTO, COLOR_HEALTH, COLOR_UTIL 
+            if 'order' not in options: options['order'] = CHART.ORDER_NON   # ORDER_NON, ORDER_ASC, ORDER_DSC 
+            if 'color' not in options: options['color'] = CHART.COLOR_AUTO  # COLOR_AUTO, COLOR_HEALTH, COLOR_UTIL 
             if 'legend' not in options: options['legend'] = False           # True : displayed, False : transparent
             if 'tooltip' not in options: options['tooltip'] = True          # True : displayed, False : transparent
             if 'pivot' not in options: options['pivot'] = False             # True : pivoted, False : general
@@ -114,10 +114,10 @@ class Chart:
                     self.options['max_g'] = str(255 - int((self.health_max * 255) / 100))
             return self
 
-    class Line(__Chart__):
+    class LINE(__Chart__):
           
         def __init__(self, *labels, **options):
-            Chart.__Chart__.__init__(self, 'line', *labels, **options)
+            CHART.__Chart__.__init__(self, 'line', *labels, **options)
              
         def Data(self, series, *vals):
             datasets = []
@@ -126,20 +126,20 @@ class Chart:
             self.series.append({'series' : series, 'datasets' : datasets})
             return self.__rgcalc__()
         
-    class Bar(__Chart__):
+    class BAR(__Chart__):
          
         def __init__(self, *labels, **options):
-            Chart.__Chart__.__init__(self, 'bar', *labels, **options)
+            CHART.__Chart__.__init__(self, 'bar', *labels, **options)
              
         def Data(self, series, *vals):
             for i in range(0, self.label_len):
                 self.series.append({self.xkey : self.labels[i], 'series' : series, self.ykey : self.__minmax__(vals[i])})
             return self.__rgcalc__()
     
-    class Pie(__Chart__):
+    class PIE(__Chart__):
         
         def __init__(self, *labels, **options):
-            Chart.__Chart__.__init__(self, 'pie', *labels, **options)
+            CHART.__Chart__.__init__(self, 'pie', *labels, **options)
              
         def Data(self, series, *vals):
             datasets = []
@@ -148,9 +148,9 @@ class Chart:
             self.series.append({'series' : series, 'datasets' : datasets})
             return self.__rgcalc__()
     
-    class Donut(__Chart__):
+    class DONUT(__Chart__):
         def __init__(self, *labels, **options):
-            Chart.__Chart__.__init__(self, 'donut', *labels, **options)
+            CHART.__Chart__.__init__(self, 'donut', *labels, **options)
              
         def Data(self, series, *vals):
             datasets = []
@@ -159,7 +159,7 @@ class Chart:
             self.series.append({'series' : series, 'datasets' : datasets})
             return self.__rgcalc__()
 
-class Figure:
+class FIGURE:
     
     COLOR_AUTO = 'A'
     COLOR_HEALTH = 'H'
@@ -168,48 +168,51 @@ class Figure:
     THEME_HEALTH = {'min' : 0, 'max' : 100, 'color' : COLOR_HEALTH}
     THEME_UTIL = {'min' : 0, 'max' : 100, 'color' : COLOR_UTIL}
 
-    class __Figure__(VIEW):
+    class __Figure__(TAG):
         
         def __init__(self, figure_type, *vals, **options):
-            VIEW.__init__(self, 'SPAN', **{'id' : VIEW.getUUID(), 'lib' : 'peity'})
+            TAG.__init__(self, 'SPAN', ID=TAG.UUID(), LIB='peity')
             if 'color' in options: color = options.pop('color')
-            else: color = Figure.COLOR_AUTO
+            else: color = FIGURE.COLOR_AUTO
             self['figure'] = {'type' : figure_type, 'color' : color, 'options' : options}
             self.html(','.join(str(s) for s in vals))
 
-    class Line(__Figure__):
+    class LINE(__Figure__):
         
         def __init__(self, *vals, **options):
-            Figure.__Figure__.__init__(self, 'line', *vals, **options)
+            FIGURE.__Figure__.__init__(self, 'line', *vals, **options)
             if len(vals) > 0 and vals[-1] != None: self['figure']['cval'] = vals[-1]
             else: self['figure']['cval'] = 0
 
-    class Bar(__Figure__):
+    class BAR(__Figure__):
         
         def __init__(self, *vals, **options):
-            Figure.__Figure__.__init__(self, 'bar', *vals, **options)
+            FIGURE.__Figure__.__init__(self, 'bar', *vals, **options)
     
-    class Pie(__Figure__):
+    class PIE(__Figure__):
         
         def __init__(self, *vals, **options):
-            Figure.__Figure__.__init__(self, 'pie', *vals, **options)
+            FIGURE.__Figure__.__init__(self, 'pie', *vals, **options)
             if len(vals) > 0 and vals[0] != None: self['figure']['cval'] = vals[0]
             else: self['figure']['cval'] = 0
     
-    class Donut(__Figure__):
+    class DONUT(__Figure__):
         
         def __init__(self, *vals, **options):
             if 'hole' in options: options['innerRadius'] = options.pop('hole')
-            Figure.__Figure__.__init__(self, 'donut', *vals, **options)
+            
+            # Tobe Add : transform="scale(-1,1) translate(-100,0)"
+            
+            FIGURE.__Figure__.__init__(self, 'donut', *vals, **options)
             if len(vals) > 0 and vals[0] != None: self['figure']['cval'] = vals[0]
             else: self['figure']['cval'] = 0
 
-class Topo(VIEW):
+class TOPO(TAG):
     
     def __init__(self, **options):
         if 'width' not in options: options['width'] = 0
         if 'height' not in options: options['height'] = 400
-        VIEW.__init__(self, 'CANVAS', **{'id' : VIEW.getUUID(), 'lib' : 'arbor', 'class' : 'arborwrapper'})
+        TAG.__init__(self, 'CANVAS', ID=TAG.UUID(), LIB='arbor', CLASS='arborwrapper')
         self.nodes = {}
         self.edges = {}
         self['topo'] = {
@@ -235,9 +238,9 @@ class Topo(VIEW):
         if name in self.nodes: return True
         return False
 
-class Gauge(VIEW):
+class GAUGE(TAG):
     
     def __init__(self, title, value, min=0, max=100, **attrs):
-        VIEW.__init__(self, 'DIV', **ATTR.merge(attrs, {'id' : VIEW.getUUID(), 'lib' : 'justgage'}))
+        TAG.__init__(self, 'DIV', **TAG.ATTR(attrs, ID=TAG.UUID(), LIB='justgage'))
         self['chart'] = {'title' : title, 'value' : value, 'min' : min, 'max' : max}
     

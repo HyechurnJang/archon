@@ -128,13 +128,17 @@ class MainPage:
 mainpage = MainPage()
 
 urlpatterns = [
-    url(r'^favicon\.ico$', RedirectView.as_view(url='/resources/images/favicon.ico')),
-    url(r'account/login/?$', auth_views.login, {'template_name': 'login.html'}, name='login'),
-    url(r'account/logout/?$', auth_views.logout, {'next_page': '/'}, name='logout'),
-    url(r'^admin/', admin.site.urls),
     url(r'^dashboard/', dashboard.dashboard),
+    url(r'^account/login/?$', auth_views.login, {'template_name': 'login.html'}, name='login'),
+    url(r'^account/logout/?$', auth_views.logout, {'next_page': '/'}, name='logout'),
+    url(r'^admin/', admin.site.urls),
+    url(r'^favicon\.ico$', RedirectView.as_view(url='/resources/images/favicon.ico')),
     url(r'^', mainpage.sendMainPage),
 ]
+
+application_setting = __import__('application')
+application_names = application_setting.APPLICATION_NAMES
+application_language = application_setting.APPLICATION_LANGUAGE
 
 def parse_urls(parent, urls):
     parent_url = '/' + '/'.join(parent)
@@ -147,13 +151,16 @@ def parse_urls(parent, urls):
         term = re.sub('[\^/\?+*]|(\\\[wdW])', '', urls._regex)
         ret = []
         for url in urls.urlconf_name: ret.append(parse_urls(parent + [term], url))
+        try: urls.namespace = urls.namespace[application_language]
+        except: pass
         return {'name' : parent_name + '-' + term, 'display' : urls.namespace, 'urls' : ret}
     elif isinstance(urls, RegexURLPattern):
         term = re.sub('[\^/\?+*]|(\\\[wdW])', '', urls._regex)
+        try: urls.name = urls.name[application_language]
+        except: pass
         return {'name' : parent_name + '-' + term, 'display' : urls.name, 'url' : parent_url + '/' + term}
     return None
 
-application_names = __import__('application').APPLICATION_NAMES
 navbar_desc = []
 print('1. Loading applications')
 for app in INSTALLED_APPS:

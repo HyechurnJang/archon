@@ -41,7 +41,20 @@ from . import views
 # Link your view here.
 #===============================================================================
 
+url_show = [
+    url(r'^static_nat/?', views.static_nat, name='Static NAT'),
+    url(r'^dynamic_nat/?', views.dynamic_nat, name='Dynamic NAT'),
+    url(r'^pat_pool/?', views.pat_pool, name='PAT Pool'),
+#     url(r'^graph_patpool/?', views.graph_patpool, name={'en' : 'PAT Pool Graph', 'ko' : u'PAT Pool 그래프'}),
+]
+
+# url_conf = [
+#     url(r'^ipuser/?', views.config_ipuser, name={'en' : 'IP User', 'ko' : u'IP 사용자 설정'}),
+#     url(r'^domain/?', views.config_domain, name={'en' : 'Domain', 'ko' : u'도메인 설정'}),
+# ]
+
 urlpatterns = [
-    url(r'^overview/?', views.overview, name=u'개요'),
-    url(r'^conf/?', views.config, name=u'설정'),
+    url(r'^overview/?', views.overview, name={'en' : 'Overview', 'ko' : u'개요'}),
+    url(r'^show/', include(url_show, namespace={'en' : 'Show', 'ko' : u'점검'})),
+    url(r'^conf/?', views.config, name={'en' : 'Config', 'ko' : u'설정'}),
 ]
