@@ -49,7 +49,7 @@ from django.http import JsonResponse
 from archon.settings import SESSION_COOKIE_AGE
 from archon.view import *
 
-ARCHON_DEBUG = True
+ARCHON_DEBUG = False
 
 class ManagerAbstraction:
     
