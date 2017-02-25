@@ -40,6 +40,7 @@ from ..models import FaultMessage
 @TABLE.ASYNC.pageview()
 def fault_async(R, M, V):
     domain_name = R.Path[4]
+    
 #     flt_cnt, faults = Burster(
 #     )(M[domain_name].Fault.count
 #     )(M[domain_name].Fault.list, page=(R.Page,R.Length), detail=True, sort='created|desc'
@@ -53,7 +54,6 @@ def fault_async(R, M, V):
                      fault['severity'],
                      STRWRAP(400).html(SMALL().html(fault['descr'])),
                      SMALL().html(fault['created'][:-10]))
-    
     return table
 
 def fault_all(R, M, V):

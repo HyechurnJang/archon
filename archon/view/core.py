@@ -171,13 +171,14 @@ class TABLE(TAG):
         
                 def decofunc(r, m, v):
                     r.Draw = int(r.Query['draw'][0])
-                    r.Length = int(r.Query['length'][0])
-                    r.Start = int(r.Query['start'][0])
+                    r.Length = int(r.Query['length'])
+                    r.Start = int(r.Query['start'])
                     r.Page = r.Start / r.Length
-                    r.OrderCol = int(r.Query['order[0][column]'][0])
-                    r.OrderDir = r.Query['order[0][dir]'][0]
-                    r.Search = r.Query['search[value]'][0]
-                    if r.Search == '': r.Search = None
+#                     r.OrderCol = int(r.Query['order[0][column]'][0])
+#                     r.OrderDir = r.Query['order[0][dir]'][0]
+#                     r.Search = r.Query['search[value]']
+#                     if r.Search == '': r.Search = None
+                    
                     return view(r, m, v)
                 
                 return decofunc
