@@ -44,15 +44,12 @@ https://docs.djangoproject.com/en/1.9/howto/deployment/wsgi/
 """
 
 import os
-from django.core.wsgi import get_wsgi_application
-
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "archon.settings")
+
+from django.core.wsgi import get_wsgi_application
 application = get_wsgi_application()
 
-
-
 import sys
-import json
 from .settings import INSTALLED_APPS
 from openpyxl import load_workbook
 
@@ -89,7 +86,6 @@ for app in INSTALLED_APPS:
         sys.stdout.write('%-40s =====> ' % locale_path)
         archon_locales[app_name] = getLocaleFromXLSX(locale_path)
         print('[ OK ]')
-# print json.dumps(archon_locales, indent=2)
 __builtins__['archon_locales'] = archon_locales
 
 print('\n4. Loading archon managers')
@@ -102,4 +98,3 @@ for app in INSTALLED_APPS:
         print('[ OK ]')
 
 print('\n5. Archon Initialization Finished >> Logging Start')
-

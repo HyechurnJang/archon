@@ -64,6 +64,7 @@ class HealthMonitor(pygics.Task):
         self.health = {'_tstamp' : []}
         for i in reversed(range(0, ASA_HEALTH_MONITOR_CNT)):
             self.health['_tstamp'].append('00:00:00')
+        self.start()
         
     def task(self):
         now = time.strftime("%H:%M:%S", time.localtime(time.time()))
@@ -108,6 +109,7 @@ class ObjectCache(pygics.Task):
         self.manager = manager
         self.object = {}
         self.object_group = {}
+        self.start()
         
     def task(self):
         o = self.manager.Object()
@@ -121,6 +123,7 @@ class NATCache(pygics.Task):
         pygics.Task.__init__(self, tick=ASA_OBJECT_CACHE_SEC)
         self.manager = manager
         self.nat = self.manager.NAT.list()
+        self.start()
         
     def task(self):
         self.nat = self.manager.NAT.list()
@@ -129,12 +132,6 @@ class Manager(archon.ManagerAbstraction, asadipy.MultiDomain):
     
     def __init__(self, debug=False):
         asadipy.MultiDomain.__init__(self, conns=5, conn_max=10, debug=debug)
-        self.scheduler = pygics.Scheduler(10)
-        self.healthmon = HealthMonitor(self)
-        self.objectcache = ObjectCache(self)
-        self.natcache = NATCache(self)
-        self.scheduler.register(self.healthmon, self.objectcache, self.natcache)
-        self.scheduler.start()
         domains = Domain.objects.all()
         for domain in domains:
             asadipy.MultiDomain.addDomain(self, domain.name, domain.ip, domain.user, domain.password)
@@ -142,6 +139,10 @@ class Manager(archon.ManagerAbstraction, asadipy.MultiDomain):
         ipusers = IpUser.objects.all()
         for ipuser in ipusers:
             self.ipusers['%s-%s' % (ipuser.domain, ipuser.ip)] = {'user': ipuser.user, 'domain' : ipuser.domain, 'ip' : ipuser.ip}
+            
+        self.healthmon = HealthMonitor(self)
+        self.objectcache = ObjectCache(self)
+        self.natcache = NATCache(self)
     
     def addDomain(self, domain_name, ip, user, pwd):
         try: Domain.objects.get(name=domain_name)

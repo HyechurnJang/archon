@@ -41,12 +41,12 @@ def host_all(R, M, V):
     #===========================================================================
     # Get Data
     #===========================================================================
-#     host_data, nic_data = Burster(
-#     )(M.Class('compHost').list, detail=True, sort=['type', 'dn']
-#     )(M.Class('compNic').list, detail=True
-#     ).run()
-    host_data = M.Class('compHost').list(detail=True, sort=['type', 'dn'])
-    nic_data = M.Class('compNic').list(detail=True)
+    host_data, nic_data = Burst(
+    )(M.Class('compHost').list, detail=True, sort=['type', 'dn']
+    )(M.Class('compNic').list, detail=True
+    ).do()
+#     host_data = M.Class('compHost').list(detail=True, sort=['type', 'dn'])
+#     nic_data = M.Class('compNic').list(detail=True)
 
     #===========================================================================
     # Logic

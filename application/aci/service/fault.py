@@ -41,12 +41,12 @@ from ..models import FaultMessage
 def fault_async(R, M, V):
     domain_name = R.Path[4]
     
-#     flt_cnt, faults = Burster(
-#     )(M[domain_name].Fault.count
-#     )(M[domain_name].Fault.list, page=(R.Page,R.Length), detail=True, sort='created|desc'
-#     ).run()
-    flt_cnt = M[domain_name].Fault.count()
-    faults = M[domain_name].Fault.list(page=(R.Page,R.Length), detail=True, sort='created|desc')
+    flt_cnt, faults = Burst(
+    )(M[domain_name].Fault.count
+    )(M[domain_name].Fault.list, page=(R.Page,R.Length), detail=True, sort='created|desc'
+    ).do()
+#     flt_cnt = M[domain_name].Fault.count()
+#     faults = M[domain_name].Fault.list(page=(R.Page,R.Length), detail=True, sort='created|desc')
     
     table = TABLE.ASYNCDATA(R.Draw, flt_cnt, flt_cnt)
     for fault in faults:
@@ -58,16 +58,16 @@ def fault_async(R, M, V):
 
 def fault_all(R, M, V):
     
-#     cri_cnt, maj_cnt, min_cnt, war_cnt = Burster(
-#     )(M.Fault.count, severity='critical'
-#     )(M.Fault.count, severity='major'
-#     )(M.Fault.count, severity='minor'
-#     )(M.Fault.count, severity='warning'
-#     ).run()
-    cri_cnt = M.Fault.count(severity='critical')
-    maj_cnt = M.Fault.count(severity='major')
-    min_cnt = M.Fault.count(severity='minor')
-    war_cnt = M.Fault.count(severity='warning')
+    cri_cnt, maj_cnt, min_cnt, war_cnt = Burst(
+    )(M.Fault.count, severity='critical'
+    )(M.Fault.count, severity='major'
+    )(M.Fault.count, severity='minor'
+    )(M.Fault.count, severity='warning'
+    ).do()
+#     cri_cnt = M.Fault.count(severity='critical')
+#     maj_cnt = M.Fault.count(severity='major')
+#     min_cnt = M.Fault.count(severity='minor')
+#     war_cnt = M.Fault.count(severity='warning')
     
     cri_num = 0
     maj_num = 0

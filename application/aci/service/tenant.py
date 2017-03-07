@@ -41,20 +41,20 @@ def tenant_all(R, M, V):
     #===========================================================================
     # Get Data
     #===========================================================================
-#     tns, epgs, bds, ctxs, ctrs, flts = Burster(
-#     )(M.Tenant.list, sort='name'
-#     )(M.EPG.list, sort='name'
-#     )(M.BridgeDomain.list, sort='name'
-#     )(M.Context.list, sort='name'
-#     )(M.Contract.list, sort='name'
-#     )(M.Filter.list, sort='name'
-#     ).run()
-    tns = M.Tenant.list(sort='name')
-    epgs = M.EPG.list(sort='name')
-    bds = M.BridgeDomain.list(sort='name')
-    ctxs = M.Context.list(sort='name')
-    ctrs = M.Contract.list(sort='name')
-    flts = M.Filter.list(sort='name')
+    tns, epgs, bds, ctxs, ctrs, flts = Burst(
+    )(M.Tenant.list, sort='name'
+    )(M.EPG.list, sort='name'
+    )(M.BridgeDomain.list, sort='name'
+    )(M.Context.list, sort='name'
+    )(M.Contract.list, sort='name'
+    )(M.Filter.list, sort='name'
+    ).do()
+#     tns = M.Tenant.list(sort='name')
+#     epgs = M.EPG.list(sort='name')
+#     bds = M.BridgeDomain.list(sort='name')
+#     ctxs = M.Context.list(sort='name')
+#     ctrs = M.Contract.list(sort='name')
+#     flts = M.Filter.list(sort='name')
     
     #===========================================================================
     # Logic

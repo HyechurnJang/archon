@@ -61,6 +61,7 @@ class HealthMonitor(pygics.Task):
         self.health = {'_tstamp' : []}
         for i in reversed(range(0, mon_cnt)):
             self.health['_tstamp'].append('00:00:00')
+        self.start()
         
     def getNewHealthHist(self, dn, score):
         if dn in self.health:
@@ -79,20 +80,14 @@ class HealthMonitor(pygics.Task):
     def task(self):
         now = time.strftime("%H:%M:%S", time.localtime(time.time()))
         
-#         total, pod, node, tenant, appprof, epg = Burster(
-#         )(self.manager.health
-#         )(self.manager.Pod.health
-#         )(self.manager.Node.health
-#         )(self.manager.Tenant.health
-#         )(self.manager.AppProfile.health
-#         )(self.manager.EPG.health
-#         ).run()
-        total = self.manager.health()
-        pod = self.manager.Pod.health()
-        node = self.manager.Node.health()        
-        tenant = self.manager.Tenant.health()
-        appprof = self.manager.AppProfile.health()
-        epg = self.manager.EPG.health()
+        total, pod, node, tenant, appprof, epg = Burst(
+        )(self.manager.health
+        )(self.manager.Pod.health
+        )(self.manager.Node.health
+        )(self.manager.Tenant.health
+        )(self.manager.AppProfile.health
+        )(self.manager.EPG.health
+        ).do()
         
         health = {'_tstamp' : self.health['_tstamp'][1:]}
         health['_tstamp'].append(now)
@@ -118,7 +113,6 @@ class HealthMonitor(pygics.Task):
             for dp in epg[dom_name]:
                 dn = dom_name + '/' + dp['dn']
                 health[dn] = self.getNewHealthHist(dn, dp['score'])
-        
         
         self.health = health
     
@@ -203,18 +197,15 @@ class EndpointTracker(acidipy.SubscribeHandler):
 
 class Manager(archon.ManagerAbstraction, acidipy.MultiDomain):
     
-    def __init__(self, mon_sec=ACI_MONSEC, mon_cnt=10, debug=False):
-        acidipy.MultiDomain.__init__(self, conns=5, conn_max=10, debug=debug)
-        self.scheduler = pygics.Scheduler(10)
-        self.healthmon = HealthMonitor(self, mon_sec, mon_cnt)
-        self.scheduler.register(self.healthmon)
-        self.scheduler.start()
+    def __init__(self, mon_sec=ACI_MONSEC, mon_cnt=10, debug=True):
+        acidipy.MultiDomain.__init__(self, debug=debug)
         domains = Domain.objects.all()
         for domain in domains:
             ret = acidipy.MultiDomain.addDomain(self, domain.name, domain.controllers, domain.user, domain.password)
             if ret:
                 self[domain.name].eptracker = EndpointTracker(self, domain.name)
                 self[domain.name].Endpoint.subscribe(self[domain.name].eptracker)
+        self.healthmon = HealthMonitor(self, mon_sec, mon_cnt)
     
     def addDomain(self, domain_name, ip, user, pwd):
         try: Domain.objects.get(name=domain_name)
@@ -240,3 +231,4 @@ class Manager(archon.ManagerAbstraction, acidipy.MultiDomain):
     def initEndpoint(self):
         EndpointTracker.initDatabase()
         for domain_name in self: self[domain_name].eptracker.getInitData()
+        

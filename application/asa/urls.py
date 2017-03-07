@@ -45,7 +45,7 @@ url_show = [
     url(r'^static_nat/?', views.static_nat, name='Static NAT'),
     url(r'^dynamic_nat/?', views.dynamic_nat, name='Dynamic NAT'),
     url(r'^pat_pool/?', views.pat_pool, name='PAT Pool'),
-#     url(r'^graph_patpool/?', views.graph_patpool, name={'en' : 'PAT Pool Graph', 'ko' : u'PAT Pool 그래프'}),
+    url(r'^graph_pat_pool/?', views.pat_pool_graph, name='PAT Pool Graph'),
 ]
 
 # url_conf = [

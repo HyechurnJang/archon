@@ -36,11 +36,7 @@
 
 import re
 import json
-
-import gevent.monkey
-gevent.monkey.patch_socket()
-gevent.monkey.patch_ssl()
-import gevent
+from pygics import Burst
 
 from django.contrib import admin
 from django.contrib.auth.decorators import login_required
@@ -49,7 +45,7 @@ from django.http import JsonResponse
 from archon.settings import SESSION_COOKIE_AGE
 from archon.view import *
 
-ARCHON_DEBUG = False
+ARCHON_DEBUG = True
 
 class ManagerAbstraction:
     
@@ -59,37 +55,6 @@ class ManagerAbstraction:
     def instance(cls, *argv, **kargs):
         if cls.__MANAGER__ == None: cls.__MANAGER__ = cls(*argv, **kargs)
         return cls.__MANAGER__
-
-class Burster:
-    
-    def __init__(self):
-        self.methods = []
-        self.args = []
-        self.kargs = []
-        self.length = 0
-        
-    def __call__(self, method, *argv, **kargs):
-        self.methods.append(method)
-        self.args.append(argv)
-        self.kargs.append(kargs)
-        self.length += 1
-        return self
-    
-    def run(self):
-        ret = [None for i in range(0, self.length)]
-        fetches = []
-        
-        def fetch(__method__, __ret__, __index__, *argv, **kargs):
-            try: __ret__[__index__] = __method__(*argv, **kargs)
-            except Exception as e: print str(e)
-        
-        for i in range(0, self.length):
-            fetches.append(gevent.spawn(fetch, self.methods[i], ret, i, *self.args[i], **self.kargs[i]))
-        try: gevent.joinall(fetches, raise_error=True)
-        except Exception as e:
-            print 'Burster', str(e)
-            for r in ret: print r
-        return ret
 
 class ArchonReq:
     

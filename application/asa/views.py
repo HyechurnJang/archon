@@ -44,15 +44,18 @@ from manager import Manager
 def overview(R, M, V):
     if not M: V.Page.html(ALERT(V('Info'), V('Non-exist ASA Connection'), CLASS='alert-info')); return
     
-    health, nat_count, conn_count = Burster(
+    health, nat_count, conn_count = Burst(
     )(M.getHealth
     )(M.NAT.count
     )(M.Conn.count
     ).run()
     
-    for domain_name in M:
-        chart_hist = CHART.LINE(height=145, min=0, max=100, *health['_tstamp'])
-        chart_curr = CHART.BAR(V('CPU'), V('Memory'), V('Disk'), height=145, **CHART.THEME_UTIL)
+    chart_hist = CHART.LINE(height=145, min=0, max=100, *health['_tstamp'])
+    chart_curr_row = ROW()
+    chart_conn_tran = DIV()
+    
+    for domain_name in sorted(M.keys()):
+        chart_curr = CHART.BAR('CPU', 'Memory', 'Disk', height=145, **CHART.THEME_UTIL)
         cpu_curr = 0
         mem_curr = 0
         disk_curr = 0
@@ -66,47 +69,53 @@ def overview(R, M, V):
             elif domain_name + '/disk' in dn:
                 chart_hist.Data(domain_name + '/Disk', *health[dn])
                 disk_curr = health[dn][-1]
-        chart_curr.Data(V('Current'), cpu_curr, mem_curr, disk_curr)
+        chart_curr.Data('Current', cpu_curr, mem_curr, disk_curr)
+        chart_curr_row.html(
+            COL(2).html(chart_curr, HEAD(4, STYLE='margin:0px;text-align:center;').html(domain_name))
+        )
         
-        chart_conn = CHART.BAR(V('Max'), V('Current'),
+        chart_conn = CHART.BAR('Max', 'Current',
                                height=40, margin=['65px', '0px', '20px', '20px'],
                                pivot=True, tooltip=False,
                                color=['rgba(128,177,211,0.8)', 'rgba(255,0,0,0.8)']
         ).Data(
-            V('Connections'), conn_count[domain_name]['most_used'], conn_count[domain_name]['in_use'], 
+            'Connections', conn_count[domain_name]['most_used'], conn_count[domain_name]['in_use'], 
         )
         
-        chart_tran = CHART.BAR(V('Max'), V('Current'),
+        chart_tran = CHART.BAR('Max', 'Current',
                                height=40, margin=['65px', '0px', '20px', '20px'],
                                pivot=True, tooltip=False,
                                color=['rgba(128,177,211,0.8)', 'rgba(255,0,0,0.8)']
         ).Data(
-            V('NATs'), nat_count[domain_name]['most_used'], nat_count[domain_name]['in_use']
+            'NATs', nat_count[domain_name]['most_used'], nat_count[domain_name]['in_use']
         )
-        
-        V.Page.html(
-            PANEL(CLASS='panel-dgrey').Head(STRONG().html(V('%s Utilization') % domain_name)).Body(
-                ROW().html(
-                    COL(8).html(
-                        HEAD(3, STYLE='margin:0px;').html(V('System Utilization History')),
-                        chart_hist
+        chart_conn_tran.html(
+            ROW().html(
+                COL(1, STYLE='padding:10px 0px 0px 0px;').html(HEAD(3).html(domain_name)),
+                COL(11, STYLE='padding:0px;').html(
+                    ROW().html(
+                        COL(2, STYLE='padding:5px 0px 0px 0px;').html(HEAD(4, STYLE='margin:0px;text-align:right;').html('Connections')),
+                        COL(10, STYLE='padding:0px;').html(chart_conn)
                     ),
-                    COL(4).html(
-                        HEAD(3, STYLE='margin:0px;').html(V('System Current')),
-                        chart_curr
+                    ROW().html(
+                        COL(2, STYLE='padding:5px 0px 0px 0px;').html(HEAD(4, STYLE='margin:0px;text-align:right;').html('Translations')),
+                        COL(10, STYLE='padding:0px;').html(chart_tran)
                     )
-                ),
-                HEAD(3, STYLE='margin:0px;').html(V('Counts')),
-                ROW().html(
-                    COL(2, STYLE='padding:5px 0px 0px 0px;').html(HEAD(4, STYLE='margin:0px;text-align:right;').html(V('Connections'))),
-                    COL(10, STYLE='padding:0px;').html(chart_conn)
-                ),
-                ROW().html(
-                    COL(2, STYLE='padding:5px 0px 0px 0px;').html(HEAD(4, STYLE='margin:0px;text-align:right;').html(V('Translations'))),
-                    COL(10, STYLE='padding:0px;').html(chart_tran)
-                ),
+                )
             )
         )
+        
+    V.Page.html(
+        PANEL(CLASS='panel-dgrey').Head(STRONG().html('Utilization')).Body(
+            HEAD(3, STYLE='margin:0px;').html('System Utilization History'),
+            chart_hist,
+            HEAD(3, STYLE='margin:0px;').html('System Current'),
+            chart_curr_row
+        ),
+        PANEL(CLASS='panel-dgrey').Head(STRONG().html('Counts')).Body(
+            chart_conn_tran
+        )
+    )
     
     V.Menu.html(BUTTON(CLASS='btn-primary').click('/'.join(R.Path)).html(V('Refresh')))
 
@@ -427,7 +436,7 @@ def pat_pool(R, M, V):
     V.Menu.html(BUTTON(CLASS='btn-primary').click('/'.join(R.Path)).html(V('Refresh')))
     
 @pageview(Manager)
-def graph_patpool(R, M, V):
+def pat_pool_graph(R, M, V):
     if not M: V.Page.html(ALERT(V('Info'), V('Non-exist ASA Connection'), CLASS='alert-info')); return
     
     pools = M.NAT.PATPool.list()
@@ -440,10 +449,12 @@ def graph_patpool(R, M, V):
         for pool in pools[domain_name]:
             addr = '%s/%s' % (pool['address'], pool['protocol'])
             if addr not in pats: pats[addr] = {'range' : [], 'count' : [], 'alloc' : [], 'total_count' : 0, 'total_alloc' : 0}
-            rfreg = '%d-%d' % (pool['rangeStart'], pool['rangeEnd'])
-            count = pool['rangeEnd'] - pool['rangeStart'] + 1
+            rsplit = pool['range'].split('-')
+            rstart = int(rsplit[0])
+            rend = int(rsplit[1])
+            count = rend - rstart + 1
             alloc = pool['allocated']
-            pats[addr]['range'].append(rfreg)
+            pats[addr]['range'].append(pool['range'])
             pats[addr]['count'].append(count)
             pats[addr]['alloc'].append(alloc)
             pats[addr]['total_count'] += count

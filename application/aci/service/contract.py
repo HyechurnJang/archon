@@ -41,16 +41,16 @@ def contract_all(R, M, V):
     #===========================================================================
     # Get Data
     #===========================================================================
-#     ctrts, subjs, provs, conss = Burster(
-#     )(M.Contract.list, detail=True, sort='dn'
-#     )(M.Subject.list, sort='dn'
-#     )(M.Class('vzRtProv').list, sort='dn'
-#     )(M.Class('vzRtCons').list, sort='dn'
-#     ).run()
-    ctrts = M.Contract.list(detail=True, sort='dn')
-    subjs = M.Subject.list(sort='dn')
-    provs = M.Class('vzRtProv').list(sort='dn')
-    conss = M.Class('vzRtCons').list(sort='dn')
+    ctrts, subjs, provs, conss = Burst(
+    )(M.Contract.list, detail=True, sort='dn'
+    )(M.Subject.list, sort='dn'
+    )(M.Class('vzRtProv').list, sort='dn'
+    )(M.Class('vzRtCons').list, sort='dn'
+    ).do()
+#     ctrts = M.Contract.list(detail=True, sort='dn')
+#     subjs = M.Subject.list(sort='dn')
+#     provs = M.Class('vzRtProv').list(sort='dn')
+#     conss = M.Class('vzRtCons').list(sort='dn')
     
     #===========================================================================
     # Logic
