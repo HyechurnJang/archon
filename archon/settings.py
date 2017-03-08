@@ -76,7 +76,7 @@ INSTALLED_APPS = [
 
 ARCHON_APPLICATIONS = []
 
-app_paths = os.listdir(APP_DIR)
+app_paths = sorted(os.listdir(APP_DIR))
 for app_path in app_paths:
     if os.path.isdir(APP_DIR + '/' + app_path):
         app_src_path = 'application.' + app_path
