@@ -48,7 +48,7 @@ def overview(R, M, V):
     )(M.getHealth
     )(M.NAT.count
     )(M.Conn.count
-    ).run()
+    ).do()
     
     chart_hist = CHART.LINE(height=145, min=0, max=100, *health['_tstamp'])
     chart_curr_row = ROW()
