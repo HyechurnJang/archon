@@ -176,14 +176,19 @@ class TABLE(TAG):
                     if isinstance(r.Length, list): r.Length = r.Length[0]
                     r.Start = int(r.Query['start'])
                     if isinstance(r.Start, list): r.Start = r.Start[0]
-                    r.OrderCol = int(r.Query['order[0][column]'])
-                    if isinstance(r.OrderCol, list): r.OrderCol = r.OrderCol[0]
-                    r.OrderDir = r.Query['order[0][dir]']
-                    if isinstance(r.OrderDir, list): r.OrderDir = r.OrderDir[0]
-                    r.Search = r.Query['search[value]']
-                    if isinstance(r.Search, list): r.Search = r.Search[0]
-                    if r.Search == '': r.Search = None
+                    
+                    try:
+                        r.OrderCol = int(r.Query['order[0][column]'])
+                        if isinstance(r.OrderCol, list): r.OrderCol = r.OrderCol[0]
+                        r.OrderDir = r.Query['order[0][dir]']
+                        if isinstance(r.OrderDir, list): r.OrderDir = r.OrderDir[0]
+                        r.Search = r.Query['search[value]']
+                        if isinstance(r.Search, list): r.Search = r.Search[0]
+                        if r.Search == '': r.Search = None
+                    except: pass
+                    
                     r.Page = r.Start / r.Length
+                    
                     return view(r, m, v)
                 
                 return decofunc
