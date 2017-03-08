@@ -41,8 +41,8 @@ from archon import modelview
 #===============================================================================
 # Create your models here.
 #===============================================================================
-class Sample(models.Model):
+class SampleModel(models.Model):
     author = models.CharField(max_length=64)
     text = models.CharField(max_length=1024)
 
-modelview(Sample)
+modelview(SampleModel)

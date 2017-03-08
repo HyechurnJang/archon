@@ -62,7 +62,7 @@ from django.contrib import admin
 from django.contrib.auth import views as auth_views
 from django.contrib.auth.decorators import login_required
 
-from .settings import INSTALLED_APPS
+from .settings import ARCHON_APPLICATIONS, ARCHON_LANGUAGE
 import dashboard
 
 class MainPage:
@@ -136,10 +136,6 @@ urlpatterns = [
     url(r'^', mainpage.sendMainPage),
 ]
 
-application_setting = __import__('application')
-application_names = application_setting.APPLICATION_NAMES
-application_language = application_setting.APPLICATION_LANGUAGE
-
 def parse_urls(parent, urls):
     parent_url = '/' + '/'.join(parent)
     parent_name = '-'.join(parent)
@@ -151,31 +147,25 @@ def parse_urls(parent, urls):
         term = re.sub('[\^/\?+*]|(\\\[wdW])', '', urls._regex)
         ret = []
         for url in urls.urlconf_name: ret.append(parse_urls(parent + [term], url))
-        try: urls.namespace = urls.namespace[application_language]
+        try: urls.namespace = urls.namespace[ARCHON_LANGUAGE]
         except: pass
         return {'name' : parent_name + '-' + term, 'display' : urls.namespace, 'urls' : ret}
     elif isinstance(urls, RegexURLPattern):
         term = re.sub('[\^/\?+*]|(\\\[wdW])', '', urls._regex)
-        try: urls.name = urls.name[application_language]
+        try: urls.name = urls.name[ARCHON_LANGUAGE]
         except: pass
         return {'name' : parent_name + '-' + term, 'display' : urls.name, 'url' : parent_url + '/' + term}
     return None
 
 navbar_desc = []
 print('1. Loading applications')
-for app in INSTALLED_APPS:
-    if 'application.' in app:
-        name = app.split('application.')[1]
-        for application_name in application_names:
-            if name == application_name['name']:
-                display = application_name['display']
-                break
-        else: display = name.upper()
-        sys.stdout.write('%-40s =====> ' % ('%s : %s' % (display, app)))
-        app_urls = include(app + '.urls')
-        urlpatterns = [ url(r'^%s/' % name, app_urls) ] + urlpatterns
-        navbar_desc.append({'name' : name, 'display' : display, 'urls' : parse_urls([name], app_urls[0].urlpatterns)})
-        print('[ OK ]')
+for app in ARCHON_APPLICATIONS:
+    name = app['name']
+    display = app['display']     
+    path = 'application.' + name
+    sys.stdout.write('%-40s =====> ' % ('%s : %s' % (display, path)))
+    urls = include(path + '.urls')
+    urlpatterns = [ url(r'^%s/' % name, urls) ] + urlpatterns
+    navbar_desc.append({'name' : name, 'display' : display, 'urls' : parse_urls([name], urls[0].urlpatterns)})
+    print('[ OK ]')
 mainpage.setAppDesc(navbar_desc)
-
-print('\n2. Loading WSGI Server')

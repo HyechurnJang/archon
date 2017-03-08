@@ -34,8 +34,6 @@
 #                                                                              #
 ################################################################################
 
-import re
-import json
 from archon import *
 
 def get_host_type(V, t):
@@ -104,7 +102,7 @@ def set_topo(topo, dn, color='grey', path_color='grey', dot=False):
 def get_dn_topo(dn):
     sdn = dn.split('/')
     sdn_len = len(sdn)
-    topo = Topo()
+    topo = TOPO()
     prev_name = None
     for i in range(0, sdn_len):
         rn = sdn[i]
@@ -116,17 +114,3 @@ def get_dn_topo(dn):
         if prev_name != None: topo.Edge(prev_name, name)
         prev_name = name
     return topo
-  
-if __name__ == '__main__':
-    
-    topo = Topo()
-    print topo
-    set_topo(topo, 'comp/prov-VMware/ctrlr-[BBB]-VC/hv-host-491/mgmtnic-vmk1', color='red', dot=True)
-    import json
-    print json.dumps(topo, indent=2)
-    
-    
-    
-    
-    
-    

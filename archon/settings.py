@@ -47,22 +47,20 @@ https://docs.djangoproject.com/en/1.9/ref/settings/
 """
 
 import os
+import importlib
+
+APPLICATION_SETTINGS = __import__('application')
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-
-
-# Quick-start development settings - unsuitable for production
-# See https://docs.djangoproject.com/en/1.9/howto/deployment/checklist/
+APP_DIR = BASE_DIR + '/application'
 
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = 'xqc)^+lns24=i0c5n!kegnxlfd5f&1(=cf-@nvd6f$ndkyp^fp'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
-
-ALLOWED_HOSTS = []
-
+DEBUG = APPLICATION_SETTINGS.DEBUG
+ALLOWED_HOSTS = APPLICATION_SETTINGS.ALLOWED_HOSTS
 
 # Application definition
 
@@ -76,8 +74,16 @@ INSTALLED_APPS = [
     'archon',
 ]
 
-application_names = __import__('application').APPLICATION_NAMES
-for application_name in application_names: INSTALLED_APPS.append('application.' + application_name['name'])
+ARCHON_APPLICATIONS = []
+
+app_paths = os.listdir(APP_DIR)
+for app_path in app_paths:
+    if os.path.isdir(APP_DIR + '/' + app_path):
+        app_src_path = 'application.' + app_path
+        app_settings = importlib.import_module(app_src_path + '.settings')
+        if app_settings.ACTIVE:
+            INSTALLED_APPS.append(app_src_path)
+            ARCHON_APPLICATIONS.append({'name' : app_path, 'display' : app_settings.DISPLAY})
 
 MIDDLEWARE_CLASSES = [
     'django.middleware.security.SecurityMiddleware',
@@ -122,34 +128,27 @@ DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
         'NAME': 'archon',
+        'USER': APPLICATION_SETTINGS.DATABASE_USER,
+        'PASSWORD': APPLICATION_SETTINGS.DATABASE_PASSWORD
     }
 }
 DATABASE_OPTIONS = {'charset': 'utf8'}
-database_auth = __import__('application').DATABASE_AUTH
-DATABASES['default']['USER'] = database_auth['USER']
-DATABASES['default']['PASSWORD'] = database_auth['PASSWORD']
 
 # Password validation
 # https://docs.djangoproject.com/en/1.9/ref/settings/#auth-password-validators
 
 AUTH_PASSWORD_VALIDATORS = [
-    {
-        'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',
-    },
-    {
-        'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator',
-    },
-    {
-        'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator',
-    },
-    {
-        'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
-    },
+    {'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',},
+    {'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator',},
+    {'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator',},
+    {'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',},
 ]
 
 
 # Internationalization
 # https://docs.djangoproject.com/en/1.9/topics/i18n/
+
+ARCHON_LANGUAGE = APPLICATION_SETTINGS.LANGUAGE
 
 LANGUAGE_CODE = 'ko-KR'
 
@@ -166,4 +165,5 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/1.9/howto/static-files/
 
 STATIC_URL = '/resources/'
-STATICFILES_DIRS = [ os.path.join(BASE_DIR, "archon/resources"), ]
+STATIC_DIR = 'archon/resources'
+# STATICFILES_DIRS = [ os.path.join(BASE_DIR, "archon/resources"), ]

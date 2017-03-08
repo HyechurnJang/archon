@@ -40,27 +40,21 @@ import pygics
 import acidipy
 import archon
 
-from application import APPLICATION_CONFIGS
-
 from archon import *
 from models import *
+from .settings import *
 
 #===============================================================================
 # Create your manager here.
 #===============================================================================
 
-ACI_MANAGER_DEBUG = False
-ACI_HEALTH_MONITOR_SEC = APPLICATION_CONFIGS['aci_health_monitor_sec']
-ACI_HEALTH_MONITOR_CNT = 10
-
 class HealthMonitor(pygics.Task):
     
-    def __init__(self, manager, mon_sec=ACI_HEALTH_MONITOR_SEC):
-        pygics.Task.__init__(self, tick=mon_sec)
+    def __init__(self, manager):
+        pygics.Task.__init__(self, tick=HEALTH_MON_SEC)
         self.manager = manager
-        self.count = ACI_HEALTH_MONITOR_CNT
         self.health = {'_tstamp' : []}
-        for i in reversed(range(0, ACI_HEALTH_MONITOR_CNT)):
+        for i in reversed(range(0, HEALTH_MON_CNT)):
             self.health['_tstamp'].append('00:00:00')
         self.start()
         
@@ -71,7 +65,7 @@ class HealthMonitor(pygics.Task):
             return ret
         else:
             ret = []
-            for i in range(0, self.count - 1): ret.append(0)
+            for i in range(0, HEALTH_MON_CNT - 1): ret.append(0)
             ret.append(score)
             return ret
         
@@ -201,8 +195,8 @@ class EndpointTracker(acidipy.SubscribeHandler):
 
 class Manager(archon.ManagerAbstraction, acidipy.MultiDomain):
     
-    def __init__(self, debug=ACI_MANAGER_DEBUG):
-        acidipy.MultiDomain.__init__(self, debug=debug)
+    def __init__(self):
+        acidipy.MultiDomain.__init__(self, debug=MANAGER_DEBUG)
         domains = Domain.objects.all()
         for domain in domains:
             ret = acidipy.MultiDomain.addDomain(self, domain.name, domain.controllers, domain.user, domain.password)

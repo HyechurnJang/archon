@@ -43,9 +43,6 @@ For more information on this file, see
 https://docs.djangoproject.com/en/1.9/howto/deployment/wsgi/
 """
 
-# import os
-# os.environ.setdefault("DJANGO_SETTINGS_MODULE", "archon.settings")
-
 from django.core.wsgi import get_wsgi_application
 application = get_wsgi_application()
 
@@ -75,7 +72,7 @@ def getLocaleFromXLSX(path):
     
     return locale
 
-print('\n3. Loading locales')
+print('\n2. Loading locales')
 sys.stdout.write('%-40s =====> ' % './archon/locale.xlsx')
 archon_locales = {'GLOBAL' : getLocaleFromXLSX('./archon/locale.xlsx')}
 print('[ OK ]')
@@ -88,7 +85,7 @@ for app in INSTALLED_APPS:
         print('[ OK ]')
 __builtins__['archon_locales'] = archon_locales
 
-print('\n4. Loading archon managers')
+print('\n3. Loading archon managers')
 for app in INSTALLED_APPS:
     if 'application.' in app:
         manager_path = app + '.manager'
@@ -97,4 +94,4 @@ for app in INSTALLED_APPS:
         __import__(manager_path, globals(), fromlist=fromlist).Manager.instance()
         print('[ OK ]')
 
-print('\n5. Archon Initialization Finished >> Logging Start')
+print('\n4. Archon Initialization Finished >> Logging Start')

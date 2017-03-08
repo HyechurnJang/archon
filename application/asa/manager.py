@@ -40,29 +40,20 @@ import pygics
 import asadipy
 import archon
 
-from application import APPLICATION_CONFIGS
-
 from models import *
+from .settings import *
 
 #===============================================================================
 # Create your manager here.
 #===============================================================================
 
-ASA_MANAGER_DEBUG = False
-ASA_HEALTH_MONITOR_SEC = APPLICATION_CONFIGS['asa_health_monitor_sec']
-ASA_HEALTH_MONITOR_CNT = 10
-
-ASA_OBJECT_CACHE_SEC = APPLICATION_CONFIGS['asa_object_cache_sec']
-ASA_NAT_CACHE_SEC = APPLICATION_CONFIGS['asa_nat_cache_sec']
-
 class HealthMonitor(pygics.Task):
     
     def __init__(self, manager):
-        pygics.Task.__init__(self, tick=ASA_HEALTH_MONITOR_SEC)
+        pygics.Task.__init__(self, tick=HEALTH_MON_SEC)
         self.manager = manager
-        self.count = ASA_HEALTH_MONITOR_CNT
         self.health = {'_tstamp' : []}
-        for i in reversed(range(0, ASA_HEALTH_MONITOR_CNT)):
+        for i in reversed(range(0, HEALTH_MON_CNT)):
             self.health['_tstamp'].append('00:00:00')
         self.start()
         
@@ -79,21 +70,21 @@ class HealthMonitor(pygics.Task):
             dn_disk = domain_name + '/disk'
             
             if dn_cpu in self.health: health[dn_cpu] = self.health[dn_cpu][1:]
-            else: health[dn_cpu] = [None for i in range(0, self.count - 1)]
+            else: health[dn_cpu] = [None for i in range(0, HEALTH_MON_CNT - 1)]
             health[dn_cpu].append(stats[domain_name]['cpu']['total']['1min'])
             
             for i in range(0, len(stats[domain_name]['cpu']['core'])):
                 dn_core_num = dn_core + '/%d' % i
                 if dn_core_num in self.health: health[dn_core_num] = self.health[dn_core_num][1:]
-                else: health[dn_core_num] = [None for j in range(0, self.count - 1)]
+                else: health[dn_core_num] = [None for j in range(0, HEALTH_MON_CNT - 1)]
                 health[dn_core_num].append(stats[domain_name]['cpu']['core'][i]['1min'])
             
             if dn_mem in self.health: health[dn_mem] = self.health[dn_mem][1:]
-            else: health[dn_mem] = [None for i in range(0, self.count - 1)]
+            else: health[dn_mem] = [None for i in range(0, HEALTH_MON_CNT - 1)]
             health[dn_mem].append(stats[domain_name]['memory']['used_percent'])
             
             if dn_disk in self.health: health[dn_disk] = self.health[dn_disk][1:]
-            else: health[dn_disk] = [None for i in range(0, self.count - 1)]
+            else: health[dn_disk] = [None for i in range(0, HEALTH_MON_CNT - 1)]
             health[dn_disk].append(stats[domain_name]['disk']['used_percent'])
 
         
@@ -102,36 +93,36 @@ class HealthMonitor(pygics.Task):
     def getHealth(self):
         return self.health
 
-class ObjectCache(pygics.Task):
-    
-    def __init__(self, manager):
-        pygics.Task.__init__(self, tick=ASA_OBJECT_CACHE_SEC)
-        self.manager = manager
-        self.object = {}
-        self.object_group = {}
-        self.start()
-        
-    def run(self):
-        o = self.manager.Object()
-        og = self.manager.ObjectGroup()
-        self.object = o
-        self.object_group = og
-
-class NATCache(pygics.Task):
-    
-    def __init__(self, manager):
-        pygics.Task.__init__(self, tick=ASA_OBJECT_CACHE_SEC)
-        self.manager = manager
-        self.nat = self.manager.NAT.list()
-        self.start()
-        
-    def run(self):
-        self.nat = self.manager.NAT.list()
+# class ObjectCache(pygics.Task):
+#     
+#     def __init__(self, manager):
+#         pygics.Task.__init__(self, tick=ASA_OBJECT_CACHE_SEC)
+#         self.manager = manager
+#         self.object = {}
+#         self.object_group = {}
+#         self.start()
+#         
+#     def run(self):
+#         o = self.manager.Object()
+#         og = self.manager.ObjectGroup()
+#         self.object = o
+#         self.object_group = og
+# 
+# class NATCache(pygics.Task):
+#     
+#     def __init__(self, manager):
+#         pygics.Task.__init__(self, tick=ASA_OBJECT_CACHE_SEC)
+#         self.manager = manager
+#         self.nat = self.manager.NAT.list()
+#         self.start()
+#         
+#     def run(self):
+#         self.nat = self.manager.NAT.list()
 
 class Manager(archon.ManagerAbstraction, asadipy.MultiDomain):
     
-    def __init__(self, debug=ASA_MANAGER_DEBUG):
-        asadipy.MultiDomain.__init__(self, conns=5, conn_max=10, debug=debug)
+    def __init__(self):
+        asadipy.MultiDomain.__init__(self, debug=MANAGER_DEBUG)
         domains = Domain.objects.all()
         for domain in domains:
             asadipy.MultiDomain.addDomain(self, domain.name, domain.ip, domain.user, domain.password)
@@ -141,8 +132,8 @@ class Manager(archon.ManagerAbstraction, asadipy.MultiDomain):
             self.ipusers['%s-%s' % (ipuser.domain, ipuser.ip)] = {'user': ipuser.user, 'domain' : ipuser.domain, 'ip' : ipuser.ip}
             
         self.healthmon = HealthMonitor(self)
-        self.objectcache = ObjectCache(self)
-        self.natcache = NATCache(self)
+#         self.objectcache = ObjectCache(self)
+#         self.natcache = NATCache(self)
     
     def addDomain(self, domain_name, ip, user, pwd):
         try: Domain.objects.get(name=domain_name)
