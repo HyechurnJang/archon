@@ -50,16 +50,18 @@ from models import *
 # Create your manager here.
 #===============================================================================
 
-ACI_MONSEC = APPLICATION_CONFIGS['aci_health_monitor_sec']
+ACI_MANAGER_DEBUG = True
+ACI_HEALTH_MONITOR_SEC = APPLICATION_CONFIGS['aci_health_monitor_sec']
+ACI_HEALTH_MONITOR_CNT = 10
 
 class HealthMonitor(pygics.Task):
     
-    def __init__(self, manager, mon_sec, mon_cnt):
+    def __init__(self, manager, mon_sec=ACI_HEALTH_MONITOR_SEC):
         pygics.Task.__init__(self, tick=mon_sec)
         self.manager = manager
-        self.count = mon_cnt
+        self.count = ACI_HEALTH_MONITOR_CNT
         self.health = {'_tstamp' : []}
-        for i in reversed(range(0, mon_cnt)):
+        for i in reversed(range(0, ACI_HEALTH_MONITOR_CNT)):
             self.health['_tstamp'].append('00:00:00')
         self.start()
         
@@ -197,7 +199,7 @@ class EndpointTracker(acidipy.SubscribeHandler):
 
 class Manager(archon.ManagerAbstraction, acidipy.MultiDomain):
     
-    def __init__(self, mon_sec=ACI_MONSEC, mon_cnt=10, debug=True):
+    def __init__(self, debug=ACI_MANAGER_DEBUG):
         acidipy.MultiDomain.__init__(self, debug=debug)
         domains = Domain.objects.all()
         for domain in domains:
@@ -205,7 +207,7 @@ class Manager(archon.ManagerAbstraction, acidipy.MultiDomain):
             if ret:
                 self[domain.name].eptracker = EndpointTracker(self, domain.name)
                 self[domain.name].Endpoint.subscribe(self[domain.name].eptracker)
-        self.healthmon = HealthMonitor(self, mon_sec, mon_cnt)
+        self.healthmon = HealthMonitor(self)
     
     def addDomain(self, domain_name, ip, user, pwd):
         try: Domain.objects.get(name=domain_name)

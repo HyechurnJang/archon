@@ -49,6 +49,7 @@ from models import *
 # Create your manager here.
 #===============================================================================
 
+ASA_MANAGER_DEBUG = True
 ASA_HEALTH_MONITOR_SEC = APPLICATION_CONFIGS['asa_health_monitor_sec']
 ASA_HEALTH_MONITOR_CNT = 10
 
@@ -130,7 +131,7 @@ class NATCache(pygics.Task):
 
 class Manager(archon.ManagerAbstraction, asadipy.MultiDomain):
     
-    def __init__(self, debug=False):
+    def __init__(self, debug=ASA_MANAGER_DEBUG):
         asadipy.MultiDomain.__init__(self, conns=5, conn_max=10, debug=debug)
         domains = Domain.objects.all()
         for domain in domains:
