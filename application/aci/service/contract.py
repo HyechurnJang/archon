@@ -47,10 +47,6 @@ def contract_all(R, M, V):
     )(M.Class('vzRtProv').list, sort='dn'
     )(M.Class('vzRtCons').list, sort='dn'
     ).do()
-#     ctrts = M.Contract.list(detail=True, sort='dn')
-#     subjs = M.Subject.list(sort='dn')
-#     provs = M.Class('vzRtProv').list(sort='dn')
-#     conss = M.Class('vzRtCons').list(sort='dn')
     
     #===========================================================================
     # Logic

@@ -34,7 +34,6 @@
 #                                                                              #
 ################################################################################
 
-import re
 import time
 
 import pygics
@@ -49,7 +48,7 @@ from models import *
 # Create your manager here.
 #===============================================================================
 
-ASA_MANAGER_DEBUG = True
+ASA_MANAGER_DEBUG = False
 ASA_HEALTH_MONITOR_SEC = APPLICATION_CONFIGS['asa_health_monitor_sec']
 ASA_HEALTH_MONITOR_CNT = 10
 
@@ -67,7 +66,7 @@ class HealthMonitor(pygics.Task):
             self.health['_tstamp'].append('00:00:00')
         self.start()
         
-    def task(self):
+    def run(self):
         now = time.strftime("%H:%M:%S", time.localtime(time.time()))
         stats = self.manager.Stat()
         health = {'_tstamp' : self.health['_tstamp'][1:]}
@@ -112,7 +111,7 @@ class ObjectCache(pygics.Task):
         self.object_group = {}
         self.start()
         
-    def task(self):
+    def run(self):
         o = self.manager.Object()
         og = self.manager.ObjectGroup()
         self.object = o
@@ -126,7 +125,7 @@ class NATCache(pygics.Task):
         self.nat = self.manager.NAT.list()
         self.start()
         
-    def task(self):
+    def run(self):
         self.nat = self.manager.NAT.list()
 
 class Manager(archon.ManagerAbstraction, asadipy.MultiDomain):

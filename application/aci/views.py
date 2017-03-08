@@ -65,20 +65,7 @@ def overview(R, M, V):
     )(M.Fault.list, severity='minor'
     )(M.Fault.list, severity='warning'
     ).do()
-#     cnt_nd = M.Node.count()
-#     cnt_tt = M.Tenant.count()
-#     cnt_bd = M.BridgeDomain.count()
-#     cnt_epg = M.EPG.count()
-#     cnt_ep = M.Endpoint.count()
-#     cnt_ft = M.Filter.count()
-#     cnt_ct = M.Contract.count()
-#     cnt_47d = M.Class('vnsCDev').count()
-#     cnt_47g = M.Class('vnsGraphInst').count()
-#     cnt_fc = M.Fault.list(severity='critical')
-#     cnt_fj = M.Fault.list(severity='major')
-#     cnt_fn = M.Fault.list(severity='minor')
-#     cnt_fw = M.Fault.list(severity='warning')
-    
+
     def resolution(data, res):
         div = data / res
         return data, res * div, res * (div + 1)
@@ -217,11 +204,6 @@ def topoview(R, M, V):
     )(M.Pod.list
     )(M.Node.list
     ).do()
-#     tns = M.Tenant.list()
-#     aps = M.AppProfile.list()
-#     epgs = M.EPG.list()
-#     pods = M.Pod.list()
-#     nodes = M.Node.list()
     
     nav = NAV()
     for domain_name in M:
@@ -318,8 +300,6 @@ def epg_util(R, M, V):
         )(ctrl.Class('l2IngrBytesAg15min').list, detail=True
         )(ctrl.Class('l2IngrPktsAg15min').list, detail=True
         ).do()
-#         bytes = ctrl.Class('l2IngrBytesAg15min').list(detail=True)
-#         pkts = ctrl.Class('l2IngrPktsAg15min').list(detail=True)
 
     #===========================================================================
     # Logic
@@ -436,8 +416,7 @@ def intf_util(R, M, V):
         )(M.Node.list, role='leaf', sort='dn', detail=True
         )(M.Node.list, role='spine', sort='dn', detail=True
         ).do()
-#         leafs = M.Node.list(role='leaf', sort='dn', detail=True)
-#         spines = M.Node.list(role='spine', sort='dn', detail=True)
+        
         for domain_name in M:
             for node in leafs[domain_name]:
                 if node['fabricSt'] == 'active':

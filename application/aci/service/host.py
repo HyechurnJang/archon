@@ -45,8 +45,6 @@ def host_all(R, M, V):
     )(M.Class('compHost').list, detail=True, sort=['type', 'dn']
     )(M.Class('compNic').list, detail=True
     ).do()
-#     host_data = M.Class('compHost').list(detail=True, sort=['type', 'dn'])
-#     nic_data = M.Class('compNic').list(detail=True)
 
     #===========================================================================
     # Logic

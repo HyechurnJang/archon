@@ -48,11 +48,6 @@ def external_all(R, M, V):
     )(M.Class('fvRsProv').list, detail=True, sort='dn'
     )(M.Class('fvRsCons').list, detail=True, sort='dn'
     ).do()
-#     extns = M.L3Profile.list(detail=True, sort='dn')
-#     ctxts = M.Context.list(detail=True, sort='dn')
-#     subns = M.Class('l3extSubnet').list(detail=True, sort='dn')
-#     provs = M.Class('fvRsProv').list(detail=True, sort='dn')
-#     conss = M.Class('fvRsCons').list(detail=True, sort='dn')
     
     #===========================================================================
     # Logic

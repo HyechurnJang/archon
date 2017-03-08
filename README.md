@@ -1,4 +1,5 @@
 # archon
+
 Cisco Application Centric Manager
 
 ## 1. Install
@@ -24,11 +25,13 @@ Cisco Application Centric Manager
 
 #### 1.1.2. Install Python Package 
 
-	$ pip install django mysqlclient openpyxl
+	$ pip install pygics django mysqlclient openpyxl
 
-#### 1.1.3. Install Acidipy
+#### 1.1.3. Install Product Rest API Wrapper
 
 [Acidipy Link](https://github.com/HyechurnJang/acidipy)
+
+[Asadipy Link](https://github.com/HyechurnJang/asadipy)
 
 #### 1.1.4. Create Database
 
@@ -67,11 +70,18 @@ Edit {ARCHON_ROOT}/application/__init__.py
 	$ python manage.py makemigrations
 	$ python manage.py migrate
 	$ python manage.py createsuperuser
-	$ python manage.py runserver 0.0.0.0:80
+
+Important! {ADMIN_NAME} & {PASSWORD} is same as Variables in Create Database Section
+
+**ACI : Faults Data for ACI Application**
+
+	$ python manage.py loaddata apic_faults
 
 * makemigrations : create python wrapper for database
 * migrate : create database tables
 * createsuperuser : create superuser
-* runserver : excute django server with <Accept Address>:<Listening Port>
+* loaddata : load fixture to database
 
-Important! {ADMIN_NAME} & {PASSWORD} is same as Variables in Create Database Section
+#### 1.1.6 Running Server
+
+	$ python server.py

@@ -45,8 +45,6 @@ def fault_async(R, M, V):
     )(M[domain_name].Fault.count
     )(M[domain_name].Fault.list, page=(R.Page,R.Length), detail=True, sort='created|desc'
     ).do()
-#     flt_cnt = M[domain_name].Fault.count()
-#     faults = M[domain_name].Fault.list(page=(R.Page,R.Length), detail=True, sort='created|desc')
     
     table = TABLE.ASYNCDATA(R.Draw, flt_cnt, flt_cnt)
     for fault in faults:
@@ -64,10 +62,6 @@ def fault_all(R, M, V):
     )(M.Fault.count, severity='minor'
     )(M.Fault.count, severity='warning'
     ).do()
-#     cri_cnt = M.Fault.count(severity='critical')
-#     maj_cnt = M.Fault.count(severity='major')
-#     min_cnt = M.Fault.count(severity='minor')
-#     war_cnt = M.Fault.count(severity='warning')
     
     cri_num = 0
     maj_num = 0

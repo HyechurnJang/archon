@@ -49,12 +49,6 @@ def tenant_all(R, M, V):
     )(M.Contract.list, sort='name'
     )(M.Filter.list, sort='name'
     ).do()
-#     tns = M.Tenant.list(sort='name')
-#     epgs = M.EPG.list(sort='name')
-#     bds = M.BridgeDomain.list(sort='name')
-#     ctxs = M.Context.list(sort='name')
-#     ctrs = M.Contract.list(sort='name')
-#     flts = M.Filter.list(sort='name')
     
     #===========================================================================
     # Logic

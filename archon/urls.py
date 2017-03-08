@@ -179,4 +179,3 @@ for app in INSTALLED_APPS:
 mainpage.setAppDesc(navbar_desc)
 
 print('\n2. Loading WSGI Server')
-

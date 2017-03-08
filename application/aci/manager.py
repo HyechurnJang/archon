@@ -34,7 +34,6 @@
 #                                                                              #
 ################################################################################
 
-import re
 import time
 
 import pygics
@@ -50,7 +49,7 @@ from models import *
 # Create your manager here.
 #===============================================================================
 
-ACI_MANAGER_DEBUG = True
+ACI_MANAGER_DEBUG = False
 ACI_HEALTH_MONITOR_SEC = APPLICATION_CONFIGS['aci_health_monitor_sec']
 ACI_HEALTH_MONITOR_CNT = 10
 
@@ -79,7 +78,7 @@ class HealthMonitor(pygics.Task):
     def getHealth(self):
         return self.health
     
-    def task(self):
+    def run(self):
         now = time.strftime("%H:%M:%S", time.localtime(time.time()))
         
         total, pod, node, tenant, appprof, epg = Burst(
@@ -152,7 +151,7 @@ class EndpointTracker(acidipy.SubscribeHandler):
             
             epts = EPTracker.objects.filter(domain=self.domain_name,
                                             dn=ep['dn'],
-                                            stop='N/A')
+                                            stop='Active')
             
             if len(epts) != 0:
                 for ept in epts:
@@ -171,31 +170,34 @@ class EndpointTracker(acidipy.SubscribeHandler):
                                          dn=ep['dn'],
                                          intf=','.join(self.getIfName(ep)),
                                          start=self.convertTstamp(ep['modTs']),
-                                         stop='N/A')
+                                         stop='Active')
             
     def subscribe(self, status, obj):
+        if self.manager.debug: print('[Info]Archon:ACI:Manager:EPTracker:%s:%s:%s' % (obj.class_name, status, obj))
+        
         sdn = obj['dn'].split('/')
         start = self.convertTstamp(obj['modTs'])
         
         epts = EPTracker.objects.filter(domain=self.domain_name,
                                         dn=obj['dn'],
-                                        stop='N/A')
+                                        stop='Active')
         
         for ept in epts:
             if ept.start != start:
                 ept.stop = start
                 ept.save()
         
-        EPTracker.objects.create(mac=obj['mac'],
-                                 ip=obj['ip'],
-                                 domain=self.domain_name,
-                                 tenant=sdn[1].replace('tn-', ''),
-                                 app=sdn[2].replace('ap-', ''),
-                                 epg=sdn[3].replace('epg-', ''),
-                                 dn=obj['dn'],
-                                 intf=','.join(self.getIfName(obj)),
-                                 start=self.convertTstamp(obj['modTs']),
-                                 stop='N/A')
+        if status != 'deleted':
+            EPTracker.objects.create(mac=obj['mac'],
+                                     ip=obj['ip'],
+                                     domain=self.domain_name,
+                                     tenant=sdn[1].replace('tn-', ''),
+                                     app=sdn[2].replace('ap-', ''),
+                                     epg=sdn[3].replace('epg-', ''),
+                                     dn=obj['dn'],
+                                     intf=','.join(self.getIfName(obj)),
+                                     start=self.convertTstamp(obj['modTs']),
+                                     stop='Active')
 
 class Manager(archon.ManagerAbstraction, acidipy.MultiDomain):
     
