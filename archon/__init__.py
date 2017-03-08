@@ -128,7 +128,6 @@ def pageview(manager_class, **async_path):
             async_path_names = async_path.keys()
             for async_path_name in async_path_names:
                 if async_path_name in path:
-                    print async_path_name, async_path
                     try: return JsonResponse(async_path[async_path_name](r, m, v))
                     except Exception as e: return JsonResponse(ArchonView.__error__(v('application error'), str(e)))
             
