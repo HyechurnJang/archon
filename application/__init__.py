@@ -34,7 +34,7 @@
 #                                                                              #
 ################################################################################
 
-WSGI_DEBUG = True
+WSGI_DEBUG = False
 WSGI_HOSTS = ['0.0.0.0']
 LANGUAGE = 'ko' # en
 DATABASE_USER = 'admin'
