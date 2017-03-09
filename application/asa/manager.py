@@ -93,32 +93,6 @@ class HealthMonitor(pygics.Task):
     def getHealth(self):
         return self.health
 
-# class ObjectCache(pygics.Task):
-#     
-#     def __init__(self, manager):
-#         pygics.Task.__init__(self, tick=ASA_OBJECT_CACHE_SEC)
-#         self.manager = manager
-#         self.object = {}
-#         self.object_group = {}
-#         self.start()
-#         
-#     def run(self):
-#         o = self.manager.Object()
-#         og = self.manager.ObjectGroup()
-#         self.object = o
-#         self.object_group = og
-# 
-# class NATCache(pygics.Task):
-#     
-#     def __init__(self, manager):
-#         pygics.Task.__init__(self, tick=ASA_OBJECT_CACHE_SEC)
-#         self.manager = manager
-#         self.nat = self.manager.NAT.list()
-#         self.start()
-#         
-#     def run(self):
-#         self.nat = self.manager.NAT.list()
-
 class Manager(archon.ManagerAbstraction, asadipy.MultiDomain):
     
     def __init__(self):
@@ -132,8 +106,6 @@ class Manager(archon.ManagerAbstraction, asadipy.MultiDomain):
             self.ipusers['%s-%s' % (ipuser.domain, ipuser.ip)] = {'user': ipuser.user, 'domain' : ipuser.domain, 'ip' : ipuser.ip}
             
         self.healthmon = HealthMonitor(self)
-#         self.objectcache = ObjectCache(self)
-#         self.natcache = NATCache(self)
     
     def addDomain(self, domain_name, ip, user, pwd):
         try: Domain.objects.get(name=domain_name)
@@ -172,15 +144,3 @@ class Manager(archon.ManagerAbstraction, asadipy.MultiDomain):
 
     def getHealth(self):
         return self.healthmon.getHealth()
-    
-    def getObject(self):
-        return self.objectcache.object
-    
-    def getObjectGroup(self):
-        return self.objectcache.object_group
-    
-    def getNAT(self):
-        return self.natcache.nat
-
-
-

@@ -123,8 +123,10 @@ def overview(R, M, V):
 def static_nat(R, M, V):
     if not M: V.Page.html(ALERT(V('Info'), V('Non-exist ASA Connection'), CLASS='alert-info')); return
     
-    nats = M.getNAT()
-    objs = M.getObject()
+    nats, objs = Burst(
+    )(M.NAT.list
+    )(M.Object
+    ).do()
     
     table = TABLE.BASIC('Domain', 'Original', 'Translated')
     
@@ -201,10 +203,12 @@ def dynamic_nat(R, M, V):
         elif val >= 40: return 'panel-yellow'
         else: return 'panel-green'
     
-    nats = M.getNAT()
-    objs = M.getObject()
-    ogs = M.getObjectGroup()
-    nps = M.NAT.NATPool.list()
+    objs, ogs, nats, nps = Burst(
+    )(M.Object
+    )(M.ObjectGroup
+    )(M.NAT.list
+    )(M.NAT.NATPool.list
+    ).do()
     
     table = TABLE.BASIC('Domain', 'Original', 'Translated', 'Address Range', 'Allocated', 'Utilization<0->')
     records = []
@@ -314,10 +318,12 @@ def pat_pool(R, M, V):
         elif val >= 40: return 'panel-yellow'
         else: return 'panel-green'
     
-    nats = M.getNAT()
-    objs = M.getObject()
-    ogs = M.getObjectGroup()
-    pps = M.NAT.PATPool.list()
+    objs, ogs, nats, pps = Burst(
+    )(M.Object
+    )(M.ObjectGroup
+    )(M.NAT.list
+    )(M.NAT.PATPool.list
+    ).do()
     
     table = TABLE.BASIC('Domain', 'Original', 'Translated', 'Address', 'Protocol', 'Allocated', 'Utilization<0->')
     records = []
