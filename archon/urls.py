@@ -128,10 +128,10 @@ class MainPage:
 mainpage = MainPage()
 
 urlpatterns = [
-    url(r'^dashboard/', dashboard.dashboard),
+    url(r'^dashboard/?$', dashboard.dashboard),
     url(r'^account/login/?$', auth_views.login, {'template_name': 'login.html'}, name='login'),
     url(r'^account/logout/?$', auth_views.logout, {'next_page': '/'}, name='logout'),
-    url(r'^admin/', admin.site.urls),
+    url(r'^admin/?$', admin.site.urls),
     url(r'^favicon\.ico$', RedirectView.as_view(url='/resources/images/favicon.ico')),
     url(r'^', mainpage.sendMainPage),
 ]
