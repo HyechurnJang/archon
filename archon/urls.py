@@ -144,14 +144,14 @@ def parse_urls(parent, urls):
         for url in urls: ret.append(parse_urls(parent, url))
         return ret
     elif isinstance(urls, RegexURLResolver):
-        term = re.sub('[\^/\?+*]|(\\\[wdW])', '', urls._regex)
+        term = re.sub('[\^/\?+*\$]|(\\\[wdW])', '', urls._regex)
         ret = []
         for url in urls.urlconf_name: ret.append(parse_urls(parent + [term], url))
         try: urls.namespace = urls.namespace[ARCHON_LANGUAGE]
         except: pass
         return {'name' : parent_name + '-' + term, 'display' : urls.namespace, 'urls' : ret}
     elif isinstance(urls, RegexURLPattern):
-        term = re.sub('[\^/\?+*]|(\\\[wdW])', '', urls._regex)
+        term = re.sub('[\^/\?+*\$]|(\\\[wdW])', '', urls._regex)
         try: urls.name = urls.name[ARCHON_LANGUAGE]
         except: pass
         return {'name' : parent_name + '-' + term, 'display' : urls.name, 'url' : parent_url + '/' + term}
