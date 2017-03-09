@@ -34,7 +34,10 @@
 #                                                                              #
 ################################################################################
 
+import importlib
 from archon import *
+
+from .settings import ARCHON_APPLICATIONS
 
 class Manager(ManagerAbstraction):
     
@@ -44,8 +47,38 @@ class Manager(ManagerAbstraction):
 @pageview(Manager)
 def dashboard(R, M, V):
     
-    V.Page.html(
-        DIV().html(
-            FLIPCLOCK()
+    alen = len(ARCHON_APPLICATIONS)
+    amod = alen % 4
+    if alen <= 4:
+        if amod == 0: col_size = 3
+        elif amod == 1: col_size = 12
+        elif amod == 2: col_size = 6
+        elif amod == 3: col_size = 4
+    else: col_size = 3
+    
+    app_jumbos = ROW()
+    
+    for app in ARCHON_APPLICATIONS:
+        app_summary = importlib.import_module(app['src'] + '.manager').Manager.instance().getSummary(R, M, V)
+        app_jumbos.html(
+            COL(col_size).html(
+                JUMBO(STYLE='padding:20px;').html(
+                    DIV(STYLE='text-align:center;').html(
+                        IMG('/resources/images/device/' + app_summary['icon'], STYLE='height:150px;'),
+                        HEAD(1).html(app_summary['name'])
+                    ),
+                    DIV(STYLE='height:100px;text-align:center;').html(
+                        PARA().html(app_summary['desc'])
+                    )
+                ).click(app_summary['link'])
+            )
         )
+    
+    V.Page.html(
+        ROW().html(
+            COL(12).html(
+                FLIPCLOCK()
+            )
+        ),
+        app_jumbos
     )

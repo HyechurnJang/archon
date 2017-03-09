@@ -230,3 +230,12 @@ class Manager(archon.ManagerAbstraction, acidipy.MultiDomain):
         EndpointTracker.initDatabase()
         for domain_name in self: self[domain_name].eptracker.getInitData()
         
+    def getSummary(self, R, M, V):
+        return {
+            'name' : 'ACI',
+            'icon' : 'aci/APIC_Default.png',
+            'desc' : 'Application Centric Infrastructure Monitoring Application',
+            'link' : '/aci/overview',
+            'view' : DIV()
+        }
+        

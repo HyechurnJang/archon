@@ -36,6 +36,8 @@
 
 import archon
 
+from archon import *
+
 #===============================================================================
 # Create your manager here.
 #===============================================================================
@@ -43,3 +45,12 @@ class Manager(archon.ManagerAbstraction):
     
     def __init__(self):
         pass
+    
+    def getSummary(self, R, M, V):
+        return {
+            'name' : 'Sample',
+            'icon' : 'Default.png',
+            'desc' : 'Sample Application',
+            'link' : '/dashboard',
+            'view' : DIV()
+        }

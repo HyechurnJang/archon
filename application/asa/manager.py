@@ -40,6 +40,7 @@ import pygics
 import asadipy
 import archon
 
+from archon import *
 from models import *
 from .settings import *
 
@@ -144,3 +145,12 @@ class Manager(archon.ManagerAbstraction, asadipy.MultiDomain):
 
     def getHealth(self):
         return self.healthmon.getHealth()
+    
+    def getSummary(self, R, M, V):
+        return {
+            'name' : 'ASA',
+            'icon' : 'asa/ASA_Default.png',
+            'desc' : 'Adaptive Security Appliance Monitoring Application',
+            'link' : '/asa/overview',
+            'view' : DIV()
+        }

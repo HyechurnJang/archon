@@ -55,6 +55,15 @@ class ManagerAbstraction:
     def instance(cls, *argv, **kargs):
         if cls.__MANAGER__ == None: cls.__MANAGER__ = cls(*argv, **kargs)
         return cls.__MANAGER__
+    
+    def getSummary(self, r, m, v): 
+        return {
+            'name' : '?',
+            'icon' : 'Default.png',
+            'desc' : 'This is Unknown Manager',
+            'link' : '/dashboard',
+            'view' : DIV()
+        }
 
 class ArchonReq:
     

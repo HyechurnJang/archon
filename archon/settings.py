@@ -59,8 +59,8 @@ APP_DIR = BASE_DIR + '/application'
 SECRET_KEY = 'xqc)^+lns24=i0c5n!kegnxlfd5f&1(=cf-@nvd6f$ndkyp^fp'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = APPLICATION_SETTINGS.DEBUG
-ALLOWED_HOSTS = APPLICATION_SETTINGS.ALLOWED_HOSTS
+DEBUG = APPLICATION_SETTINGS.WSGI_DEBUG
+ALLOWED_HOSTS = APPLICATION_SETTINGS.WSGI_HOSTS
 
 # Application definition
 
@@ -83,7 +83,7 @@ for app_path in app_paths:
         app_settings = importlib.import_module(app_src_path + '.settings')
         if app_settings.ACTIVE:
             INSTALLED_APPS.append(app_src_path)
-            ARCHON_APPLICATIONS.append({'name' : app_path, 'display' : app_settings.DISPLAY})
+            ARCHON_APPLICATIONS.append({'name' : app_path, 'display' : app_settings.DISPLAY, 'src' : app_src_path})
 
 MIDDLEWARE_CLASSES = [
     'django.middleware.security.SecurityMiddleware',
