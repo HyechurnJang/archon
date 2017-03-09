@@ -54,7 +54,7 @@ def ep_all(R, M, V):
     hyp_cnt = 0
     vir_cnt = 0
     
-    for domain_name in M:
+    for domain_name in sorted(M.keys()):
         
         paths = M[domain_name].Class('fvRsCEpToPathEp').list()
         nics = M[domain_name].Class('compNic').list(detail=True)

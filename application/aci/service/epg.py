@@ -48,7 +48,7 @@ def epg_all(R, M, V):
     #===========================================================================
     table = TABLE.BASIC(V('Domain'), V('Name'), V('Bridge Domain'), V('Provided Contracts'), V('Consumed Contracts'), V('Binding Path'))
     epg_cnt = 0
-    for domain_name in M:
+    for domain_name in sorted(M.keys()):
         for epg in epgs[domain_name]:
             epg_cnt += 1
             raw = re.sub('(uni/|tn-|ap-|epg-)', '', epg['dn']).split('/')

@@ -55,7 +55,7 @@ def tenant_all(R, M, V):
     #===========================================================================
     table = TABLE.BASIC(V('Domain'), V('Name'), V('EPG'), V('Bridge Domain'), V('Context'), V('Contract'), V('Filter'))
     tn_cnt = 0
-    for domain_name in M:
+    for domain_name in sorted(M.keys()):
         for tn in tns[domain_name]:
             tn_cnt += 1
             name = GET('/aci/show/tenant/%s/%s' % (domain_name, tn['dn'])).html(tn['name'])

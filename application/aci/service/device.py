@@ -49,7 +49,7 @@ def device_all(R, M, V):
     #===========================================================================
     # Logic
     #===========================================================================
-    for domain_name in M:
+    for domain_name in sorted(M.keys()):
         table = TABLE.BASIC(V('ID'), V('Type'), V('Name'), V('Model'), V('Serial'), V('Version'), V('Management IP'), V('State'), V('Fabric State'), V('Uptime'))
         
         cnt_ctrl = 0

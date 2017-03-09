@@ -70,7 +70,7 @@ def fault_all(R, M, V):
     
     nav = NAV()
     
-    for domain_name in M:
+    for domain_name in sorted(M.keys()):
         cri_num += cri_cnt[domain_name]
         maj_num += maj_cnt[domain_name]
         min_num += min_cnt[domain_name]

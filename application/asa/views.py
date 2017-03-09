@@ -449,7 +449,7 @@ def pat_pool_graph(R, M, V):
     
     pool_list = ROW()
     
-    for domain_name in M:
+    for domain_name in sorted(M.key()):
         pats = {}
          
         for pool in pools[domain_name]:
@@ -565,7 +565,7 @@ def config(R, M, V):
     
     table = TABLE.FLIP(V('Domain Name'), V('+ASA IP'), V('+Administrator ID'), V('+Start Connections'), V('+Max Connections'), '')
     
-    for domain_name in M:
+    for domain_name in sorted(M.key()):
         table.Record(domain_name,
                      M[domain_name]['ip'],
                      M[domain_name]['user'],

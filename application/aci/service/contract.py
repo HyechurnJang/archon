@@ -55,7 +55,7 @@ def contract_all(R, M, V):
     ctrt_cnt = 0
     prov_cnt = 0
     cons_cnt = 0
-    for domain_name in M:
+    for domain_name in sorted(M.keys()):
         for ctrt in ctrts[domain_name]:
             ctrt_cnt += 1
             dn = ctrt['dn']

@@ -55,7 +55,7 @@ def external_all(R, M, V):
     table = TABLE.BASIC(V('Domain'), V('Name'), V('Contexts'), V('Subnets'), V('Provided Contracts'), V('Consumed Contracts'))
     extn_cnt = 0
     
-    for domain_name in M:
+    for domain_name in sorted(M.keys()):
         for extn in extns[domain_name]:
             extn_cnt += 1
             dn = extn['dn']
