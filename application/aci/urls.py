@@ -41,35 +41,35 @@ from . import views
 # Link your view here.
 #===============================================================================
 url_show = [
-    url(r'^host/?$', views.host, name={'en' : 'Host', 'ko' : u'호스트'}),
-    url(r'^device/?$', views.device, name={'en' : 'Device', 'ko' : u'장치'}),
-    url(r'^tenant/?$', views.tenant, name={'en' : 'Tenant', 'ko' : u'테넌트'}),
-    url(r'^epgroup/?$', views.epg, name={'en' : 'EPG', 'ko' : u'엔드포인트그룹'}),
-    url(r'^endpoint/?$', views.endpoint, name={'en' : 'Endpoint', 'ko' : u'엔드포인트'}),
-    url(r'^contract/?$', views.contract, name={'en' : 'Contract', 'ko' : u'컨트랙'}),
-    url(r'^external/?$', views.external, name={'en' : 'External', 'ko' : u'외부네트워크'}),
-    url(r'^fault/?$', views.fault, name={'en' : 'Fault', 'ko' : u'오류'})
+    url(r'^host/?', views.host, name={'en' : 'Host', 'ko' : u'호스트'}),
+    url(r'^device/?', views.device, name={'en' : 'Device', 'ko' : u'장치'}),
+    url(r'^tenant/?', views.tenant, name={'en' : 'Tenant', 'ko' : u'테넌트'}),
+    url(r'^epgroup/?', views.epg, name={'en' : 'EPG', 'ko' : u'엔드포인트그룹'}),
+    url(r'^endpoint/?', views.endpoint, name={'en' : 'Endpoint', 'ko' : u'엔드포인트'}),
+    url(r'^contract/?', views.contract, name={'en' : 'Contract', 'ko' : u'컨트랙'}),
+    url(r'^external/?', views.external, name={'en' : 'External', 'ko' : u'외부네트워크'}),
+    url(r'^fault/?', views.fault, name={'en' : 'Fault', 'ko' : u'오류'})
 ]
 
 url_stat = [
-    url(r'^epgstat/?$', views.epg_util, name={'en' : 'EPG Util', 'ko' : u'엔드포인트그룹 사용율'}),
-    url(r'^intfstat/?$', views.intf_util, name={'en' : 'Interface Util', 'ko' : u'인터페이스 사용율'}),
-    url(r'^acl_permit/?$', views.acl_permit, name={'en' : 'Permit Packet', 'ko' : u'허용패킷로그'}),
-    url(r'^acl_deny/?$', views.acl_deny, name={'en' : 'Deny Packet', 'ko' : u'차단패킷로그'}),
+    url(r'^epgstat/?', views.epg_util, name={'en' : 'EPG Util', 'ko' : u'엔드포인트그룹 사용율'}),
+    url(r'^intfstat/?', views.intf_util, name={'en' : 'Interface Util', 'ko' : u'인터페이스 사용율'}),
+    url(r'^acl_permit/?', views.acl_permit, name={'en' : 'Permit Packet', 'ko' : u'허용패킷로그'}),
+    url(r'^acl_deny/?', views.acl_deny, name={'en' : 'Deny Packet', 'ko' : u'차단패킷로그'}),
 ]
 
 url_tool = [
-    url(r'^eptracker/?$', views.eptracker, name={'en' : 'Endpoint Tracker', 'ko' : u'엔드포인트 추적기'}),
-    url(r'^ofinder/?$', views.ofinder, name={'en' : 'Object Finder', 'ko' : u'오브젝트 검색기'}),
+    url(r'^eptracker/?', views.eptracker, name={'en' : 'Endpoint Tracker', 'ko' : u'엔드포인트 추적기'}),
+    url(r'^ofinder/?', views.ofinder, name={'en' : 'Object Finder', 'ko' : u'오브젝트 검색기'}),
 ]
 
 urlpatterns = [
-    url(r'^overview/?$', views.overview, name={'en' : 'Overview', 'ko' : u'개요'}),
-    url(r'^healthview/?$', views.healthview, name={'en' : 'Health', 'ko' : u'상태'}),
-    url(r'^topoview/?$', views.topoview, name={'en' : 'Relation', 'ko' : u'관계도'}),
+    url(r'^overview/?', views.overview, name={'en' : 'Overview', 'ko' : u'개요'}),
+    url(r'^healthview/?', views.healthview, name={'en' : 'Health', 'ko' : u'상태'}),
+    url(r'^topoview/?', views.topoview, name={'en' : 'Relation', 'ko' : u'관계도'}),
     url(r'^show/', include(url_show, namespace={'en' : 'Show', 'ko' : u'점검'})),
     url(r'^stat/', include(url_stat, namespace={'en' : 'Stat', 'ko' : u'분석'})),
     url(r'^tool/', include(url_tool, namespace={'en' : 'Tools', 'ko' : u'도구'})),
-    url(r'^conf/?$', views.config, name={'en' : 'Config', 'ko' : u'설정'}),
+    url(r'^conf/?', views.config, name={'en' : 'Config', 'ko' : u'설정'}),
 ]
 

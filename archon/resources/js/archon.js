@@ -187,7 +187,8 @@ function GetData(url) {
 				ParseViewData(data.menu);
 				page_current.html(ParseViewDom(page_current.attr("id") + '-', data.page));
 				ParseViewData(data.page);
-				page_current.css("height", "calc(100% - 100px)");
+				if (page_current.attr("id") == "dashboard-page") { page_current.css("height", "calc(100% - 50px)"); } 
+				else { page_current.css("height", "calc(100% - 100px)"); }
 				page_current.fadeIn(350);
 				page_current.collapse("show");
 			}, 400);
