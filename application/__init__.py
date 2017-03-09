@@ -35,7 +35,7 @@
 ################################################################################
 
 WSGI_DEBUG = True
-WSGI_HOSTS = []
+WSGI_HOSTS = ['0.0.0.0']
 LANGUAGE = 'ko' # en
 DATABASE_USER = 'admin'
 DATABASE_PASSWORD = '1234Qwer'
