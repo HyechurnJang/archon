@@ -1,0 +1,3 @@
+#!/bin/bash
+
+cd /root/archon && screen -dmS archon python server.py
