@@ -67,9 +67,9 @@ urlpatterns = [
     url(r'^overview/?$', views.overview, name={'en' : 'Overview', 'ko' : u'개요'}),
     url(r'^healthview/?$', views.healthview, name={'en' : 'Health', 'ko' : u'상태'}),
     url(r'^topoview/?$', views.topoview, name={'en' : 'Relation', 'ko' : u'관계도'}),
-    url(r'^show/?$', include(url_show, namespace={'en' : 'Show', 'ko' : u'점검'})),
-    url(r'^stat/?$', include(url_stat, namespace={'en' : 'Stat', 'ko' : u'분석'})),
-    url(r'^tool/?$', include(url_tool, namespace={'en' : 'Tools', 'ko' : u'도구'})),
+    url(r'^show/', include(url_show, namespace={'en' : 'Show', 'ko' : u'점검'})),
+    url(r'^stat/', include(url_stat, namespace={'en' : 'Stat', 'ko' : u'분석'})),
+    url(r'^tool/', include(url_tool, namespace={'en' : 'Tools', 'ko' : u'도구'})),
     url(r'^conf/?$', views.config, name={'en' : 'Config', 'ko' : u'설정'}),
 ]
 

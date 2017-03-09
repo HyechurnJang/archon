@@ -53,5 +53,5 @@ url_sample = [
 ]
 
 urlpatterns = [
-    url(r'^samples/?$', include(url_sample, namespace=u'샘플예제')),
+    url(r'^samples/', include(url_sample, namespace=u'샘플예제')),
 ]
