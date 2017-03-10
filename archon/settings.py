@@ -167,3 +167,4 @@ USE_TZ = True
 STATIC_URL = '/resources/'
 STATIC_DIR = 'archon/resources'
 # STATICFILES_DIRS = [ os.path.join(BASE_DIR, "archon/resources"), ]
+LOGOFILE_PATH = BASE_DIR+"/"+STATIC_DIR+"/images/logo.png"

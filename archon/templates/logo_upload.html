@@ -1,0 +1,64 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="Cisco Webkit">
+    <meta name="author" content="hyjang@cisco.com">
+
+
+    <!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
+    <title>Archon</title>
+
+
+    <!-- CSS -->
+    <link rel="stylesheet" href="/resources/css/bootstrap.css" />
+    <link rel="stylesheet" href="/resources/css/font-awesome.min.css" />
+    <link rel="stylesheet" href="/resources/css/datatables.min.css"/>
+    <link rel="stylesheet" href="/resources/css/footable.bootstrap.min.css"/>
+    <link rel="stylesheet" href="/resources/css/flipclock.css" />
+    <link rel="stylesheet" href="/resources/css/archon.css" />
+
+
+    <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
+    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+    <!--[if lt IE 9]>
+        <script src="https://oss.maxcdn.com/html5shiv/3.7.3/html5shiv.min.js"></script>
+        <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
+    <![endif]-->
+</head>
+<body>
+    <!-- Javascripts -->
+    <script src="/resources/js/jquery-2.2.4.min.js"></script>
+    <script src="/resources/js/bootstrap.min.js"></script>
+    <script src="/resources/js/d3.min.js"></script>
+    <script src="/resources/js/datatables.min.js"></script>
+    <script src="/resources/js/footable.min.js"></script>
+    <script src="/resources/js/dimple.v2.3.0.min.js"></script>
+    <script src="/resources/js/arbor.js"></script>
+    <script src="/resources/js/arbor-tween.js"></script>
+    <script src="/resources/js/arbor-graphics.js"></script>
+    <script src="/resources/js/raphael-2.1.4.min.js"></script>
+    <script src="/resources/js/justgage.js"></script>
+    <script src="/resources/js/flipclock.min.js"></script>
+    <script src="/resources/js/jquery.peity.min.js"></script>
+    <script src="/resources/js/archonUX.js"></script>
+    <script src="/resources/js/archon.js"></script>
+  <p align="center">
+  Logo Image Update 
+  - Size(width * height) : 264px * 500px, Transparent background 
+  <form method="post" enctype="multipart/form-data">
+    {% csrf_token %}
+    <input type="file" name="logo">
+    <button type="submit">Upload</button>
+  </form>
+
+  {% if uploaded_file_url %}
+    <p>File uploaded at: <a href="{{ uploaded_file_url }}">{{ uploaded_file_url }}</a></p>
+  {% endif %}
+  </p>
+</body>
+</html>

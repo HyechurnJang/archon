@@ -64,6 +64,7 @@ from django.contrib.auth.decorators import login_required
 
 from .settings import ARCHON_APPLICATIONS, ARCHON_LANGUAGE
 import dashboard
+import logo
 
 class MainPage:
     
@@ -133,6 +134,7 @@ urlpatterns = [
     url(r'^account/logout/?', auth_views.logout, {'next_page': '/'}, name='logout'),
     url(r'^admin/?', admin.site.urls),
     url(r'^favicon\.ico', RedirectView.as_view(url='/resources/images/favicon.ico')),
+    url(r'^upload$', logo.upload),
     url(r'^', mainpage.sendMainPage),
 ]
 
