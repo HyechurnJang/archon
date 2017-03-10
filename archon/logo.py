@@ -10,7 +10,7 @@ def upload(request):
         myfile = request.FILES['logo']
         fs = FileSystemStorage( "/tmp")
         filename = fs.save( "logo.png", myfile)
-        with open( settins.LOGOFILE_PATH, "wb+") as logof:
+        with open( settings.LOGOFILE_PATH, "wb+") as logof:
             srcf = fs.open( filename, "rb")
             logof.write( srcf.read())
             srcf.close()

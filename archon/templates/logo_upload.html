@@ -1,4 +1,4 @@
-{% load static %}
+{% load staticfiles %}
 
 <!DOCTYPE html>
 <html lang="en">
@@ -47,18 +47,27 @@
     <script src="/resources/js/jquery.peity.min.js"></script>
     <script src="/resources/js/archonUX.js"></script>
     <script src="/resources/js/archon.js"></script>
-  <p align="center">
-  Logo Image Update 
-  - Size(width * height) : 264px * 500px, Transparent background 
-  <form method="post" enctype="multipart/form-data">
-    {% csrf_token %}
-    <input type="file" name="logo">
-    <button type="submit">Upload</button>
-  </form>
+    
+    
+    <!-- upload Form -->
+    <div id="loginboard">
+        <div id="loginpanel" class="panel panel-default">
+            <div class="panel-body">
+                <form method="post" action="/upload" enctype="multipart/form-data">
 
-  {% if uploaded_file_url %}
-    <p>File uploaded at: <a href="{{ uploaded_file_url }}">{{ uploaded_file_url }}</a></p>
-  {% endif %}
-  </p>
+                    <div id="loginlogo">
+                        <img src="/resources/images/logo.png" />
+                    </div>
+                    <div class="form-group">
+                        <label>File Name</label>
+                        <input type="file" name="logo">
+                    </div>
+                    <div class="form-group">
+                        <button type="submit" class="btn btn-primary" style="float:right;">Upload &amp; Change</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
 </body>
 </html>
