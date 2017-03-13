@@ -1,0 +1,6 @@
+pygics
+django 
+mysqlclient 
+openpyxl
+acidipy
+asadipy
