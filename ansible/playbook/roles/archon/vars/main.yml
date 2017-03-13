@@ -1,0 +1,13 @@
+---
+basedir: /home/cisco/archon
+
+#Maria database information
+database_host: localhost
+database_name: archon
+database_user: admin
+database_pass: 1234Qwer
+database_port: 3306
+
+#git repo
+repo_url : https://github.com/HyechurnJang/archon.git
+branch_name: master

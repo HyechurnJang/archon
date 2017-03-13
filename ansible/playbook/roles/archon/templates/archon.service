@@ -1,0 +1,14 @@
+[Unit]
+Description=Archon service 
+After=mariadb.service
+
+[Service]
+Type=simple
+User=root
+ExecStart=/usr/bin/python server.py
+WorkingDirectory={{basedir}}
+Restart=on-abort
+
+
+[Install]
+WantedBy=multi-user.target

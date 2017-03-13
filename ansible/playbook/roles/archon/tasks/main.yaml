@@ -1,0 +1,139 @@
+---
+- name: install required packages on centos 
+  package: name={{item}} state=present
+  with_items:
+    - mariadb
+    - mariadb-server
+    - mariadb-devel 
+    - mariadb-libs
+    - python-devel
+    - gcc 
+    - gcc-c++ 
+    - make 
+    - openssl-devel
+    - openldap-devel
+    - libselinux-python
+    - git
+    - screen
+  tags:
+    - database
+    - application
+
+- name: mariadb default character set for mariadb-5.5
+  ini_file: dest=/etc/my.cnf.d/server.cnf section=mariadb-5.5 option={{item.name}} value={{item.value}}
+  with_items:
+    - {name: init_connect, value: '"SET collation_connection = utf8_general_ci"'}
+    - {name: init_connect, value: '"SET NAMES utf8"'}
+    - {name: character-set-server, value: utf8}
+    - {name: collation-server, value: utf8_general_ci}
+  tags:
+    - database
+
+- name: restart mariadb 
+  service: name={{item}} state=restarted
+  with_items:
+    - mariadb
+  tags:
+    - database
+
+- name: reset for all modification 
+  become: no
+  remote_user: "{{ user_name}}"
+  shell: git checkout -- * chdir="{{basedir}}"
+  ignore_errors: true
+  tags:
+    - application
+
+- name: clone source from git repos
+  become: no
+  remote_user: "{{ user_name}}"
+  git: repo={{repo_url}} dest={{basedir}} clone=yes version={{branch_name}} force=yes
+  register: git_clone_status
+  ignore_errors: true
+  tags:
+    - application 
+
+- name: git pull from remote repos
+  become: no
+  remote_user: "{{ user_name}}"  
+  shell: git pull chdir="{{basedir}}"
+  when: git_clone_status.changed != false
+  ignore_errors: true
+  tags:
+    - application
+
+- name: install requirements on portal 
+  pip: requirements={{basedir}}/requirements.txt chdir={{ basedir}}
+  tags:
+    - application
+
+- name: install python packages 
+  pip: name={{item}}
+  with_items:
+    - virtualenv
+    - uwsgi
+  tags:
+    - application
+
+- name: drop database on mariadb
+  mysql_db: name={{ database_name}} state=absent
+  ignore_errors: true
+  tags:
+    - database
+
+- name: create database on mariadb
+  mysql_db: name={{ database_name}} state=present
+  tags:
+    - database
+
+- name: make mariadb account 
+  mysql_user: host={{ item }} priv="{{database_name}}.*:ALL" login_user=root name={{ database_user}} password={{ database_pass}}
+  with_items:
+    - "{{ database_host}}"
+    - localhost
+#    - '%'
+  tags:
+    - database
+
+- name: copy __init__.py 
+  become: no
+  template: src=init.j2 dest="{{ basedir}}/application/__init__.py" force=yes
+  tags:
+    - application
+
+- name: disable specific service
+  lineinfile: dest={{basedir}}/application/{{item}}/settings.py regexp='^ACTIVE' line="ACTIVE = False" 
+  with_items:
+    - asa
+    - sample
+
+- name: django makemigrations
+  become: no
+  remote_user: "{{ user_name}}"  
+  shell: python manage.py makemigrations chdir={{basedir}}
+  tags:
+    - application
+
+- name: django migrate
+  become: no
+  remote_user: "{{ user_name}}"
+  shell: python manage.py migrate chdir={{basedir}}
+  tags:
+    - application
+
+- name: copy archon service 
+  template: src=archon.service dest=/usr/lib/systemd/system/archon.service force=yes
+  tags:
+    - application
+
+- name: enable systemctl daemon-reload & enable archon.service
+  shell: systemctl daemon-reload && systemctl enable archon.service && systemctl start archon.service
+  tags:
+    - application 
+
+- name: copy superuser template
+  template: src=superuser.py dest={{basedir}} mode="0755"
+
+- name: create superuser for django 
+  shell: python superuser.py chdir={{basedir}}
+
