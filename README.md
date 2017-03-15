@@ -67,6 +67,8 @@ Edit {ARCHON_ROOT}/application/__init__.py
 	DATABASE_USER = '{ADMIN_NAME}'
 	DATABASE_PASSWORD = '{PASSWORD}'
 
+Important! {ADMIN_NAME} & {PASSWORD} is same as Variables in Create Database Section
+
 #### 1.1.6. Setting Applications
 
 Edit {ARCHON_ROOT}/application/{APPLICATION_NAME}/settings.py
@@ -88,8 +90,6 @@ Edit {ARCHON_ROOT}/application/{APPLICATION_NAME}/settings.py
 	$ python manage.py makemigrations
 	$ python manage.py migrate
 	$ python manage.py createsuperuser
-
-Important! {ADMIN_NAME} & {PASSWORD} is same as Variables in Create Database Section
 
 **If ACI Application Enabled : Faults Data for ACI Application**
 
