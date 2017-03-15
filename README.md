@@ -61,10 +61,11 @@ Using Environments
 
 Edit {ARCHON_ROOT}/application/__init__.py
 
-	DATABASE_AUTH = {
-		'USER': '{ADMIN_NAME}',
-		'PASSWORD': '{PASSWORD}'
-	}
+	WSGI_DEBUG = True # if False then production level
+	WSGI_HOSTS = [] # if WSGI_DEBUG is False then need to insert service IP
+	LANGUAGE = '{DEFAULT_LANGUAGE}' # en or ko
+	DATABASE_USER = '{ADMIN_NAME}'
+	DATABASE_PASSWORD = '{PASSWORD}'
 
 	$ cd {ARCHON_ROOT}
 	$ python manage.py makemigrations
