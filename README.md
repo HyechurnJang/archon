@@ -67,6 +67,23 @@ Edit {ARCHON_ROOT}/application/__init__.py
 	DATABASE_USER = '{ADMIN_NAME}'
 	DATABASE_PASSWORD = '{PASSWORD}'
 
+#### 1.1.6. Setting Applications
+
+Edit {ARCHON_ROOT}/application/{APPLICATION_NAME}/settings.py
+
+	#===============================================================================
+	# Archon Settings
+	#===============================================================================
+	ACTIVE = True # True = Enable Service, False = Disable Service
+	DISPLAY = u'{APPLICATION_DISPLAYED_NAME}'
+	
+	#===============================================================================
+	# Application Settings
+	#===============================================================================
+	...
+
+#### 1.1.7. Django Initialization
+
 	$ cd {ARCHON_ROOT}
 	$ python manage.py makemigrations
 	$ python manage.py migrate
@@ -74,7 +91,7 @@ Edit {ARCHON_ROOT}/application/__init__.py
 
 Important! {ADMIN_NAME} & {PASSWORD} is same as Variables in Create Database Section
 
-**ACI : Faults Data for ACI Application**
+**If ACI Application Enabled : Faults Data for ACI Application**
 
 	$ python manage.py loaddata apic_faults
 
@@ -83,6 +100,6 @@ Important! {ADMIN_NAME} & {PASSWORD} is same as Variables in Create Database Sec
 * createsuperuser : create superuser
 * loaddata : load fixture to database
 
-#### 1.1.6 Running Server
+#### 1.1.8 Running Server
 
 	$ python server.py
