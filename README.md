@@ -91,7 +91,7 @@ Edit {ARCHON_ROOT}/application/{APPLICATION_NAME}/settings.py
 	$ python manage.py migrate
 	$ python manage.py createsuperuser
 
-**If ACI Application Enabled : Faults Data for ACI Application**
+If ACI Application Enabled : Faults Data for ACI Application
 
 	$ python manage.py loaddata apic_faults
 
