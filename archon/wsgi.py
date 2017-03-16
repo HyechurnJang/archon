@@ -43,12 +43,11 @@ For more information on this file, see
 https://docs.djangoproject.com/en/1.9/howto/deployment/wsgi/
 """
 
-from django.core.wsgi import get_wsgi_application
-application = get_wsgi_application()
-
 import sys
-from .settings import INSTALLED_APPS
 from openpyxl import load_workbook
+from django.core.wsgi import get_wsgi_application
+from .settings import INSTALLED_APPS
+from .manager import Manager
 
 def getLocaleFromXLSX(path):
     wb = load_workbook(filename=path)
@@ -85,7 +84,12 @@ for app in INSTALLED_APPS:
         print('[ OK ]')
 __builtins__['archon_locales'] = archon_locales
 
-print('\n3. Loading archon managers')
+print('\n3. Loading archon manager')
+sys.stdout.write('%-40s =====> ' % 'Archon Manager')
+__builtins__['Archon'] = Manager.instance()
+print('[ OK ]')
+
+print('\n4. Loading application managers')
 for app in INSTALLED_APPS:
     if 'application.' in app:
         manager_path = app + '.manager'
@@ -94,4 +98,5 @@ for app in INSTALLED_APPS:
         __import__(manager_path, globals(), fromlist=fromlist).Manager.instance()
         print('[ OK ]')
 
-print('\n4. Archon Initialization Finished >> Logging Start')
+print('\n5. Archon Initialization Finished >> Logging Start')
+application = get_wsgi_application()

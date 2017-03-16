@@ -64,9 +64,11 @@ $(document).ready(function() {
 	var dynpages = $(".dynpage");
 	var app_selector = $(".app-selector");
 	var page_selector = $(".page-selector");
+	var admin_selector = $(".admin-selector");
 	var loading_page = $("#loading-page");
 	var subject_page = $("#subject-page");
 	var dashboard_page = $("#dashboard-page");
+	var admin_page = $("#archon-admin-page");
 
 	apps.hide();
 	pages.collapse({'toggle': false});
@@ -84,9 +86,11 @@ $(document).ready(function() {
 		page_selector.css("color", "#777");
 		apps.fadeOut(350);
 		dashboard_page.fadeOut(350);
+		admin_page.fadeOut(350);
 		subject_page.fadeOut(350);
 		dynpages.fadeOut(350);
 		dashboard_page.collapse("hide");
+		admin_page.collapse("hide");
 		subject_page.collapse("hide");
 		dynpages.collapse("hide");
 		dynpages.html(null);
@@ -132,9 +136,57 @@ $(document).ready(function() {
 		page_selector.css("color", "#777");
 		selector.css("color", "#337ab7");
 		dashboard_page.fadeOut(350);
+		admin_page.fadeOut(350);
 		subject_page.fadeOut(350);
 		dynpages.fadeOut(350);
 		dashboard_page.collapse("hide");
+		admin_page.collapse("hide");
+		subject_page.collapse("hide");
+		dynpages.collapse("hide");
+		dynpages.html(null);
+		loading_page.collapse("show");
+		$.ajax({
+			url : url,
+			dataType : "json",
+			success : function(data) {
+				if ( page_current == page ) {
+					setTimeout(function() {
+						$("#subject-title").html(selector.html());
+						$("#subject-title").attr("onclick", "GetData('" + url + "');");
+						$("#subject-menu").html(ParseViewDom(page.attr("id") + '-m-', data.menu))
+						ParseViewData(data.menu);
+						page.html(ParseViewDom(page.attr("id") + '-', data.page));
+						ParseViewData(data.page);
+						page.css("height", "calc(100% - 100px)");
+						loading_page.collapse("hide");
+						subject_page.fadeIn(350);
+						page.fadeIn(350);
+						subject_page.collapse("show");
+						page.collapse("show");
+					}, 400);
+				}
+			},
+			error : function(xhr, status, thrown) {
+				window.alert("Session Timeout!");
+				window.location.replace('/');
+			}
+		});
+	});
+	
+	admin_selector.click(function() {
+		SetSchedBtnOff();
+		var selector = $(this);
+		var page = $("#archon-admin-page");
+		var url = selector.attr("view");
+		page_current = page;
+		url_current = url;
+		page_selector.css("color", "#777");
+		dashboard_page.fadeOut(350);
+		admin_page.fadeOut(350);
+		subject_page.fadeOut(350);
+		dynpages.fadeOut(350);
+		dashboard_page.collapse("hide");
+		admin_page.collapse("hide");
 		subject_page.collapse("hide");
 		dynpages.collapse("hide");
 		dynpages.html(null);
@@ -218,6 +270,41 @@ function PostData(uuid, url) {
 		headers: { "X-CSRFToken": GetCookie("csrftoken") },
 		dataType: "json",
 		data: JSON.stringify(data),
+		success : function(data) {
+			setTimeout(function() {
+				$("#subject-menu").html(ParseViewDom(page_current.attr("id") + '-m-', data.menu))
+				ParseViewData(data.menu);
+				page_current.html(ParseViewDom(page_current.attr("id") + '-', data.page));
+				ParseViewData(data.page);
+				page_current.css("height", "calc(100% - 100px)");
+				page_current.fadeIn(350);
+				page_current.collapse("show");
+			}, 400);
+		},
+		error : function(xhr, status, thrown) {
+			window.alert("Session Timeout!");
+			window.location.replace('/');
+		}
+	});
+};
+
+function PostFile(uuid, url) {
+	SetSchedBtnOff();
+	var dynpages = $(".dynpage");
+	var subject_page = $("#subject-page");
+	var finput = $("#" + uuid + "-file");
+	var form = new FormData($("#" + uuid));
+	form.append(finput.attr("NAME"), finput[0].files[0]);
+	dynpages.fadeOut(350);
+	dynpages.collapse("hide");
+	$.ajax({
+		type: "POST",
+		url: url,
+		data: form,
+		cache: false,
+		contentType: false,
+		processData: false,
+		headers: { "X-CSRFToken": GetCookie("csrftoken") },
 		success : function(data) {
 			setTimeout(function() {
 				$("#subject-menu").html(ParseViewDom(page_current.attr("id") + '-m-', data.menu))

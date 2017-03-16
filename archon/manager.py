@@ -34,8 +34,64 @@
 #                                                                              #
 ################################################################################
 
-from core import TAG, DIV, SPAN, HEAD, PARA, ANCH, LABEL, STRONG, SMALL, IMG, ICON, THEAD, TBODY, TH, TR, TD, TABLE, UL, LI, FORM, INPUT, SELECT, OPTION, BUTTON
-from deco import ROW, COL, STRWRAP, KEYVAL, ALERT, PANEL, COUNTER, INDENT, SECTOR, LISTGROUP, NAV, MODAL, JUMBO, FLIPCLOCK, OVERLAP
-from action import GET, POST, UPLOAD, DELETE
-from chart import CHART, FIGURE, TOPO, GAUGE
+import re
+import archon
 
+from openpyxl import load_workbook
+from .settings import BASE_DIR, STATIC_DIR
+from archon import *
+
+#===============================================================================
+# Create your manager here.
+#===============================================================================
+
+class Inventory(dict):
+    
+    class InvDict(dict):
+        def __init__(self): dict.__init__(self)
+        def Get(self, key):
+            if key in self: return self[key]
+            return None
+    
+    def __init__(self):
+        dict.__init__(self)
+        self.initMACIP()
+        
+    def initMACIP(self):
+        self._macip_file_path = BASE_DIR + '/' + STATIC_DIR + '/files/macip.xlsx'
+        self['MAC'] = None
+        self['IP'] = None
+        self.reloadMACIP()
+        
+    def reloadMACIP(self):
+        mac = Inventory.InvDict()
+        ip = Inventory.InvDict()
+        wb = load_workbook(filename=self._macip_file_path)
+        sheet = wb['address']
+        sheet_macip = sheet['A']
+        sheet_name = sheet['B']
+        idx = 1
+        for macip in sheet_macip[1:]:
+            mi = macip.value
+            if re.search('\w\w:\w\w:\w\w:\w\w:\w\w:\w\w', mi):
+                key = re.sub('\s', '', mi).upper()
+                name = sheet_name[idx].value
+                mac[key] = name
+            elif re.search('\d+\.\d+\.\d+\.\d+', mi):
+                key = re.sub('\s', '', mi)
+                name = sheet_name[idx].value
+                ip[key] = name
+            idx += 1
+        self['MAC'] = mac
+        self['IP'] = ip
+    
+    @property
+    def MAC(self): return self['MAC']
+    
+    @property
+    def IP(self): return self['IP']
+
+class Manager(archon.ManagerAbstraction):
+    
+    def __init__(self):
+        self.INV = Inventory()

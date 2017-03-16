@@ -32,7 +32,7 @@ td>p {
 	padding: 10px 0px 10px 0px;
 }
 #loginlogo>img {
-	width: 80%
+	width: 80%;
 }
 
 .navbar {
@@ -52,7 +52,7 @@ td>p {
 }
 
 .navbar-brand>img {
-	width: 40px;
+	height: 20px;
 }
 
 .input-group {
@@ -109,6 +109,10 @@ td>p {
   text-decoration: none;
 }
 
+.admin-selector {
+	cursor: pointer;
+}
+
 #sched-toggle-btn {
 	float: right;
 	padding: 10px;
@@ -131,10 +135,16 @@ td>p {
 	height: calc(100% - 50px);
 }
 #dashboard-page {
+	padding-top: 10px;
     overflow-y: scroll;
     height: calc(100% - 50px);
     background-color: rgba(255,255,255,0.91);
-    padding-top: 10px;
+}
+#archon-admin-page {
+	padding-top: 10px;
+    overflow-y: scroll;
+    height: calc(100% - 100px);
+    background-color: rgba(255,255,255,0.91);
 }
 #subject-page {
 	background-color: rgba(255,255,255,0.7);

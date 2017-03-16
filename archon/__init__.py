@@ -73,6 +73,9 @@ class ArchonReq:
         self.Path = path
         self.Query = query
         self.Data = data
+        
+    def __str__(self):
+        return '%s:%s\nQuery:%s\nData:%s' % (self.Method, self.Path, self.Query, self.Data)
 
 class ArchonView:
     
@@ -126,11 +129,23 @@ def pageview(manager_class, **async_path):
             except Exception as e: return JsonResponse(ArchonView.__error__(v('manager allocation error'), str(e)))
             
             try:
-                if method == 'GET': query = request.GET; data = {}
-                elif method == 'POST': query = request.POST; data = json.loads(request.body)
-                elif method == 'PUT': query = request.PUT; data = json.loads(request.body)
-                elif method == 'DELETE': query = {}; data = {}
-                else: query = {}; data = {}
+                if method == 'GET':
+                    query = dict(request.GET)
+                    data = {}
+                elif method == 'POST':
+                    query = dict(request.POST)
+                    if not hasattr(request, '_body') and request._read_started: data = request.FILES
+                    else: data = json.loads(request.body)
+                elif method == 'PUT':
+                    query = dict(request.PUT)
+                    if not hasattr(request, '_body') and request._read_started: data = request.FILES
+                    else: data = json.loads(request.body)
+                elif method == 'DELETE':
+                    query = {}
+                    data = {}
+                else:
+                    query = {}
+                    data = {}
             except Exception as e: return JsonResponse(ArchonView.__error__(v('request error'), str(e)))
             r = ArchonReq(request, method, path, query, data)
             
@@ -153,11 +168,24 @@ def pageview(manager_class, **async_path):
             v = ArchonView(app, lang)
             m = manager_class.instance()
             
-            if method == 'GET': query = dict(request.GET); data = {}
-            elif method == 'POST': query = dict(request.POST); data = json.loads(request.body)
-            elif method == 'PUT': query = dict(request.PUT); data = json.loads(request.body)
-            elif method == 'DELETE': query = {}; data = {}
-            else: query = {}; data = {}
+            if method == 'GET':
+                query = dict(request.GET)
+                data = {}
+            elif method == 'POST':
+                query = dict(request.POST)
+                if not hasattr(request, '_body') and request._read_started: data = request.FILES
+                else: data = json.loads(request.body)
+            elif method == 'PUT':
+                query = dict(request.PUT)
+                if not hasattr(request, '_body') and request._read_started: data = request.FILES
+                else: data = json.loads(request.body)
+            elif method == 'DELETE':
+                query = {}
+                data = {}
+            else:
+                query = {}
+                data = {}
+                
             r = ArchonReq(request, method, path, query, data)
             
             async_path_names = async_path.keys()
