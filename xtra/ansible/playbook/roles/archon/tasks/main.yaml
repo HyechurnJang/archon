@@ -18,6 +18,22 @@
   tags:
     - database
     - application
+  when: ansible_distribution == 'CentOS' or ansible_distribution == 'Red Hat Enterprise Linux'
+
+- name: install required packages on ubuntu
+  package: name={{item}} state=present
+  with_items:
+    - git 
+    - gcc
+    - mariadb-server
+    - libmysqlclient-dev
+    - python-dev
+    - screen
+  tags:
+    - database
+    - application
+  when: ansible_distribution == 'Ubuntu' or ansible_distribution == 'Debian'
+
 
 - name: mariadb default character set for mariadb-5.5
   ini_file: dest=/etc/my.cnf.d/server.cnf section=mariadb-5.5 option={{item.name}} value={{item.value}}
@@ -33,6 +49,15 @@
   service: name={{item}} state=restarted
   with_items:
     - mariadb
+  when: ansible_distribution == 'CentOS' or ansible_distribution == 'Red Hat Enterprise Linux'
+  tags:
+    - database
+
+- name: restart mariadb 
+  service: name={{item}} state=restarted
+  with_items:
+    - mysql
+  when: ansible_distribution == 'Ubuntu' or ansible_distribution == 'Debian'
   tags:
     - database
 
@@ -121,15 +146,29 @@
   tags:
     - application
 
-- name: copy archon service 
+- name: copy archon service (rhel/centos)
   template: src=archon.service dest=/usr/lib/systemd/system/archon.service force=yes
   tags:
     - application
+  when: ansible_distribution == 'CentOS' or ansible_distribution == 'Red Hat Enterprise Linux'
 
 - name: enable systemctl daemon-reload & enable archon.service
   shell: systemctl daemon-reload && systemctl enable archon.service && systemctl start archon.service
   tags:
     - application 
+  when: ansible_distribution == 'CentOS' or ansible_distribution == 'Red Hat Enterprise Linux'
+
+- name: copy archon service (ubuntu)
+  template: src=archon.sh dest=/etc/init.d mode="0755" force=yes
+  tags:
+    - application
+  when: ansible_distribution == 'Ubuntu' or ansible_distribution == 'Debian'
+
+- name: register as service
+  shell: update-rc.d archon.sh defaults && service archon.sh start
+  tags:
+    - application
+  when: ansible_distribution == 'Ubuntu' or ansible_distribution == 'Debian'  
 
 - name: copy superuser template
   template: src=superuser.py dest={{basedir}} mode="0755"
@@ -137,3 +176,9 @@
 - name: create superuser for django 
   shell: python superuser.py chdir={{basedir}}
 
+- name: cleanup 
+  file: dest={{item}} state=absent
+  with_items:
+    - "{{basedir}}/superuser.py"
+    - /tmp/get-pip.py
+  ignore_errors: true

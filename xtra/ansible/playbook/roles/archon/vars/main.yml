@@ -9,5 +9,5 @@ database_pass: 1234Qwer
 database_port: 3306
 
 #git repo
-repo_url : https://github.com/HyechurnJang/archon.git
+repo_url : https://github.com/CiscoKorea/archon.git
 branch_name: master
