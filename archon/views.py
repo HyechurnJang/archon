@@ -34,9 +34,6 @@
 #                                                                              #
 ################################################################################
 
-import shutil
-import settings
-
 from archon import *
 from settings import BASE_DIR, STATIC_DIR
 from .manager import Manager
