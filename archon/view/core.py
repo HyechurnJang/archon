@@ -238,7 +238,7 @@ class FORM(TAG):
     def __init__(self, **attrs): TAG.__init__(self, 'form', **attrs)
 
 class INPUT(TAG):
-        def __init__(self, **attrs): TAG.__init__(self, 'input', **attrs)
+    def __init__(self, **attrs): TAG.__init__(self, 'input', **attrs)
 
 class SELECT(TAG):
     def __init__(self, **attrs): TAG.__init__(self, 'select', **attrs)

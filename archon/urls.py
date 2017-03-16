@@ -52,6 +52,7 @@ Including another URLconf
 
 import re
 import sys
+import shutil
 from django.core.urlresolvers import RegexURLPattern, RegexURLResolver
 from django.conf.urls import url, include
 from django.views.generic import RedirectView
@@ -62,14 +63,15 @@ from django.contrib import admin
 from django.contrib.auth import views as auth_views
 from django.contrib.auth.decorators import login_required
 
-from .settings import ARCHON_APPLICATIONS, ARCHON_LANGUAGE
+from .settings import ARCHON_APPLICATIONS, ARCHON_LANGUAGE, BASE_DIR, STATIC_DIR
 import dashboard
-import logo
+import views
 
 class MainPage:
     
     def __init__(self):
         self.mainpage = loader.get_template('mainpage.html')
+        self.logopage = loader.get_template('logopage.html').render({})
         
     def setAppDesc(self, desc):
         
@@ -105,10 +107,18 @@ class MainPage:
             page_selectors += '</ul>\n'
         for page_name in page_names: pages += '<div id="%s" class="container-fluid page dynpage collapse">%s</div>\n' % (page_name, page_name)
         
+        admin_selectors = [
+            '<li><a class="admin-selector" view="/archon/mapping">MAC & IP</a></li>',
+            '<li class="divider"></li>'
+            '<li><a href="/admin/">Database Tool</a></li>',
+            '<li><a href="/archon/logo">Logo Uploader</a></li>',
+            '<li class="divider"></li>'
+        ]
+        
         self.app_selectors = Template(app_selectors).render(Context())
         self.page_selectors = Template(page_selectors).render(Context())
         self.pages = Template(pages).render(Context())
-        self.admin = Template('<li><a href="/admin/">Admin Tool</a></li><li class="divider"></li>').render(Context())
+        self.admin = Template(''.join(admin_selectors)).render(Context())
         self.user = Template('').render(Context())
 
     @method_decorator(login_required)
@@ -126,15 +136,26 @@ class MainPage:
                                                       'user_menu' : self.user,
                                                       'pages' : self.pages}))
     
+    @method_decorator(login_required)
+    def sendLogoPage(self, request):
+        logo_dir = BASE_DIR + '/' + STATIC_DIR + '/images/'
+        if request.method == 'POST' and 'logo' in request.FILES:
+            logo = request.FILES['logo']
+            with open(logo_dir + 'logo.png', 'wb+') as fd: fd.write(logo.read())
+        elif request.method == 'POST':
+            shutil.copyfile(logo_dir + 'cisco_logo.png', logo_dir + 'logo.png')
+        return HttpResponse(self.logopage)
+    
 mainpage = MainPage()
 
 urlpatterns = [
     url(r'^dashboard/?', dashboard.dashboard),
     url(r'^account/login/?', auth_views.login, {'template_name': 'login.html'}, name='login'),
     url(r'^account/logout/?', auth_views.logout, {'next_page': '/'}, name='logout'),
+    url(r'^archon/logo/?', mainpage.sendLogoPage),
+    url(r'^archon/mapping/?', views.mapping),
     url(r'^admin/?', admin.site.urls),
     url(r'^favicon\.ico', RedirectView.as_view(url='/resources/images/favicon.ico')),
-    url(r'^upload$', logo.upload),
     url(r'^', mainpage.sendMainPage),
 ]
 

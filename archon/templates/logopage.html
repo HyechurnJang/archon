@@ -5,6 +5,10 @@
 <head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta http-equiv="Expires" content="Mon, 06 Jan 1990 00:00:01 GMT">
+	<meta http-equiv="Expires" content="-1">
+	<meta http-equiv="Pragma" content="no-cache">
+	<meta http-equiv="Cache-Control" content="no-cache">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="description" content="Cisco Webkit">
     <meta name="author" content="hyjang@cisco.com">
@@ -53,19 +57,28 @@
     <div id="loginboard">
         <div id="loginpanel" class="panel panel-default">
             <div class="panel-body">
-                <form method="post" action="/upload" enctype="multipart/form-data">
-
-                    <div id="loginlogo">
-                        <img src="/resources/images/logo.png" />
+				<form method="post" action="/archon/logo" enctype="multipart/form-data">
+					<div id="loginlogo">
+                        <img src="/resources/images/logo.png" style="border:1px solid #000;"/>
+                    </div>
+					<strong>Requirements</strong><br/>
+					<small>
+						<ul>
+                      		<li>Transparented PNG file</li>
+                      		<li>Must be width longer than height</li>
+                      		<li>If empty file to make cisco logo</li>
+                      	</ul>
+					</small>
+                    <div class="form-group">
+                        <input type="file" name="logo" style="width:100%;">
                     </div>
                     <div class="form-group">
-                        <label>Logo File(500px X 264px Transparent PNG)</label>
-                        <input type="file" name="logo">
+                    	<button type="submit" class="btn btn-danger" style="width:100%;">Change</button>                    
                     </div>
-                    <div class="form-group">
-                        <button type="submit" class="btn btn-primary" style="float:right;">Upload &amp; Change</button>
-                    </div>
-                </form>
+				</form>
+            </div>
+            <div class="panel-footer">
+            	<a class="btn btn-primary" style="width:100%;" href="/">Back to Main Page</a>
             </div>
         </div>
     </div>

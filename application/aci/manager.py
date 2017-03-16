@@ -222,14 +222,14 @@ class Manager(archon.ManagerAbstraction, acidipy.MultiDomain):
         acidipy.MultiDomain.delDomain(self, domain_name)
         domain.delete()
         return True
-
-    def getHealth(self):
-        return self.healthmon.getHealth()
     
     def initEndpoint(self):
         EndpointTracker.initDatabase()
         for domain_name in self: self[domain_name].eptracker.getInitData()
         
+    def getHealth(self):
+        return self.healthmon.getHealth()
+    
     def getSummary(self, R, M, V):
         return {
             'name' : 'ACI',

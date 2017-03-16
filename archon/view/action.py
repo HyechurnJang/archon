@@ -80,13 +80,31 @@ class POST(DIV):
         )
         return self
     
-    def Select(self, name, label='select', *elems, **attrs):
+    def Select(self, name, label='Select', *elems, **attrs):
         select = SELECT(**TAG.ATTR(attrs, NAME=name, CLASS='form-control ' + self.uuid))
         for elem in elems: select.html(OPTION().html(elem))
         self['elems'].insert(-1,
-            DIV(CLASS='input-group').html(label).html(select)
+            DIV(CLASS='input-group').html(
+                label,
+                select
+            )
         )
         return self
+
+class UPLOAD(FORM):
+    
+    def __init__(self, url, name, label='Select File', submit='Upload', **attrs):
+        self.uuid = TAG.UUID()
+        FORM.__init__(self, **TAG.ATTR(attrs, ID=self.uuid, CLASS='form-inline', method='post'))
+        self.html(
+            DIV(CLASS='input-group').html(
+                SPAN(CLASS='input-group-addon', STYLE='border-color:#337ab7;').html(STRONG().html(label)),
+                INPUT(ID=self.uuid + '-file', TYPE='file', NAME=name, CLASS='form-control', STYLE='border-color:#337ab7;border-right:0px;'),
+                ANCH(CLASS='btn btn-primary', STYLE='display:table-cell;border-radius:0px 5px 5px 0px;', href="javascript:PostFile('%s','%s');" % (self.uuid, url)).html(
+                    ICON('arrow-circle-up'), ' ', submit
+                )
+            )
+        )
     
 class DELETE(ANCH):
 

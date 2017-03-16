@@ -95,9 +95,17 @@ def ep_all(R, M, V):
                     intf = path['dn'].split(dn + '/rscEpToPathEp-')[1]
                     intf = re.sub('(topology/|pod-|protpaths-|paths-|pathep-|\[|\])', '', intf)
             
+            mac_disp = Archon.INV.MAC.Get(mac)
+            if mac_disp != None: mac_disp = mac + ' (%s)' % mac_disp
+            else: mac_disp = mac
+            
+            ip_disp = Archon.INV.IP.Get(ip)
+            if ip_disp != None: ip_disp = ip + ' (%s)' % ip_disp
+            else: ip_disp = ip
+            
             table.Record(domain_name,
-                         GET('/aci/show/endpoint/%s/%s' % (domain_name, dn)).html(mac),
-                         epg_name, intf, encap, ip, nic_type)
+                         GET('/aci/show/endpoint/%s/%s' % (domain_name, dn)).html(mac_disp),
+                         epg_name, intf, encap, ip_disp, nic_type)
     
     #===========================================================================
     # View

@@ -34,8 +34,34 @@
 #                                                                              #
 ################################################################################
 
-from core import TAG, DIV, SPAN, HEAD, PARA, ANCH, LABEL, STRONG, SMALL, IMG, ICON, THEAD, TBODY, TH, TR, TD, TABLE, UL, LI, FORM, INPUT, SELECT, OPTION, BUTTON
-from deco import ROW, COL, STRWRAP, KEYVAL, ALERT, PANEL, COUNTER, INDENT, SECTOR, LISTGROUP, NAV, MODAL, JUMBO, FLIPCLOCK, OVERLAP
-from action import GET, POST, UPLOAD, DELETE
-from chart import CHART, FIGURE, TOPO, GAUGE
+import shutil
+import settings
 
+from archon import *
+from settings import BASE_DIR, STATIC_DIR
+from .manager import Manager
+
+@pageview(Manager)
+def mapping(R, M, V):
+    if R.Method == 'POST' and 'mapper' in R.Data:
+        with open(BASE_DIR + '/' + STATIC_DIR + '/files/macip.xlsx', 'wb+') as fd:
+            fd.write(R.Data['mapper'].read())
+        M.INV.reloadMACIP()
+    
+    mac_table = TABLE.BASIC(V('MAC'), V('Name'))
+    ip_table = TABLE.BASIC(V('IP'), V('Name'))
+    nav = NAV(STYLE='margin-top:10px;')
+    nav.Tab('MAC Mapper', DIV(STYLE='margin-top:5px;').html(mac_table))
+    nav.Tab('IP Mapper', DIV(STYLE='margin-top:5px;').html(ip_table))
+    
+    for mac, name in M.INV.MAC.items(): mac_table.Record(mac, name)
+    for ip, name in M.INV.IP.items(): ip_table.Record(ip, name)
+    
+    V.Page.html(
+        UPLOAD('/archon/mapping', 'mapper', V('Select MAC & IP File'), V('Upload')),
+        ANCH(CLASS='btn btn-success', href='/resources/files/macip.xlsx', STYLE='width:100%;').html(
+            ICON('arrow-circle-down'), ' ', 'Download'
+        ),
+        nav
+    )
+    
