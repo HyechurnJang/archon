@@ -229,12 +229,12 @@ def ep_one(R, M, V):
         if vm_host != None: hstdiv.html(vm_host)
         if hv_host != None: hstdiv.html(hv_host)
     
-    V.Page.html(HEAD(1).html(ep['name']))
     V.Page.html(
+        HEAD(1).html(get_mac_name(ep['name'])),
         HEAD(3).html('Layer 2'),
         HEAD(4).html(ep['mac'] + ' ' + ep['encap']),
         HEAD(3).html('Layer 3'),
-        HEAD(4).html(ep['ip'])
+        HEAD(4).html(get_ip_name(ep['ip']))
     )
     V.Page.html(nav)
     V.Menu.html(BUTTON(CLASS='btn-primary').click('/'.join(R.Path)).html(V('Refresh')))
