@@ -114,3 +114,13 @@ def get_dn_topo(dn):
         if prev_name != None: topo.Edge(prev_name, name)
         prev_name = name
     return topo
+
+def get_ip_name(ip):
+    name = Archon.INV.IP.Get(ip)
+    if name != None: return '%s (%s)' % (ip, name)
+    return ip
+
+def get_mac_name(mac):
+    name = Archon.INV.MAC.Get(mac)
+    if name != None: return '%s (%s)' % (mac, name)
+    return mac

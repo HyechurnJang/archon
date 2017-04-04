@@ -68,8 +68,8 @@ def host_all(R, M, V):
                 os_name, _ = get_host_os(V, host['os'], host['cfgdOs'])
                 for nic in nic_data[domain_name]:
                     if dn2nic in nic['dn']:
-                        ip_data += '<p><small>' + nic['ip'] + ',&nbsp;</small></p>'
-                        mac_data += '<p><small>' + nic['mac'] + ',&nbsp;</small></p>'
+                        ip_data += '<p><small>' + get_ip_name(nic['ip']) + ',&nbsp;</small></p>'
+                        mac_data += '<p><small>' + get_mac_name(nic['mac']) + ',&nbsp;</small></p>'
                 if host.class_name == 'compPhys':
                     cnt_phy += 1
                     ph_table.Record(oid, host['name'], ip_data, mac_data, os_name, host['state'])
@@ -89,7 +89,7 @@ def host_all(R, M, V):
                             ipmac += '<p>Hypervisor NIC&nbsp;:&nbsp;' + nic['mac'] + '&nbsp;:&nbsp;' + nic['ip'] + '</p>'
                         elif nic.class_name == 'compMgmtNic':
                             ipmac += '<p>Management NIC&nbsp;:&nbsp;' + nic['mac'] + '&nbsp;:&nbsp;' + nic['ip'] + '</p>'
-                hv_table.Record(oid, host['name'], os_name, host['state'], ipmac)
+                hv_table.Record(oid, get_ip_name(host['name']), os_name, host['state'], ipmac)
     
     #===========================================================================
     # View
