@@ -1,5 +1,5 @@
 function UXDataTableBasic(view) {
-	var options = {
+	$("#" + view.attrs.ID).DataTable({
 		scrollX: false,
 		dom: 'Bfrtip',
         lengthMenu: [
@@ -16,8 +16,7 @@ function UXDataTableBasic(view) {
         search: { "regex": false },
         order: view.options.order,
         destroy: true
-	};
-	$("#" + view.attrs.ID).DataTable(options);
+	});
 };
 
 function UXDataTableAsync(view) {
@@ -51,7 +50,7 @@ function UXFlipClock(view) {
 
 function UXJustgage(view) {
 	setTimeout(function() {
-		var g = new JustGage({
+		running_alloc.push(new JustGage({
 			id: view.attrs.ID,
 			title: view.chart.title,
 		    value: view.chart.value,
@@ -69,7 +68,7 @@ function UXJustgage(view) {
 	        },
 	        startAnimationTime: 0,
 	        refreshAnimationTime: 0,
-		});
+		}));
 	}, 0);
 };
 
@@ -81,6 +80,9 @@ function UXDimple(view) {
     if (height == null) { height = "100%"; }
     var svg = dimple.newSvg("#" + view.attrs.ID, width, height);
     var chart = new dimple.chart(svg);
+    running_alloc.push(svg);
+    running_alloc.push(chart);
+    
     chart.setMargins(margin[0], margin[1], margin[2], margin[3]);//"30px", "20px", "20px", "20px");
     
     var xAxis = null;
@@ -412,7 +414,7 @@ var ArborRenderer1 = function(canvas){
 	}
 	var intersect_line_line = function(p1, p2, p3, p4) {
 		var denom = ((p4.y - p3.y)*(p2.x - p1.x) - (p4.x - p3.x)*(p2.y - p1.y));
-		if (denom === 0) return false // lines are parallel
+		if (denom === 0) return false
 		var ua = ((p4.x - p3.x)*(p1.y - p3.y) - (p4.y - p3.y)*(p1.x - p3.x)) / denom;
 		var ub = ((p2.x - p1.x)*(p1.y - p3.y) - (p2.y - p1.y)*(p1.x - p3.x)) / denom;
 		if (ua < 0 || ua > 1 || ub < 0 || ub > 1)  return false
@@ -435,297 +437,6 @@ var ArborRenderer1 = function(canvas){
 	return that
 };
 
-var ArborRenderer2 = function(canvas){
-    var canvas = $(canvas).get(0)
-    var ctx = canvas.getContext("2d");
-    var particleSystem
-
-    var that = {
-      init:function(system){
-        particleSystem = system
-        particleSystem.screenSize(canvas.width, canvas.height) 
-        particleSystem.screenPadding(80)
-        that.initMouseHandling()
-      },
-      redraw:function(){
-        ctx.fillStyle = "white"
-        ctx.fillRect(0,0, canvas.width, canvas.height)
-        particleSystem.eachEdge(function(edge, pt1, pt2){
-          ctx.strokeStyle = "rgba(0,0,0, .333)"
-          ctx.lineWidth = 1
-          ctx.beginPath()
-          ctx.moveTo(pt1.x, pt1.y)
-          ctx.lineTo(pt2.x, pt2.y)
-          ctx.stroke()
-        })
-
-        particleSystem.eachNode(function(node, pt){
-          var w = 10
-          ctx.fillStyle = (node.data.alone) ? "orange" : "black"
-          ctx.fillRect(pt.x-w/2, pt.y-w/2, w,w)
-        })    			
-      },
-      initMouseHandling:function(){
-        var dragged = null;
-        var handler = {
-          clicked:function(e){
-            var pos = $(canvas).offset();
-            _mouseP = arbor.Point(e.pageX-pos.left, e.pageY-pos.top)
-            dragged = particleSystem.nearest(_mouseP);
-            if (dragged && dragged.node !== null){
-              dragged.node.fixed = true
-            }
-            $(canvas).bind('mousemove', handler.dragged)
-            $(window).bind('mouseup', handler.dropped)
-            return false
-          },
-          dragged:function(e){
-            var pos = $(canvas).offset();
-            var s = arbor.Point(e.pageX-pos.left, e.pageY-pos.top)
-            if (dragged && dragged.node !== null){
-              var p = particleSystem.fromScreen(s)
-              dragged.node.p = p
-            }
-            return false
-          },
-          dropped:function(e){
-            if (dragged===null || dragged.node===undefined) return
-            if (dragged.node !== null) dragged.node.fixed = false
-            dragged.node.tempMass = 1000
-            dragged = null
-            $(canvas).unbind('mousemove', handler.dragged)
-            $(window).unbind('mouseup', handler.dropped)
-            _mouseP = null
-            return false
-          }
-        }
-        $(canvas).mousedown(handler.clicked);
-      },
-    }
-    return that
-  }    
-
-var ArborRenderer3 = function(elt){
-    var dom = $(elt)
-    var canvas = dom.get(0)
-    var ctx = canvas.getContext("2d");
-    var gfx = arbor.Graphics(canvas)
-    var sys = null
-
-    var _vignette = null
-    var selected = null,
-        nearest = null,
-        _mouseP = null;
-
-    
-    var that = {
-      init:function(pSystem){
-        sys = pSystem
-        sys.screen({size:{width:dom.width(), height:dom.height()},
-                    padding:[36,60,36,60]})
-
-        $(window).resize(that.resize)
-        that.resize()
-        that._initMouseHandling()
-
-        if (document.referrer.match(/echolalia|atlas|halfviz/)){
-          that.switchSection('demos')
-        }
-      },
-      resize:function(){
-        canvas.width = $(window).width()
-        canvas.height = .75* $(window).height()
-        sys.screen({size:{width:canvas.width, height:canvas.height}})
-        _vignette = null
-        that.redraw()
-      },
-      redraw:function(){
-        gfx.clear()
-        sys.eachEdge(function(edge, p1, p2){
-          if (edge.source.data.alpha * edge.target.data.alpha == 0) return
-          gfx.line(p1, p2, {stroke:"#b2b19d", width:2, alpha:edge.target.data.alpha})
-        })
-        sys.eachNode(function(node, pt){
-          var w = Math.max(20, 20+gfx.textWidth(node.name) )
-          if (node.data.alpha===0) return
-          if (node.data.shape=='dot'){
-            gfx.oval(pt.x-w/2, pt.y-w/2, w, w, {fill:node.data.color, alpha:node.data.alpha})
-            gfx.text(node.name, pt.x, pt.y+7, {color:"white", align:"center", font:"Arial", size:12})
-            gfx.text(node.name, pt.x, pt.y+7, {color:"white", align:"center", font:"Arial", size:12})
-          }else{
-            gfx.rect(pt.x-w/2, pt.y-8, w, 20, 4, {fill:node.data.color, alpha:node.data.alpha})
-            gfx.text(node.name, pt.x, pt.y+9, {color:"white", align:"center", font:"Arial", size:12})
-            gfx.text(node.name, pt.x, pt.y+9, {color:"white", align:"center", font:"Arial", size:12})
-          }
-        })
-        that._drawVignette()
-      },
-      
-      _drawVignette:function(){
-        var w = canvas.width
-        var h = canvas.height
-        var r = 20
-
-        if (!_vignette){
-          var top = ctx.createLinearGradient(0,0,0,r)
-          top.addColorStop(0, "#e0e0e0")
-          top.addColorStop(.7, "rgba(255,255,255,0)")
-
-          var bot = ctx.createLinearGradient(0,h-r,0,h)
-          bot.addColorStop(0, "rgba(255,255,255,0)")
-          bot.addColorStop(1, "white")
-
-          _vignette = {top:top, bot:bot}
-        }
-        
-        // top
-        ctx.fillStyle = _vignette.top
-        ctx.fillRect(0,0, w,r)
-
-        // bot
-        ctx.fillStyle = _vignette.bot
-        ctx.fillRect(0,h-r, w,r)
-      },
-
-      switchMode:function(e){
-        if (e.mode=='hidden'){
-          dom.stop(true).fadeTo(e.dt,0, function(){
-            if (sys) sys.stop()
-            $(this).hide()
-          })
-        }else if (e.mode=='visible'){
-          dom.stop(true).css('opacity',0).show().fadeTo(e.dt,1,function(){
-            that.resize()
-          })
-          if (sys) sys.start()
-        }
-      },
-      
-      switchSection:function(newSection){
-        var parent = sys.getEdgesFrom(newSection)[0].source
-        var children = $.map(sys.getEdgesFrom(newSection), function(edge){
-          return edge.target
-        })
-        
-        sys.eachNode(function(node){
-          if (node.data.shape=='dot') return // skip all but leafnodes
-
-          var nowVisible = ($.inArray(node, children)>=0)
-          var newAlpha = (nowVisible) ? 1 : 0
-          var dt = (nowVisible) ? .5 : .5
-          sys.tweenNode(node, dt, {alpha:newAlpha})
-
-          if (newAlpha==1){
-            node.p.x = parent.p.x + .05*Math.random() - .025
-            node.p.y = parent.p.y + .05*Math.random() - .025
-            node.tempMass = .001
-          }
-        })
-      },
-      
-      
-      _initMouseHandling:function(){
-        // no-nonsense drag and drop (thanks springy.js)
-        selected = null;
-        nearest = null;
-        var dragged = null;
-        var oldmass = 1
-
-        var _section = null
-
-        var handler = {
-          moved:function(e){
-            var pos = $(canvas).offset();
-            _mouseP = arbor.Point(e.pageX-pos.left, e.pageY-pos.top)
-            nearest = sys.nearest(_mouseP);
-
-            if (!nearest.node) return false
-
-            if (nearest.node.data.shape!='dot'){
-              selected = (nearest.distance < 50) ? nearest : null
-              if (selected){
-                 dom.addClass('linkable')
-                 window.status = selected.node.data.link.replace(/^\//,"http://"+window.location.host+"/").replace(/^#/,'')
-              }
-              else{
-                 dom.removeClass('linkable')
-                 window.status = ''
-              }
-            }else if ($.inArray(nearest.node.name, ['arbor.js','code','docs','demos']) >=0 ){
-              if (nearest.node.name!=_section){
-                _section = nearest.node.name
-                that.switchSection(_section)
-              }
-              dom.removeClass('linkable')
-              window.status = ''
-            }
-            
-            return false
-          },
-          clicked:function(e){
-            var pos = $(canvas).offset();
-            _mouseP = arbor.Point(e.pageX-pos.left, e.pageY-pos.top)
-            nearest = dragged = sys.nearest(_mouseP);
-            
-            if (nearest && selected && nearest.node===selected.node){
-              var link = selected.node.data.link
-              if (link.match(/^#/)){
-                 $(that).trigger({type:"navigate", path:link.substr(1)})
-              }else{
-                 window.location = link
-              }
-              return false
-            }
-            
-            
-            if (dragged && dragged.node !== null) dragged.node.fixed = true
-
-            $(canvas).unbind('mousemove', handler.moved);
-            $(canvas).bind('mousemove', handler.dragged)
-            $(window).bind('mouseup', handler.dropped)
-
-            return false
-          },
-          dragged:function(e){
-            var old_nearest = nearest && nearest.node._id
-            var pos = $(canvas).offset();
-            var s = arbor.Point(e.pageX-pos.left, e.pageY-pos.top)
-
-            if (!nearest) return
-            if (dragged !== null && dragged.node !== null){
-              var p = sys.fromScreen(s)
-              dragged.node.p = p
-            }
-
-            return false
-          },
-
-          dropped:function(e){
-            if (dragged===null || dragged.node===undefined) return
-            if (dragged.node !== null) dragged.node.fixed = false
-            dragged.node.tempMass = 1000
-            dragged = null;
-            // selected = null
-            $(canvas).unbind('mousemove', handler.dragged)
-            $(window).unbind('mouseup', handler.dropped)
-            $(canvas).bind('mousemove', handler.moved);
-            _mouseP = null
-            return false
-          }
-
-
-        }
-
-        $(canvas).mousedown(handler.clicked);
-        $(canvas).mousemove(handler.moved);
-
-      }
-    }
-    
-    return that
-  }
-
-
 function UXArbor(view) {
 	var canvas = $("#" + view.attrs.ID);
 	if (view.topo.options.width == 0) { canvas.attr("width", window.innerWidth - 50); }
@@ -733,11 +444,10 @@ function UXArbor(view) {
 	if (view.topo.options.height == 0) { canvas.attr("height", window.innerHeight - 200); }
 	else { canvas.attr("height", view.topo.options.height); }
 	var sys = arbor.ParticleSystem();
+	running_alloc.push(sys);
 	sys.screenSize(window.innerWidth);
 	sys.parameters({gravity:true, stiffness:300});
-	
-	sys.renderer = ArborRenderer1("#" + view.attrs.ID);
-	
+	sys.renderer = ArborRenderer("#" + view.attrs.ID);
 	setTimeout(function() {
 		sys.graft(view.topo.datasets);
 	}, 0);
