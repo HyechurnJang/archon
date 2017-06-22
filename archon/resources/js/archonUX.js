@@ -292,7 +292,7 @@ function UXPeity(view) {
 	};
 };
 
-var ArborRenderer1 = function(canvas){
+var ArborRenderer = function(canvas){
 	var canvas = $(canvas).get(0)
 	var ctx = canvas.getContext("2d");
 	var gfx = arbor.Graphics(canvas)
