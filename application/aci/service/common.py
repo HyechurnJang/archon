@@ -127,6 +127,12 @@ def get_mac_name(mac):
     if name != None: return '%s (%s)' % (mac, name)
     return mac
 
+def set_ip_name(ip, name):
+    Archon.INV.IP[ip] = name
+    
+def set_mac_name(mac, name):
+    Archon.INV.MAC[mac.upper()] = name
+
 def is_ip_addr(ip):
     kv = re.match('\s*(?P<ip>\d\d?\d?\.\d\d?\d?\.\d\d?\d?\.\d\d?\d?)', ip)
     if kv != None: return kv.group('ip')
@@ -149,3 +155,6 @@ def get_ip_range(ip_stt, ip_end):
             else: break
         return ret
     return []
+
+def get_comma_to_list(text):
+    return re.sub(',\s+', ',', text).split(',')

@@ -200,16 +200,26 @@ def epg_one(R, M, V):
             ips = get_ip_range(R.Data['ip_stt'], R.Data['ip_end'])
             idx = 0
             uip_name_base = str(int(time.time()))
-            uip_desc = R.Data['desc']
+            uip_descs = get_comma_to_list(R.Data['desc'])
+            uip_desc_len = len(uip_descs)
+            if uip_descs[-1] == '' and uip_desc_len > 1:
+                uip_desc_def = uip_descs[-2]
+                uip_desc_len -= 1
+            else: uip_desc_def = ''
             
             for ip in ips:
                 uip = crtrn.Class('fvIpAttr')
                 uip.class_pkey = 'name'
                 uip.class_ident = '/ipattr-%s'
                 uip_name = '%s%d' % (uip_name_base, idx)
+                if uip_desc_len > idx: uip_desc = uip_descs[idx]
+                else: uip_desc = uip_desc_def
                 idx += 1
                 try: uip.create(name=uip_name, ip='%s/32' % ip, usefvSubnet='no', descr=uip_desc)
                 except: pass
+                else:
+                    if uip_desc != '':
+                        set_ip_name(ip, uip_desc)
         
         uepg_view = DIV()
         nav.Tab(V('IP Mobility'), uepg_view)
