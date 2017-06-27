@@ -218,8 +218,7 @@ def epg_one(R, M, V):
                 try: uip.create(name=uip_name, ip='%s/32' % ip, usefvSubnet='no', descr=uip_desc)
                 except: pass
                 else:
-                    if uip_desc != '':
-                        set_ip_name(ip, uip_desc)
+                    if uip_desc != '': set_ip_name(ip, uip_desc)
         
         uepg_view = DIV()
         nav.Tab(V('IP Mobility'), uepg_view)
@@ -242,7 +241,11 @@ def epg_one(R, M, V):
         datas = crtrn.Class('fvIpAttr').list(detail=True)
         for data in datas:
             uip_desc = data['descr'].decode('unicode_escape')
-            table.Record(data['ip'].split('/')[0], uip_desc, data['usefvSubnet'])
+            uip_ip = data['ip'].split('/')[0]
+            table.Record(uip_ip, uip_desc, data['usefvSubnet'])
+            if uip_desc != '': set_ip_name(uip_ip, uip_desc)
+            
+            
 
     #===========================================================================
     # View
