@@ -226,13 +226,13 @@ def epg_one(R, M, V):
         uepg_in = POST('/aci/show/epgroup/%s/%s' % (domain_name, dn), CLASS='btn-primary', STYLE='float:right;')
         uepg_in.Text('ip_stt', POST.LABEL_INLINE(V('IP Start'), STYLE='width:100px;'))
         uepg_in.Text('ip_end', POST.LABEL_INLINE(V('IP End'), STYLE='width:100px;'))
-        uepg_in.Text('desc', POST.LABEL_INLINE(V('Description'), STYLE='width:100px;'))
+        uepg_in.Text('desc', POST.LABEL_INLINE(V('Department/User'), STYLE='width:100px;'))
         uepg_view.html(
             HEAD(4).html(V('Register IPs')),
             DIV(STYLE='padding-top:5px;').html(uepg_in)
         )
         
-        table = TABLE.BASIC(V('IP'), V('Description'), V('Use EPG Subnet'))
+        table = TABLE.BASIC(V('IP'), V('Department/User'), V('Use EPG Subnet'))
         uepg_view.html(
             HEAD(4).html(V('Mobility IPs')),
             DIV(STYLE='padding-top:5px;').html(table)
