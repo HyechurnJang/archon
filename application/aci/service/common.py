@@ -34,6 +34,8 @@
 #                                                                              #
 ################################################################################
 
+import re
+import ipaddress
 from archon import *
 
 def get_host_type(V, t):
@@ -124,3 +126,26 @@ def get_mac_name(mac):
     name = Archon.INV.MAC.Get(mac)
     if name != None: return '%s (%s)' % (mac, name)
     return mac
+
+def is_ip_addr(ip):
+    kv = re.match('\s*(?P<ip>\d\d?\d?\.\d\d?\d?\.\d\d?\d?\.\d\d?\d?)', ip)
+    if kv != None: return kv.group('ip')
+    return ''
+
+def get_ip_range(ip_stt, ip_end):
+    ip_stt = is_ip_addr(ip_stt)
+    ip_end = is_ip_addr(ip_end)
+    if ip_stt != '':
+        if ip_end == '': return [ip_stt]
+        ip_stt = ipaddress.ip_address(unicode(ip_stt))
+        ip_end = ipaddress.ip_address(unicode(ip_end))
+        if ip_stt >= ip_end: return [str(ip_stt)]
+        i = 0
+        ret = []
+        while True:
+            _tmp = ip_stt + i
+            i += 1
+            if _tmp <= ip_end: ret.append(str(_tmp))
+            else: break
+        return ret
+    return []

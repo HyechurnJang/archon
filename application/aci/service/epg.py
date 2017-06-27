@@ -34,6 +34,7 @@
 #                                                                              #
 ################################################################################
 
+import time
 from archon import *
 from common import *
 
@@ -83,6 +84,7 @@ def epg_all(R, M, V):
     V.Menu.html(BUTTON(CLASS='btn-primary').click('/'.join(R.Path)).html(V('Refresh')))
 
 def epg_one(R, M, V):
+    
     #===========================================================================
     # Get Data
     #===========================================================================
@@ -190,6 +192,47 @@ def epg_one(R, M, V):
                     DIV(STYLE='padding-left:22px;').html(data['name'])
                 )
             )
+    if epg['isAttrBasedEPg'] == 'yes':
+        
+        crtrn = epg.Class('fvCrtrn').list()[0]
+        
+        if R.Method == 'POST':
+            ips = get_ip_range(R.Data['ip_stt'], R.Data['ip_end'])
+            idx = 0
+            uip_name_base = str(int(time.time()))
+            uip_desc = R.Data['desc']
+            
+            for ip in ips:
+                uip = crtrn.Class('fvIpAttr')
+                uip.class_pkey = 'name'
+                uip.class_ident = '/ipattr-%s'
+                uip_name = '%s%d' % (uip_name_base, idx)
+                idx += 1
+                try: uip.create(name=uip_name, ip='%s/32' % ip, usefvSubnet='no', descr=uip_desc)
+                except: pass
+        
+        uepg_view = DIV()
+        nav.Tab(V('IP Mobility'), uepg_view)
+        
+        uepg_in = POST('/aci/show/epgroup/%s/%s' % (domain_name, dn), CLASS='btn-primary', STYLE='float:right;')
+        uepg_in.Text('ip_stt', POST.LABEL_INLINE(V('IP Start'), STYLE='width:100px;'))
+        uepg_in.Text('ip_end', POST.LABEL_INLINE(V('IP End'), STYLE='width:100px;'))
+        uepg_in.Text('desc', POST.LABEL_INLINE(V('Description'), STYLE='width:100px;'))
+        uepg_view.html(
+            HEAD(4).html(V('Register IPs')),
+            DIV(STYLE='padding-top:5px;').html(uepg_in)
+        )
+        
+        table = TABLE.BASIC(V('IP'), V('Description'), V('Use EPG Subnet'))
+        uepg_view.html(
+            HEAD(4).html(V('Mobility IPs')),
+            DIV(STYLE='padding-top:5px;').html(table)
+        )
+        
+        datas = crtrn.Class('fvIpAttr').list(detail=True)
+        for data in datas:
+            uip_desc = data['descr'].decode('unicode_escape')
+            table.Record(data['ip'].split('/')[0], uip_desc, data['usefvSubnet'])
 
     #===========================================================================
     # View
