@@ -117,6 +117,14 @@ def get_dn_topo(dn):
         prev_name = name
     return topo
 
+def is_ip_name(ip):
+    if Archon.INV.IP.Get(ip) != None: return True
+    return False
+
+def is_mac_name(mac):
+    if Archon.INV.MAC.Get(mac) != None: return True
+    return False
+
 def get_ip_name(ip):
     name = Archon.INV.IP.Get(ip)
     if name != None: return '%s (%s)' % (ip, name)

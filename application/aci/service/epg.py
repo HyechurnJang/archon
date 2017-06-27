@@ -243,9 +243,7 @@ def epg_one(R, M, V):
             uip_desc = data['descr'].decode('unicode_escape')
             uip_ip = data['ip'].split('/')[0]
             table.Record(uip_ip, uip_desc, data['usefvSubnet'])
-            if uip_desc != '': set_ip_name(uip_ip, uip_desc)
-            
-            
+            if uip_desc != '' and get_ip_name(uip_ip) != uip_desc: set_ip_name(uip_ip, uip_desc)
 
     #===========================================================================
     # View
