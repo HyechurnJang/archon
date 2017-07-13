@@ -2,8 +2,10 @@ var page_current = null;
 var url_current = null;
 
 var sched_id = null;
-var sched_msec = 10000;
+var sched_msec = 30000;
 var sched_toggle = false;
+
+var running_alloc = new Array();
 
 function GetCookie(c_name)
 {
@@ -35,6 +37,7 @@ function SetSchedBtnOff() {
 function Scheduler(id) {
 	if (sched_toggle == true && sched_id == id && url_current != null) {
 		var start = new Date().getTime();
+		while (running_alloc.length != 0) { delete running_alloc.pop(); };
 		$.ajax({
 			type: "GET",
 			url: url_current,
@@ -95,6 +98,7 @@ $(document).ready(function() {
 		dynpages.collapse("hide");
 		dynpages.html(null);
 		loading_page.collapse("show");
+		while (running_alloc.length != 0) { delete running_alloc.pop(); };
 		$.ajax({
 			url : "/dashboard/",
 			dataType : "json",
@@ -145,6 +149,7 @@ $(document).ready(function() {
 		dynpages.collapse("hide");
 		dynpages.html(null);
 		loading_page.collapse("show");
+		while (running_alloc.length != 0) { delete running_alloc.pop(); };
 		$.ajax({
 			url : url,
 			dataType : "json",
@@ -191,6 +196,7 @@ $(document).ready(function() {
 		dynpages.collapse("hide");
 		dynpages.html(null);
 		loading_page.collapse("show");
+		while (running_alloc.length != 0) { delete running_alloc.pop(); };
 		$.ajax({
 			url : url,
 			dataType : "json",
@@ -229,6 +235,7 @@ function GetData(url) {
 	var subject_page = $("#subject-page");
 	dynpages.fadeOut(350);
 	dynpages.collapse("hide");
+	while (running_alloc.length != 0) { delete running_alloc.pop(); };
 	$.ajax({
 		type: "GET",
 		url: url,
@@ -263,6 +270,7 @@ function PostData(uuid, url) {
 	});
 	dynpages.fadeOut(350);
 	dynpages.collapse("hide");
+	while (running_alloc.length != 0) { delete running_alloc.pop(); };
 	$.ajax({
 		type: "POST",
 		url: url,
@@ -297,6 +305,7 @@ function PostFile(uuid, url) {
 	form.append(finput.attr("NAME"), finput[0].files[0]);
 	dynpages.fadeOut(350);
 	dynpages.collapse("hide");
+	while (running_alloc.length != 0) { delete running_alloc.pop(); };
 	$.ajax({
 		type: "POST",
 		url: url,
@@ -329,6 +338,7 @@ function DeleteData(url) {
 	var subject_page = $("#subject-page");
 	dynpages.fadeOut(350);
 	dynpages.collapse("hide");
+	while (running_alloc.length != 0) { delete running_alloc.pop(); };
 	$.ajax({
 		type: "DELETE",
 		url: url,

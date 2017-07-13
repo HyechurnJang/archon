@@ -34,6 +34,8 @@
 #                                                                              #
 ################################################################################
 
+import re
+import ipaddress
 from archon import *
 
 def get_host_type(V, t):
@@ -114,3 +116,53 @@ def get_dn_topo(dn):
         if prev_name != None: topo.Edge(prev_name, name)
         prev_name = name
     return topo
+
+def is_ip_name(ip):
+    if Archon.INV.IP.Get(ip) != None: return True
+    return False
+
+def is_mac_name(mac):
+    if Archon.INV.MAC.Get(mac) != None: return True
+    return False
+
+def get_ip_name(ip):
+    name = Archon.INV.IP.Get(ip)
+    if name != None: return '%s (%s)' % (ip, name)
+    return ip
+
+def get_mac_name(mac):
+    name = Archon.INV.MAC.Get(mac)
+    if name != None: return '%s (%s)' % (mac, name)
+    return mac
+
+def set_ip_name(ip, name):
+    Archon.INV.IP[ip] = name
+    
+def set_mac_name(mac, name):
+    Archon.INV.MAC[mac.upper()] = name
+
+def is_ip_addr(ip):
+    kv = re.match('\s*(?P<ip>\d\d?\d?\.\d\d?\d?\.\d\d?\d?\.\d\d?\d?)', ip)
+    if kv != None: return kv.group('ip')
+    return ''
+
+def get_ip_range(ip_stt, ip_end):
+    ip_stt = is_ip_addr(ip_stt)
+    ip_end = is_ip_addr(ip_end)
+    if ip_stt != '':
+        if ip_end == '': return [ip_stt]
+        ip_stt = ipaddress.ip_address(unicode(ip_stt))
+        ip_end = ipaddress.ip_address(unicode(ip_end))
+        if ip_stt >= ip_end: return [str(ip_stt)]
+        i = 0
+        ret = []
+        while True:
+            _tmp = ip_stt + i
+            i += 1
+            if _tmp <= ip_end: ret.append(str(_tmp))
+            else: break
+        return ret
+    return []
+
+def get_comma_to_list(text):
+    return re.sub(',\s+', ',', text).split(',')

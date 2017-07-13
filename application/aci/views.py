@@ -250,9 +250,8 @@ def tenant(R, M, V):
 @pageview(Manager)
 def epg(R, M, V):
     if not M: V.Page.html(ALERT(V('Info'), V('Non-exist APIC Connection'), CLASS='alert-info')); return
-    if R.Method == 'GET':
-        if len(R.Path) > 3: epg_one(R, M, V)
-        else: epg_all(R, M, V)
+    if len(R.Path) > 3: epg_one(R, M, V)
+    else: epg_all(R, M, V)
     
 @pageview(Manager)
 def endpoint(R, M, V):

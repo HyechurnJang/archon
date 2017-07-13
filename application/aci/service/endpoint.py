@@ -95,17 +95,9 @@ def ep_all(R, M, V):
                     intf = path['dn'].split(dn + '/rscEpToPathEp-')[1]
                     intf = re.sub('(topology/|pod-|protpaths-|paths-|pathep-|\[|\])', '', intf)
             
-            mac_disp = Archon.INV.MAC.Get(mac)
-            if mac_disp != None: mac_disp = mac + ' (%s)' % mac_disp
-            else: mac_disp = mac
-            
-            ip_disp = Archon.INV.IP.Get(ip)
-            if ip_disp != None: ip_disp = ip + ' (%s)' % ip_disp
-            else: ip_disp = ip
-            
             table.Record(domain_name,
-                         GET('/aci/show/endpoint/%s/%s' % (domain_name, dn)).html(mac_disp),
-                         epg_name, intf, encap, ip_disp, nic_type)
+                         GET('/aci/show/endpoint/%s/%s' % (domain_name, dn)).html(get_mac_name(mac)),
+                         epg_name, intf, encap, get_ip_name(ip), nic_type)
     
     #===========================================================================
     # View
@@ -237,12 +229,12 @@ def ep_one(R, M, V):
         if vm_host != None: hstdiv.html(vm_host)
         if hv_host != None: hstdiv.html(hv_host)
     
-    V.Page.html(HEAD(1).html(ep['name']))
     V.Page.html(
+        HEAD(1).html(get_mac_name(ep['name'])),
         HEAD(3).html('Layer 2'),
         HEAD(4).html(ep['mac'] + ' ' + ep['encap']),
         HEAD(3).html('Layer 3'),
-        HEAD(4).html(ep['ip'])
+        HEAD(4).html(get_ip_name(ep['ip']))
     )
     V.Page.html(nav)
     V.Menu.html(BUTTON(CLASS='btn-primary').click('/'.join(R.Path)).html(V('Refresh')))
